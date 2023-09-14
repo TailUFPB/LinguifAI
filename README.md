@@ -21,16 +21,22 @@ Primeiramente, instale as depencencias:
 
 ```bash
 yarn
+# ou
+npm install
 ```
 
 Após a conclusão da instalação, crie uma build para produção do front-end:
 
 ```bash
 yarn build
+# ou
+npm build
 ```
 
 Por fim inicie o electron:
 
 ```bash
 yarn electron
+# ou
+npm electron
 ```
