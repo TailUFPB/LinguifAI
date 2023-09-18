@@ -4,7 +4,6 @@ import LoadingScreen from "../pages/loadingScreen";
 
 const Loadable = (Component: ElementType) => (props: any) => {
   // Adiciona carregamento
-  const { pathname } = useLocation();
 
   return (
     <Suspense fallback={<LoadingScreen />}>
