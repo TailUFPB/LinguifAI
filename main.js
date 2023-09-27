@@ -17,6 +17,8 @@ function createWindow() {
   const win = new BrowserWindow({
     width: 800,
     height: 600,
+    show: false, // Ocultar a janela até que esteja pronta
+    //fullscreen: true,
   });
   //win.loadURL("http://localhost:3000/"); // carrega a página hospedada localmente
   win.loadFile(path.join(__dirname, "./build/index.html")); // carrega a build do react
@@ -32,7 +34,13 @@ function createWindow() {
 
   */
 
-  mainWindow.webContents.openDevTools();
+  // Quando a janela estiver pronta, maximize-a
+  win.once("ready-to-show", () => {
+    win.maximize();
+    win.show();
+  });
+
+  win.webContents.openDevTools();
 
   win.on("close", () => {
     processes.forEach(function (proc) {
