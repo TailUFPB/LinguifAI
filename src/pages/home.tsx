@@ -13,7 +13,12 @@ export default function Home() {
             className="w-full bg-main-dark border-2 border-main-lighter text-white py-2 px-4 placeholder-gray-300 rounded-3xl h-48 resize-none"
             placeholder="Insira o texto aqui..."
           />
-          <Icon icon="material-symbols:upload-rounded" />
+          <Icon
+            icon="material-symbols:upload-rounded"
+            className="absolute text-white left-1/2 transform -translate-x-1/2"
+            width="50"
+            style={{ bottom: "20%" }}
+          />
         </div>
 
         <div className="w-1/3 relative mx-auto mt-24">
