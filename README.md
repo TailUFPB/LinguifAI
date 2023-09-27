@@ -40,3 +40,12 @@ yarn electron
 # ou
 npm electron
 ```
+
+### To-do
+
+- [ ] Abrir CSV
+- [ ] Exibir Preview de N linhas do CSV
+- [ ] Escolher colunas de entrada
+- [ ] Selecionar classificador e enviar dados
+- [ ] Exibir resultado do classificador
+- [ ] Exportar resultado em csv?
