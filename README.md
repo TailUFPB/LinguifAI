@@ -43,7 +43,9 @@ npm electron
 
 ### To-do
 
-- [ ] Abrir CSV
+#### 🚀 Sprint 1
+
+- [x] Abrir CSV
 - [ ] Exibir Preview de N linhas do CSV
 - [ ] Escolher colunas de entrada
 - [ ] Selecionar classificador e enviar dados
