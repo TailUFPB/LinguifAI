@@ -1,10 +1,10 @@
-import { Icon } from "@iconify/react";
-import { Button } from "@mui/material";
-import { ChangeEvent, useState } from "react";
+import { useState } from "react";
 import { SelectFileCard } from "../components/selectFileCard/selectFileCard";
 
 export default function Home() {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+
+  const [data, setData] = useState<any[][]>([]);
 
   return (
     <div className="bg-main-darker text-white min-h-screen flex flex-col">
@@ -13,10 +13,14 @@ export default function Home() {
           Linguif<span className="text-main-light">AI</span>
         </h1>
 
-        <SelectFileCard
-          selectedFile={selectedFile}
-          setSelectedFile={setSelectedFile}
-        />
+        {
+          <SelectFileCard
+            selectedFile={selectedFile}
+            setSelectedFile={setSelectedFile}
+            setData={setData}
+            data={data}
+          />
+        }
 
         <div className="w-1/3 relative mx-auto mt-24">
           <select className="w-full bg-main-dark border-2 border-main-lighter rounded-3xl py-2 px-4 hover:bg-main-darker text-white focus:outline-none h-14">
