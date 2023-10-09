@@ -1,4 +1,5 @@
 import pandas as pd
+import NbNewsModel
 from io import BytesIO
 #mais imports
 
@@ -10,6 +11,9 @@ class DataProcesser():
         self.df = df
 
     def nb_news_application(self):
-        pass
+        nb_model = NbNewsModel(self.df)
+        df_result = nb_model.filter_and_classify()
+        return df_result
+        
 
     ##TODO métodos com o processamento de classificação
