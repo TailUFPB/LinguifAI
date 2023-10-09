@@ -9,4 +9,7 @@ class DataProcesser():
         df = pd.read_csv(bytes_io)
         self.df = df
 
+    def nb_news_application(self):
+        pass
+
     ##TODO métodos com o processamento de classificação

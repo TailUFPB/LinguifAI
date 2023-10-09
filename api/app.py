@@ -32,6 +32,9 @@ def upload_file():
     except Exception as e:
         return jsonify({'status_code': -1, 'error': str(e)})
 
+@app.route('/nb-news-model', methods=["POST"])
+def news_model():
+    pass
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
