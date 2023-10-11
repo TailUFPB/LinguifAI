@@ -8,6 +8,8 @@ interface props {
   setSelectedFile: (file: File | null) => void;
   setData: (data: any[][]) => void;
   data: any[][];
+  header: string[];
+  setHeader: (header: string[]) => void;
 }
 
 export function SelectFileCard({
@@ -15,6 +17,8 @@ export function SelectFileCard({
   setSelectedFile,
   setData,
   data,
+  header,
+  setHeader,
 }: props) {
   const [isDragging, setIsDragging] = useState<boolean>(false);
 
@@ -34,7 +38,7 @@ export function SelectFileCard({
         });
 
         console.log("Upload do arquivo feito");
-        console.log(response)
+        console.log(response);
       } catch (error) {
         console.error("Erro no upload de arquivo: ", error);
       }
@@ -55,6 +59,7 @@ export function SelectFileCard({
           });
 
           setData(data);
+          setHeader(chaves);
         },
       });
     } else {
@@ -115,7 +120,7 @@ export function SelectFileCard({
           )}
 
           {data.length > 0 && (
-            <CsvTable data={data.slice(1, 5)} head={data[0]} />
+            <CsvTable data={data.slice(1, 5)} head={header} />
           )}
 
           <button

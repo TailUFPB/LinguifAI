@@ -5,6 +5,7 @@ export default function Home() {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
   const [data, setData] = useState<any[][]>([]);
+  const [header, setHeader] = useState<string[]>([]);
 
   return (
     <div className="bg-main-darker text-white min-h-screen flex flex-col">
@@ -19,10 +20,24 @@ export default function Home() {
             setSelectedFile={setSelectedFile}
             setData={setData}
             data={data}
+            setHeader={setHeader}
+            header={header}
           />
         }
 
         <div className="w-1/3 relative mx-auto mt-24">
+          <select className="w-full bg-main-dark border-2 border-main-lighter rounded-3xl py-2 px-4 hover:bg-main-darker text-white focus:outline-none h-14">
+            <option value="" disabled selected className="placeholder-gray-300">
+              Selecione a coluna de entrada
+            </option>
+            {header.length > 0 &&
+              header.map((column: string, index: number) => {
+                return <option value={index}>{column}</option>;
+              })}
+          </select>
+        </div>
+
+        <div className="w-1/3 relative mx-auto mt-10">
           <select className="w-full bg-main-dark border-2 border-main-lighter rounded-3xl py-2 px-4 hover:bg-main-darker text-white focus:outline-none h-14">
             <option value="" disabled selected className="placeholder-gray-300">
               Selecione um classificador
