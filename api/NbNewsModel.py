@@ -18,9 +18,9 @@ nltk.download('stopwords')
 stopwords = nltk.corpus.stopwords.words('english')
 
 class NbNewsModel():
-    
+
     def __init__(self, df):
-        self.dataframe = df
+        self.df = df
 
     def filter_and_classify(self):
         # Encontrando a contagem de ocorrências de cada categoria
@@ -46,9 +46,8 @@ class NbNewsModel():
             lista_palavras = row['tokenizado']
             for palavra in lista_palavras:
                 self.contagem_palavras_por_categoria[categoria][palavra] += 1
-        self.contagem_palavras_por_categoria['STYLE']
 
-
+        #self.contagem_palavras_por_categoria['STYLE']
 
         self.num_palavras_por_categoria = defaultdict(int)
         for idx, row in self.df_filtrado.iterrows():
@@ -62,15 +61,11 @@ class NbNewsModel():
 
         return result
 
-
     def tokenize(self, x):
         texto = re.sub(r'\d+', '', x) #Removendo números
         texto = re.sub(r'[^\w\s]', '', texto) #Removendo pontuação
         tokens = word_tokenize(texto)
         return [word for word in tokens if word not in stopwords] #Removendo stopwords
-        
-
-
 
     def classificando(self, frase):
         proporcoes_por_categoria = {}
@@ -87,5 +82,5 @@ class NbNewsModel():
                     # Caso a palavra não esteja na categoria, você pode assumir um valor padrão (por exemplo, 1.0)
                     resultado *= 1/self.num_palavras_por_categoria[categoria]  # Pode ajustar este valor conforme necessário
             proporcoes_por_categoria[categoria] = resultado
-        
+
         return max(proporcoes_por_categoria, key=proporcoes_por_categoria.get)

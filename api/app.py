@@ -2,6 +2,9 @@ from flask import Flask, jsonify, request
 from flask_cors import CORS
 from DataProcesser import DataProcesser
 import os
+import nltk
+import json
+nltk.download('wordnet')
 
 app = Flask(__name__)
 CORS(app)  # Permite todas as origens por padrão (não recomendado para produção)
@@ -34,7 +37,14 @@ def upload_file():
 
 @app.route('/nb-news-model', methods=["POST"])
 def news_model():
-    pass
+    result = data_processer.nb_news_application()
+    result_json = result.to_json()
+    return jsonify({"result": result_json})
+
+@app.route('/nb-emotions-model', methods=["POST"])
+def emotions_model():
+    result = data_processer.classify_emotions()
+    return jsonify({"result": result.to_json()})
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
