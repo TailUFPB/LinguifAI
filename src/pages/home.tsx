@@ -22,6 +22,8 @@ export default function Home() {
     let selectedData = data.map((row) => row[selectedColumn]);
 
     console.log(selectedData);
+
+    // aqui a gente usa esse dado para a chamada da api
   };
 
   return (
@@ -71,7 +73,10 @@ export default function Home() {
         </div>
 
         <div className="w-1/4 relative mx-auto mt-10">
-          <button className="w-full bg-main-dark text-white py-2 px-4 hover:bg-main-darker focus:outline-none border-2 border-main-lighter rounded-3xl h-14">
+          <button
+            className="w-full bg-main-dark text-white py-2 px-4 hover:bg-main-darker focus:outline-none border-2 border-main-lighter rounded-3xl h-14"
+            onClick={handleSubmit}
+          >
             Enviar
           </button>
         </div>
