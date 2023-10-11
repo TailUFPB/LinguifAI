@@ -7,6 +7,23 @@ export default function Home() {
   const [data, setData] = useState<any[][]>([]);
   const [header, setHeader] = useState<string[]>([]);
 
+  const [selectedColumn, setSelectedColumn] = useState<number>(0);
+  const [selectedClassifier, setSelectedClassifier] = useState<string>("");
+
+  const handleChangeSelectedColumn = (event: any) => {
+    setSelectedColumn(event.target.value);
+  };
+
+  const handleChangeSelectedClassifier = (event: any) => {
+    setSelectedClassifier(event.target.value);
+  };
+
+  const handleSubmit = async () => {
+    let selectedData = data.map((row) => row[selectedColumn]);
+
+    console.log(selectedData);
+  };
+
   return (
     <div className="bg-main-darker text-white min-h-screen flex flex-col">
       <div className="p-8 text-center font-roboto">
@@ -26,7 +43,10 @@ export default function Home() {
         }
 
         <div className="w-1/3 relative mx-auto mt-24">
-          <select className="w-full bg-main-dark border-2 border-main-lighter rounded-3xl py-2 px-4 hover:bg-main-darker text-white focus:outline-none h-14">
+          <select
+            className="w-full bg-main-dark border-2 border-main-lighter rounded-3xl py-2 px-4 hover:bg-main-darker text-white focus:outline-none h-14"
+            onChange={handleChangeSelectedColumn}
+          >
             <option value="" disabled selected className="placeholder-gray-300">
               Selecione a coluna de entrada
             </option>
@@ -38,10 +58,15 @@ export default function Home() {
         </div>
 
         <div className="w-1/3 relative mx-auto mt-10">
-          <select className="w-full bg-main-dark border-2 border-main-lighter rounded-3xl py-2 px-4 hover:bg-main-darker text-white focus:outline-none h-14">
+          <select
+            className="w-full bg-main-dark border-2 border-main-lighter rounded-3xl py-2 px-4 hover:bg-main-darker text-white focus:outline-none h-14"
+            onChange={handleChangeSelectedClassifier}
+          >
             <option value="" disabled selected className="placeholder-gray-300">
               Selecione um classificador
             </option>
+            <option value="a">Classificador a</option>
+            <option value="b">Classificador B</option>
           </select>
         </div>
 
