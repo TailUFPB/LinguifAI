@@ -43,11 +43,11 @@ npm electron
 
 ### To-do
 
-#### 🚀 Sprint 1
+#### 🚀 Tasks
 
 - [x] Abrir CSV
 - [x] Exibir Preview de N linhas do CSV
-- [ ] Escolher colunas de entrada
-- [ ] Selecionar classificador e enviar dados
+- [x] Escolher colunas de entrada
+- [X] Selecionar classificador e enviar dados
 - [ ] Exibir resultado do classificador
 - [ ] Exportar resultado em csv?
