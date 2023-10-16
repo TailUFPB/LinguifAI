@@ -17,7 +17,7 @@ O projeto utiliza das seguintes tecnologias e ferramentas:
 
 ## Como rodar a aplicação:
 
-Primeiramente, instale as depencencias: 
+Primeiramente, instale as depencencias:
 
 ```bash
 yarn
@@ -30,7 +30,7 @@ Após a conclusão da instalação, crie uma build para produção do front-end:
 ```bash
 yarn build
 # ou
-npm build
+npm run build
 ```
 
 Por fim inicie o electron:
@@ -38,7 +38,7 @@ Por fim inicie o electron:
 ```bash
 yarn electron
 # ou
-npm electron
+npm run electron
 ```
 
 ### To-do
