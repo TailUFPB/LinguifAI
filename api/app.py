@@ -1,7 +1,9 @@
 from flask import Flask, jsonify, request
 from flask_cors import CORS
 from DataProcesser import DataProcesser
+
 import os
+import pandas as pd
 import nltk
 import json
 nltk.download('wordnet')
@@ -11,6 +13,7 @@ CORS(app)  # Permite todas as origens por padrão (não recomendado para produç
 
 UPLOAD_FOLDER = './uploads'
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+app.config['JSONIFY_PRETTYPRINT_REGULAR'] = True
 
 data_processer = DataProcesser()
 
@@ -18,22 +21,17 @@ data_processer = DataProcesser()
 def hello_world():
     return jsonify("Hello, world!")
 
-@app.route('/upload', methods=["POST"])
+@app.route('/classify', methods=["POST"])
 def upload_file():
-    try:
-        file = request.files['file']
+    received_data = request.get_json()
 
-        if not file:
-            raise Exception('Nenhum arquivo detectado')
+    selected_data = received_data.get('data')
+    selected_classifier = received_data.get('classifier')
 
-        if not file.filename.endswith('.csv'):
-            raise Exception('Formato de arquivo inválido')
+    df = pd.DataFrame(selected_data, columns=['input_column'])
+    result = data_processer.handle_classify(df, selected_classifier)
 
-        data_processer.set_current_file(file.read())
-
-        return jsonify({'status_code': 200})
-    except Exception as e:
-        return jsonify({'status_code': -1, 'error': str(e)})
+    return jsonify({'result': result.to_json()})
 
 @app.route('/nb-news-model', methods=["POST"])
 def news_model():

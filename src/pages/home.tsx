@@ -22,8 +22,29 @@ export default function Home() {
     let selectedData = data.map((row) => row[selectedColumn]);
 
     console.log(selectedData);
+    console.log(selectedClassifier);
 
-    // aqui a gente usa esse dado para a chamada da api
+    try {
+      const response = await fetch('http://localhost:5000/classify', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          data: selectedData,
+          classifier: selectedClassifier,
+        }),
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        console.log(result);
+      }
+
+    } catch(error) {
+      console.error("Erro no classify: ", error);
+    }
+
   };
 
   return (

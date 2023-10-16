@@ -28,21 +28,6 @@ export function SelectFileCard({
     if (file && file.name.endsWith(".csv")) {
       setSelectedFile(file);
 
-      const formData = new FormData();
-      formData.append("file", file);
-
-      try {
-        const response = await fetch("http://localhost:5000/upload", {
-          method: "POST",
-          body: formData,
-        });
-
-        console.log("Upload do arquivo feito");
-        console.log(response);
-      } catch (error) {
-        console.error("Erro no upload de arquivo: ", error);
-      }
-
       Papa.parse(file, {
         header: true,
         dynamicTyping: true,
