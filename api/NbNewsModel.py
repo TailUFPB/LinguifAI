@@ -15,5 +15,5 @@ def news_prediction(texts):
     
     except Exception as e:
         return str(e)
-df = pd.read_csv("api/training_df/nb_news.csv")
-print(news_prediction(df['short_description']))
+# df = pd.read_csv("api/training_df/nb_news.csv")
+# print(news_prediction(df['short_description']))

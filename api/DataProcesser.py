@@ -1,5 +1,5 @@
 import pandas as pd
-from NbNewsModel import NbNewsModel
+from NbNewsModel import news_prediction
 from NbEmotionsModel import make_prediction
 from io import BytesIO
 import nltk
@@ -19,12 +19,7 @@ class DataProcesser():
         self.df = df
 
     def set_input_column(self, column):
-        df.input_column = column
-
-    def nb_news_application(self):
-        nb_model = NbNewsModel(self.df)
-        df_result = nb_model.filter_and_classify()
-        return df_result
+        self.df.input_column = column
 
     def preprocess_text(self, texto):
         if self.input_column is not None:  # Verifique se a coluna foi definida
@@ -41,5 +36,10 @@ class DataProcesser():
       result_csv = self.df# converte o df pra csv
       return result_csv
 
+
+    def nb_news_application(self):
+        self.df['coluna_classificada'] = self.df[self.input_column].apply(self.preprocess_text).apply(news_prediction)
+        result_csv = self.df
+        return result_csv
 
     ##TODO métodos com o processamento de classificação
