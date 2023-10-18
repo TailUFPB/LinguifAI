@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { SelectFileCard } from "../components/selectFileCard/selectFileCard";
+import axios from "axios";
 
 export default function Home() {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -21,30 +22,14 @@ export default function Home() {
   const handleSubmit = async () => {
     let selectedData = data.map((row) => row[selectedColumn]);
 
-    console.log(selectedData);
-    console.log(selectedClassifier);
-
-    try {
-      const response = await fetch('http://localhost:5000/classify', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          data: selectedData,
-          classifier: selectedClassifier,
-        }),
+    const response = await axios
+      .post("http://localhost:5000/classify", {
+        data: selectedData,
+        classifier: selectedClassifier,
+      })
+      .catch((error) => {
+        console.log(error);
       });
-
-      if (response.ok) {
-        const result = await response.json();
-        console.log(result);
-      }
-
-    } catch(error) {
-      console.error("Erro no classify: ", error);
-    }
-
   };
 
   return (
