@@ -10,21 +10,14 @@ from nltk.corpus import stopwords
 class DataProcesser():
 
     df = pd.DataFrame()
-    input_column = 'short_description'
+    input_column = ''
     stopwordsenglish = nltk.corpus.stopwords.words('english')
 
-    def set_current_file(self, file):
-        bytes_io = BytesIO(file)
-        df = pd.read_csv(bytes_io)
-        self.df = df
-
-    def set_input_column(self, column):
-        df.input_column = column
-
-    def nb_news_application(self):
-        nb_model = NbNewsModel(self.df)
-        df_result = nb_model.filter_and_classify()
-        return df_result
+    def handle_classify(self, df, classifier):
+        if classifier == 'a':
+            return self.classify_emotions(df)
+        elif classifier == 'b':
+            return self.nb_news_application(df)
 
     def preprocess_text(self, texto):
         if self.input_column is not None:  # Verifique se a coluna foi definida
@@ -36,9 +29,14 @@ class DataProcesser():
         else:
             return "Coluna não escolhida. Escolha a coluna primeiro."
 
-    def classify_emotions(self):
-      self.df['coluna_classificada'] = self.df[self.input_column].apply(self.preprocess_text).apply(make_prediction)
-      result_csv = self.df# converte o df pra csv
+    def nb_news_application(self, df):
+        nb_model = NbNewsModel(df)
+        df_result = nb_model.filter_and_classify()
+        return df_result
+
+    def classify_emotions(self, df):
+      df['coluna_classificada'] = df['input_column'].apply(self.preprocess_text).apply(make_prediction)
+      result_csv = df# converte o df pra csv
       return result_csv
 
 
