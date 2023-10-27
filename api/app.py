@@ -45,11 +45,16 @@ def news_model():
     result_json = result.to_json()
     return jsonify({"result": result_json})
 
-
 @app.route('/nb-emotions-model', methods=["POST"])
 def emotions_model():
     result = data_processer.classify_emotions()
     return jsonify({"result": result.to_json()})
+
+@app.route('/lin-regression-model', methods=["POST"])
+def lin_regression_model():
+    result = data_processer.lin_regression_model()
+    return jsonify({"result": result.to_json()})
+
 
 
 if __name__ == '__main__':
