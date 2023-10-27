@@ -17,9 +17,11 @@ app.config['JSONIFY_PRETTYPRINT_REGULAR'] = True
 
 data_processer = DataProcesser()
 
+
 @app.route('/', methods=['GET'])
 def hello_world():
     return jsonify("Hello, world!")
+
 
 @app.route('/classify', methods=["POST"])
 def upload_file():
@@ -28,10 +30,14 @@ def upload_file():
     selected_data = received_data.get('data')
     selected_classifier = received_data.get('classifier')
 
+    print("selected data: ", selected_data)
+    print("selected classifier: ", selected_classifier)
+
     df = pd.DataFrame(selected_data, columns=['input_column'])
     result = data_processer.handle_classify(df, selected_classifier)
 
     return jsonify({'result': result.to_json()})
+
 
 @app.route('/nb-news-model', methods=["POST"])
 def news_model():
@@ -39,10 +45,12 @@ def news_model():
     result_json = result.to_json()
     return jsonify({"result": result_json})
 
+
 @app.route('/nb-emotions-model', methods=["POST"])
 def emotions_model():
     result = data_processer.classify_emotions()
     return jsonify({"result": result.to_json()})
+
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)

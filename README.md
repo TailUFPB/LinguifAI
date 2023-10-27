@@ -49,5 +49,5 @@ npm run electron
 - [x] Exibir Preview de N linhas do CSV
 - [x] Escolher colunas de entrada
 - [X] Selecionar classificador e enviar dados
-- [ ] Exibir resultado do classificador
-- [ ] Exportar resultado em csv?
+- [x] Exibir resultado do classificador
+- [x] Exportar resultado em csv?

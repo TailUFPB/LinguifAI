@@ -31,6 +31,7 @@ export default function CsvTable({ data, head }: Props) {
                 {row.map((cell, cellIndex) => {
                   return (
                     <td
+                      key={cellIndex}
                       className={`px-5 py-1 border-grey ${
                         cellIndex == 0 ? `` : `border-l-2`
                       }`}

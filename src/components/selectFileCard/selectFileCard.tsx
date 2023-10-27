@@ -105,7 +105,7 @@ export function SelectFileCard({
           )}
 
           {data.length > 0 && (
-            <CsvTable data={data.slice(1, 5)} head={header} />
+            <CsvTable data={data.slice(0, 4)} head={header} />
           )}
 
           <button
