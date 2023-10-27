@@ -13,7 +13,7 @@ export default function CsvTable({ data, head }: Props) {
           <tr className="rounded-3xl bg-main-darker">
             {head.map((headTitle, index) => {
               return (
-                <th className={`border-grey ${index == 0 ? `` : `border-l-2`}`}>
+                <th className={`border-grey ${index === 0 ? `` : `border-l-2`}`}>
                   {headTitle}
                 </th>
               );
@@ -33,7 +33,7 @@ export default function CsvTable({ data, head }: Props) {
                     <td
                       key={cellIndex}
                       className={`px-5 py-1 border-grey ${
-                        cellIndex == 0 ? `` : `border-l-2`
+                        cellIndex === 0 ? `` : `border-l-2`
                       }`}
                     >
                       {cell}
