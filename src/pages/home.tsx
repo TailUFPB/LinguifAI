@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { SelectFileCard } from "../components/selectFileCard/selectFileCard";
+import SelectFileCard from "../components/selectFileCard/selectFileCard";
 import axios from "axios";
 import ResultTable from "../components/resultTable/resultTable";
 
@@ -24,7 +24,8 @@ export default function Home() {
 
   const handleSubmit = async () => {
     let selectedData = data.map((row) => row[selectedColumn]);
-
+    console.log(selectedData)
+    console.log(selectedClassifier);
     const response = await axios
       .post("http://localhost:5000/classify", {
         data: selectedData,

@@ -2,7 +2,6 @@ import pandas as pd
 from NbNewsModel import NbNewsModel
 from NbEmotionsModel import make_prediction
 from NbLinRegressionModel import make_prediction_nblin
-from io import BytesIO
 import nltk
 import re
 from nltk.corpus import stopwords
