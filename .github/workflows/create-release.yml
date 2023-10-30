@@ -1,0 +1,41 @@
+on:
+  push:
+    tags:
+      - 'v*'
+
+name: Create Release
+
+jobs:
+  publish-to-npm:
+    name: 🧠 Publish to npm
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+    steps:
+    - name: ⬇️ Checkout source
+      uses: actions/checkout@v3
+      
+    - name: ⎔ Setup node
+      uses: actions/setup-node@v3
+      
+    - name: 🟨 Setup python
+      uses: actions/setup-python@v3
+      
+    - name: 📦 Install dependencies and build
+      run: npm install
+      
+    - name: ✍️ Publish package
+      run: npm publish --provenance
+
+  create-github-release:
+    name: 💎 Create GitHub Release
+    runs-on: ubuntu-latest
+    needs: publish-to-npm
+    permissions:
+      contents: write
+    steps:
+      - name: ⬇️ Checkout code
+        uses: actions/checkout@v3
+        
+      - name: 💡 Create Release
+        run: gh release create ${{ github.ref }} --generate-notes
