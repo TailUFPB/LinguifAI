@@ -1,6 +1,6 @@
 import pickle
 
-def make_prediction(my_sentence):
+def make_prediction_nblin(my_sentence):
     with open("./models/vectorizer_lin.pkl", "rb") as f:
         vectorizer = pickle.load(f)
 
@@ -8,7 +8,7 @@ def make_prediction(my_sentence):
         model = pickle.load(f)
 
     new_sentence = vectorizer.transform(my_sentence)
-    
+
     prediction = model.predict(new_sentence)
     if prediction == 0:
         return "Negativo"

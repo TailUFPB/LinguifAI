@@ -1,7 +1,7 @@
 import pandas as pd
 from NbNewsModel import NbNewsModel
 from NbEmotionsModel import make_prediction
-from NbLinRegressionModel import make_prediction
+from NbLinRegressionModel import make_prediction_nblin
 from io import BytesIO
 import nltk
 import re
@@ -45,12 +45,12 @@ class DataProcesser():
             self.preprocess_text).apply(make_prediction)
         result_csv = df  # converte o df pra csv
         return result_csv
-    
+
     def lin_regression_model(self, df):
         df['output_column'] = df['input_column'].apply(
-            self.preprocess_text).apply(make_prediction)
+            self.preprocess_text).apply(make_prediction_nblin)
         result_csv = df  # converte o df pra csv
         return result_csv
-    
+
 
     # TODO métodos com o processamento de classificação

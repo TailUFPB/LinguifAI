@@ -20,10 +20,10 @@ function createWindow() {
     show: false, // Ocultar a janela até que esteja pronta
     //fullscreen: true,
   });
-  win.loadURL("http://localhost:3000/"); // carrega a página hospedada localmente
-  //win.loadFile(path.join(__dirname, "./build/index.html")); // carrega a build do react
+  //win.loadURL("http://localhost:3000/"); // carrega a página hospedada localmente
+  win.loadFile(path.join(__dirname, "./build/index.html")); // carrega a build do react
 
-  /* 
+  /*
   win.loadURL(
     url.format({
       pathname: path.join(__dirname, "./build/index.html"), // relative path to the HTML-file
