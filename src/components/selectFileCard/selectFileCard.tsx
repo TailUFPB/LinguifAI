@@ -12,7 +12,7 @@ interface props {
   setHeader: (header: string[]) => void;
 }
 
-export function SelectFileCard({
+export default function SelectFileCard({
   selectedFile,
   setSelectedFile,
   setData,
