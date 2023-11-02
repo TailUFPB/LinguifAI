@@ -1,16 +1,20 @@
+name: Create Release
+
 on:
   push:
     tags:
       - 'v*'
 
-name: Create Release
-
 jobs:
-  publish-to-npm:
-    name: 🧠 Publish to npm
+  release:
+    name: 🧠 Release
     runs-on: ubuntu-latest
     permissions:
       id-token: write
+      contents: write
+      packages: write
+      pull-requests: write
+      issues: read
     steps:
     - name: ⬇️ Checkout source
       uses: actions/checkout@v3
@@ -29,16 +33,8 @@ jobs:
       
     - name: ✍️ Release Electron app
       uses: samuelmeuli/action-electron-builder@v1.6.0
-
-  create-github-release:
-    name: 💎 Create GitHub Release
-    runs-on: ubuntu-latest
-    needs: publish-to-npm
-    permissions:
-      contents: write
-    steps:
-      - name: ⬇️ Checkout code
-        uses: actions/checkout@v3
-        
-      - name: 💡 Create Release
-        run: gh release create ${{ github.ref }} --generate-notes
+    
+    - name: 💎 Create Release
+      uses: actions/create-release@v1
+      with:
+          tag_name: ${{ github.ref }}
