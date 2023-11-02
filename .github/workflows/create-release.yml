@@ -29,7 +29,8 @@ jobs:
       run: npm install
       
     - name: 🐍 Install Python dependencies
-      run: pip install -r requirements.txt
+      run: cat requirements.txt | xargs -n 1 pip install
+      #run: pip install -r requirements.txt
       
     - name: ✍️ Release Electron app
       uses: samuelmeuli/action-electron-builder@v1.6.0
