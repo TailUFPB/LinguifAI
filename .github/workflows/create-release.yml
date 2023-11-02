@@ -20,8 +20,11 @@ jobs:
       
     - name: 🟨 Setup python
       uses: actions/setup-python@v3
+    
+    - name: 🐍 Install Python dependencies
+      run: pip install -r api/requirements.txt
       
-    - name: 📦 Install dependencies and build
+    - name: 📦 Install Node dependencies and build
       run: npm install
       
     - name: ✍️ Publish package
