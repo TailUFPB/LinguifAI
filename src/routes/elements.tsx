@@ -1,5 +1,4 @@
-import { ElementType, Suspense, lazy } from "react";
-import { useLocation } from "react-router-dom";
+import { Suspense, lazy } from "react";
 import LoadingScreen from "../pages/loadingScreen";
 
 const Loadable = (Component: ElementType) => (props: any) => {
