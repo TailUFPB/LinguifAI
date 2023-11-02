@@ -123,7 +123,7 @@ export default function Home() {
             <option value="" disabled selected className="placeholder-gray-300">
               Selecione um classificador
             </option>
-            <option value="a">Classificador A</option>
+            <option value="a">Classificador a</option>
             <option value="b">Classificador B</option>
           </select>
         </div>
