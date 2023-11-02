@@ -34,8 +34,11 @@ jobs:
       
     - name: ✍️ Release Electron app
       uses: samuelmeuli/action-electron-builder@v1.6.0
+      with:
+        github_token: ${{ secrets.github_token }}
     
     - name: 💎 Create Release
       uses: actions/create-release@v1
       with:
           tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref }}
