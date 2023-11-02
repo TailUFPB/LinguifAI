@@ -122,6 +122,7 @@ export default function SelectFileCard({
           <input
             type="file"
             id="fileInput"
+            data-testid="fileInput"
             style={{ display: "none" }}
             accept=".csv"
             onChange={handleFileChange}

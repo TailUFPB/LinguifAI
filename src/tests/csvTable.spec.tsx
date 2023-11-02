@@ -1,5 +1,6 @@
 import { render } from "@testing-library/react";
 import CsvTable from "../components/csvTable/csvTable";
+import '@testing-library/jest-dom/extend-expect';
 
 describe("CsvTable", () => {
   it("✅ should render the table headers and data correctly", () => {

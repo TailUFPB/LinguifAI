@@ -23,7 +23,8 @@ export default function ResultTable({ data, classifierName }: Props) {
             .map((row: any, index: number) => {
               return (
                 <tr
-                  className={`${
+                key={row}  
+                className={`${
                     index % 2 ? `bg-main-bold` : `bg-main-medium`
                   } border-t-2`}
                 >

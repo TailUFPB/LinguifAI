@@ -1,5 +1,6 @@
 import { render, fireEvent, screen } from "@testing-library/react";
-import SelectFileCard from "../components/selectFileCard/selectFileCard"; // Certifique-se de ajustar o caminho conforme necessário
+import SelectFileCard from "../components/selectFileCard/selectFileCard";
+import '@testing-library/jest-dom/extend-expect';
 
 describe("SelectFileCard", () => {
   it("✅ deve renderizar corretamente", () => {
