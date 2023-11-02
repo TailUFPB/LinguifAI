@@ -29,17 +29,15 @@ jobs:
       run: npm install
       
     - name: 🐍 Install Python dependencies
-      run: pip install --upgrade pip #-r requirements.txt
+      run: pip install #-r requirements.txt
       
     - name: ✍️ Release Electron app
-      run: npm run build
-      # uses: samuelmeuli/action-electron-builder@v1.6.0
-      # with:
-      #   github_token: ${{ secrets.github_token }}
+      uses: samuelmeuli/action-electron-builder@v1.6.0
+      with:
+        github_token: ${{ secrets.github_token }}
     
     - name: 💎 Create Release
       uses: actions/create-release@v1
       with:
           tag_name: ${{ github.ref }}
           release_name: Release ${{ github.ref }}
-
