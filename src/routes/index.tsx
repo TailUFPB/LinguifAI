@@ -1,5 +1,4 @@
-import { ElementType } from "react";
-import { Navigate, useLocation, useRoutes } from "react-router-dom";
+import { Navigate, useRoutes } from "react-router-dom";
 import { Home } from "./elements";
 
 export default function Router() {
