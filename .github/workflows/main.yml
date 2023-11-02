@@ -30,9 +30,6 @@ jobs:
 
         - name: 🟨 Setup Python
           uses: actions/setup-python@v3
-        
-        - name: 🐍 Install Python dependencies
-          run: pip install -r api/requirements.txt
   
         - name: 📦 Install Node dependencies
           run: npm install
@@ -56,9 +53,6 @@ jobs:
             
         - name: 🟨 Setup Python
           uses: actions/setup-python@v3
-
-        - name: 🐍 Install Python dependencies
-          run: pip install -r api/api/requirements.txt
   
         - name: 📦 Install dependencies
           run: npm install
@@ -84,9 +78,6 @@ jobs:
 
         - name: 🟨 Setup Python
           uses: actions/setup-python@v3
-
-        - name: 🐍 Install Python dependencies
-          run: pip install -r api/requirements.txt
   
         - name: 📦 Install dependencies
           run: npm install
