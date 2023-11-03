@@ -1,5 +1,5 @@
 import pandas as pd
-from NbNewsModel import NbNewsModel
+from NbNewsModel import news_prediction
 from NbEmotionsModel import make_prediction
 from NbLinRegressionModel import make_prediction_nblin
 import nltk
@@ -13,6 +13,7 @@ class DataProcesser():
     df = pd.DataFrame()
     input_column = ''
     stopwordsenglish = nltk.corpus.stopwords.words('english')
+
 
     def handle_classify(self, df, classifier):
         if classifier == 'a':
@@ -51,5 +52,9 @@ class DataProcesser():
         result_csv = df  # converte o df pra csv
         return result_csv
 
+    def nb_news_application(self):
+        self.df['coluna_classificada'] = self.df[self.input_column].apply(self.preprocess_text).apply(news_prediction)
+        result_csv = self.df
+        return result_csv
 
-    # TODO métodos com o processamento de classificação
+    ##TODO métodos com o processamento de classificação
