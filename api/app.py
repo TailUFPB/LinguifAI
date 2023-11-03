@@ -1,7 +1,9 @@
 from flask import Flask, jsonify, request
 from flask_cors import CORS
 from DataProcesser import DataProcesser
+
 import os
+import pandas as pd
 import nltk
 import json
 nltk.download('wordnet')
@@ -11,29 +13,31 @@ CORS(app)  # Permite todas as origens por padrão (não recomendado para produç
 
 UPLOAD_FOLDER = './uploads'
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+app.config['JSONIFY_PRETTYPRINT_REGULAR'] = True
 
 data_processer = DataProcesser()
+
 
 @app.route('/', methods=['GET'])
 def hello_world():
     return jsonify("Hello, world!")
 
-@app.route('/upload', methods=["POST"])
+
+@app.route('/classify', methods=["POST"])
 def upload_file():
-    try:
-        file = request.files['file']
+    received_data = request.get_json()
 
-        if not file:
-            raise Exception('Nenhum arquivo detectado')
+    selected_data = received_data.get('data')
+    selected_classifier = received_data.get('classifier')
 
-        if not file.filename.endswith('.csv'):
-            raise Exception('Formato de arquivo inválido')
+    print("selected data: ", selected_data)
+    print("selected classifier: ", selected_classifier)
 
-        data_processer.set_current_file(file.read())
+    df = pd.DataFrame(selected_data, columns=['input_column'])
+    result = data_processer.handle_classify(df, selected_classifier)
 
-        return jsonify({'status_code': 200})
-    except Exception as e:
-        return jsonify({'status_code': -1, 'error': str(e)})
+    return jsonify({'result': result.to_json()})
+
 
 @app.route('/nb-news-model', methods=["POST"])
 def news_model():
@@ -45,6 +49,13 @@ def news_model():
 def emotions_model():
     result = data_processer.classify_emotions()
     return jsonify({"result": result.to_json()})
+
+@app.route('/lin-regression-model', methods=["POST"])
+def lin_regression_model():
+    result = data_processer.lin_regression_model()
+    return jsonify({"result": result.to_json()})
+
+
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)

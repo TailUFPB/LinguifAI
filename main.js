@@ -5,7 +5,7 @@ const url = require("url");
 
 var processes = [];
 
-const child = childProcess.spawn("python", ["./backend/app.py"], {
+const child = childProcess.spawn("python", ["./api/app.py"], {
   detached: false,
   stdio: "ignore",
 });
@@ -23,7 +23,7 @@ function createWindow() {
   //win.loadURL("http://localhost:3000/"); // carrega a página hospedada localmente
   win.loadFile(path.join(__dirname, "./build/index.html")); // carrega a build do react
 
-  /* 
+  /*
   win.loadURL(
     url.format({
       pathname: path.join(__dirname, "./build/index.html"), // relative path to the HTML-file
@@ -42,12 +42,7 @@ function createWindow() {
 
   win.webContents.openDevTools();
 
-  win.on("close", () => {
-    processes.forEach(function (proc) {
-      // TENTA fechar o processo do python
-      proc.kill();
-    });
-  });
+  win.on("close", () => {});
 }
 
 app.whenReady().then(() => {
@@ -57,19 +52,15 @@ app.whenReady().then(() => {
   });
 });
 
-app.on("before-quit", () => {
-  // TENTA fechar o processo do python
-  processes.forEach(function (proc) {
-    proc.kill();
-  });
-});
+app.on("before-quit", () => {});
 
 app.on("window-all-closed", () => {
   if (process.platform !== "darwin") {
+    /*
     // TENTA fechar o processo do python
     processes.forEach(function (proc) {
       proc.kill();
-    });
+    }); */
 
     app.quit();
   }

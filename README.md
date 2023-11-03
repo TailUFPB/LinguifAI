@@ -17,7 +17,7 @@ O projeto utiliza das seguintes tecnologias e ferramentas:
 
 ## Como rodar a aplicação:
 
-Primeiramente, instale as depencencias: 
+Primeiramente, instale as depencencias:
 
 ```bash
 yarn
@@ -30,7 +30,7 @@ Após a conclusão da instalação, crie uma build para produção do front-end:
 ```bash
 yarn build
 # ou
-npm build
+npm run build
 ```
 
 Por fim inicie o electron:
@@ -38,16 +38,16 @@ Por fim inicie o electron:
 ```bash
 yarn electron
 # ou
-npm electron
+npm run electron
 ```
 
 ### To-do
 
-#### 🚀 Sprint 1
+#### 🚀 Tasks
 
 - [x] Abrir CSV
 - [x] Exibir Preview de N linhas do CSV
-- [ ] Escolher colunas de entrada
-- [ ] Selecionar classificador e enviar dados
-- [ ] Exibir resultado do classificador
-- [ ] Exportar resultado em csv?
+- [x] Escolher colunas de entrada
+- [X] Selecionar classificador e enviar dados
+- [x] Exibir resultado do classificador
+- [x] Exportar resultado em csv?
