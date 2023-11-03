@@ -7,7 +7,8 @@ interface Props {
 
 export default function CsvTable({ data, head }: Props) {
   return (
-    <div className="mt-5 w-11/12 mx-3 overflow-hidden rounded-3xl border-2 border-grey">
+    <div className="mt-5 w-11/12 mx-3 overflow-hidden rounded-3xl border-2 border-grey"
+    style={{height: "600px", overflow: "scroll"}}>
       <table className="w-full">
         <thead>
           <tr className="rounded-3xl bg-main-darker">
