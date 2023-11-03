@@ -19,16 +19,16 @@ jobs:
     - name: ⬇️ Checkout source
       uses: actions/checkout@v3
       
-    - name: ⎔ Setup node
+    - name: ⎔ Setup node package
       uses: actions/setup-node@v3
       
-    - name: 🟨 Setup python
+    - name: 🟨 Setup python package
       uses: actions/setup-python@v3
       
-    - name: 📦 Install Node dependencies and build
+    - name: 📦 Install and build Node dependencies
       run: npm install
       
-    - name: 🐍 Install Python dependencies
+    - name: 🐍 Install and build Python dependencies
       run: pip install --upgrade pip #-r requirements.txt
       
     - name: ✍️ Release Electron app
@@ -36,11 +36,3 @@ jobs:
       # uses: samuelmeuli/action-electron-builder@v1.6.0
       # with:
       #   github_token: ${{ secrets.github_token }}
-    
-    - name: 💎 Create Release
-      uses: actions/create-release@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-          tag_name: ${{ github.ref }}
-          release_name: Release ${{ github.ref }}
