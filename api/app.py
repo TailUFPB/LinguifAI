@@ -22,22 +22,20 @@ data_processer = DataProcesser()
 def hello_world():
     return jsonify("Hello, world!")
 
-
 @app.route('/classify', methods=["POST"])
 def upload_file():
     received_data = request.get_json()
 
     selected_data = received_data.get('data')
-    selected_classifier = received_data.get('classifier')
+    selected_classifier = int(received_data.get('classifier'))
 
-    print("selected data: ", selected_data)
-    print("selected classifier: ", selected_classifier)
+    #print("selected data: ", selected_data)
+    #print("selected classifier: ", selected_classifier)
 
     df = pd.DataFrame(selected_data, columns=['input_column'])
     result = data_processer.handle_classify(df, selected_classifier)
 
     return jsonify({'result': result.to_json()})
-
 
 @app.route('/nb-news-model', methods=["POST"])
 def news_model():
@@ -54,8 +52,6 @@ def emotions_model():
 def lin_regression_model():
     result = data_processer.lin_regression_model()
     return jsonify({"result": result.to_json()})
-
-
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)

@@ -32,7 +32,7 @@ export default function Home() {
         classifier: selectedClassifier,
       })
       .catch((error) => {
-        console.log(error);
+        console.error(error.response.data);
       });
 
     if (response && response.data) {
@@ -123,8 +123,9 @@ export default function Home() {
             <option value="" disabled selected className="placeholder-gray-300">
               Selecione um classificador
             </option>
-            <option value="a">Classificador a</option>
-            <option value="b">Classificador B</option>
+            <option value="0">Naive-Bayes Emotions</option>
+            <option value="1">Naive-Bayes News Topics</option>
+            <option value="2">Linear Regression Emotions</option>
           </select>
         </div>
 
