@@ -7,7 +7,7 @@ def make_prediction_nblin(my_sentence):
     with open("./models/linear_reg.pkl", "rb") as f:
         model = pickle.load(f)
 
-    new_sentence = vectorizer.transform(my_sentence)
+    new_sentence = vectorizer.transform([my_sentence])
 
     prediction = model.predict(new_sentence)
     if prediction == 0:

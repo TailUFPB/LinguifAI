@@ -6,7 +6,7 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.model_selection import train_test_split
 from sklearn.naive_bayes import MultinomialNB
 
-df = pd.read_csv("api/training_df/nb_news.csv")
+df = pd.read_csv("../training_df/nb_news.csv")
 # Dividindo os dados em um conjunto de treinamento e um conjunto de teste
 x = df['short_description']
 y = df['category']
