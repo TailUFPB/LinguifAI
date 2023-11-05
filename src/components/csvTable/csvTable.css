@@ -1,4 +1,12 @@
 .csv-table th, .csv-table td {
+    max-width: 500px;
+    height: 100px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.csv-table td {
     text-align: left;
 }
 
@@ -19,5 +27,4 @@
   .csv-div th, .csv-div td {
     border: 0.0625rem solid #ccc;
     padding: 0.625rem;
-    text-align: left;
   }
