@@ -1,0 +1,23 @@
+.csv-table th, .csv-table td {
+    text-align: left;
+}
+
+.csv-div {
+    margin-top: 1.25rem;
+    width: 90%;
+    height: 80%;
+    max-height: 1500px;
+    max-width: 1200px;
+    margin-left: 1.25rem;
+    overflow-x: auto;
+    overflow-y: auto;
+    border-radius: 1rem;
+    border-width: 0.125rem;
+    border-color: #ccc;
+  }
+
+  .csv-div th, .csv-div td {
+    border: 0.0625rem solid #ccc;
+    padding: 0.625rem;
+    text-align: left;
+  }
