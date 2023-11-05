@@ -36,23 +36,15 @@ class DataProcesser():
             return "Coluna não escolhida. Escolha a coluna primeiro."
 
     def classify_emotions(self, df):
-        df['output_column'] = df['input_column'].apply(
-            self.preprocess_text).apply(make_prediction)
-
-        result_csv = df  # converte o df pra csv
-        return result_csv
+        df['output_column'] = df['input_column'].apply(make_prediction)
+        return df
 
     def lin_regression_model(self, df):
-        df['output_column'] = df['input_column'].apply(
-            self.preprocess_text).apply(make_prediction_nblin)
-
-        result_csv = df  # converte o df pra csv
-        return result_csv
+        df['output_column'] = df['input_column'].apply(make_prediction_nblin)
+        return df
 
     def nb_news_application(self, df):
         df['output_column'] = df['input_column'].apply(news_prediction)
-
-        result_csv = df
-        return result_csv
+        return df
 
     ##TODO métodos com o processamento de classificação
