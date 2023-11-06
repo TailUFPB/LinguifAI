@@ -1,17 +1,19 @@
 const { app, BrowserWindow } = require("electron");
 const childProcess = require("child_process");
 const path = require("path");
+const axios = require("axios");
 const url = require("url");
 
 var processes = [];
 
+/*
 const child = childProcess.spawn("python", ["./api/app.py"], {
   detached: false,
   stdio: "ignore",
 });
 
 processes.push(child);
-
+*/
 function createWindow() {
   // cria a janela
   const win = new BrowserWindow({
@@ -56,12 +58,15 @@ app.on("before-quit", () => {});
 
 app.on("window-all-closed", () => {
   if (process.platform !== "darwin") {
-    /*
-    // TENTA fechar o processo do python
-    processes.forEach(function (proc) {
-      proc.kill();
-    }); */
+    //console.log("Fechando")
+    axios.get("http://127.0.0.1:5000/shutdown").then(response => {
 
-    app.quit();
+    }).catch(error => {
+
+    })
+    setTimeout(() => {
+      app.quit();
+    }, 2000);
+
   }
 });
