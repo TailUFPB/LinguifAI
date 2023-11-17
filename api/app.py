@@ -40,8 +40,9 @@ def upload_file():
 
     df = pd.DataFrame(selected_data, columns=['input_column'])
     result = data_processer.handle_classify(df, selected_classifier)
+    stats = data_processer.generate_statistics(result)
 
-    return jsonify({'result': result.to_json()})
+    return jsonify({'result': result.to_json(), 'stats': stats})
 
 @app.route('/get-classifiers', methods=["GET"])
 def get_classifiers():

@@ -15,4 +15,4 @@ def make_prediction(my_sentence):
 
     new_sentence = tfidf_vectorizer.transform([my_sentence])
     prediction = model.predict(new_sentence)
-    return prediction
+    return prediction[0]
