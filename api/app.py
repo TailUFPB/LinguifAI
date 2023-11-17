@@ -1,6 +1,7 @@
 from flask import Flask, jsonify, request
 from flask_cors import CORS
 from DataProcesser import DataProcesser
+from available_classifiers import get_available_classifiers
 
 import os
 import atexit
@@ -17,6 +18,10 @@ CORS(app)  # Permite todas as origens por padrão (não recomendado para produç
 app.config['JSONIFY_PRETTYPRINT_REGULAR'] = True
 
 data_processer = DataProcesser()
+
+def run_flask_app():
+    global server_thread
+    app.run(host='0.0.0.0', port=5000, debug=True, use_reloader=False)
 
 def shutdown_server():
     print("Server shutting down...")
@@ -38,14 +43,15 @@ def upload_file():
 
     return jsonify({'result': result.to_json()})
 
+@app.route('/get-classifiers', methods=["GET"])
+def get_classifiers():
+    classifiers = get_available_classifiers()
+    return jsonify(classifiers)
+
 @app.get('/shutdown')
 def shutdown():
     shutdown_server()
     return 'Server shutting down...'
-
-def run_flask_app():
-    global server_thread
-    app.run(host='0.0.0.0', port=5000, debug=True, use_reloader=False)
 
 if __name__ == '__main__':
     server_thread = threading.Thread(target=run_flask_app)
