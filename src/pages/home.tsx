@@ -14,6 +14,8 @@ export default function Home() {
 
   const [result, setResult] = useState<{ [key: string]: any }>({});
 
+  const [isLoading, setIsLoading] = useState(false);
+
   const handleChangeSelectedColumn = (event: any) => {
     setSelectedColumn(event.target.value);
   };
@@ -23,6 +25,7 @@ export default function Home() {
   };
 
   const handleSubmit = async () => {
+    setIsLoading(true);
     let selectedData = data.map((row) => row[selectedColumn]);
     console.log(selectedData)
     console.log(selectedClassifier);
@@ -55,6 +58,8 @@ export default function Home() {
         console.error("Os arrays 'input' e 'output' têm tamanhos diferentes.");
       }
     }
+
+    setIsLoading(false);
   };
 
   const handleDownloadOutputCSV = async () => {
@@ -134,7 +139,7 @@ export default function Home() {
             className="w-full bg-main-dark text-white py-2 px-4 hover:bg-main-darker focus:outline-none border-2 border-main-lighter rounded-3xl h-14"
             onClick={handleSubmit}
           >
-            Enviar
+            {isLoading ? "Carregando..." : "Classificar"}
           </button>
         </div>
 

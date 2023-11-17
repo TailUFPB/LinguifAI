@@ -1,4 +1,5 @@
 import React from "react";
+import './csvTable.css';
 
 interface Props {
   head: any[];
@@ -7,8 +8,8 @@ interface Props {
 
 export default function CsvTable({ data, head }: Props) {
   return (
-    <div className="mt-5 w-11/12 mx-3 overflow-hidden rounded-3xl border-2 border-grey">
-      <table className="w-full">
+    <div className="csv-div border-grey">
+      <table className="csv-table">
         <thead>
           <tr className="rounded-3xl bg-main-darker">
             {head.map((headTitle, index) => {
