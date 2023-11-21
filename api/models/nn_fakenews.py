@@ -13,8 +13,9 @@ from tensorflow.keras.layers import Embedding, LSTM, Dense, Bidirectional
 from tensorflow.keras.preprocessing.text import Tokenizer
 from tensorflow.keras.preprocessing.sequence import pad_sequences
 
-df_true = pd.read_csv("training_df/True.csv", encoding='utf-8', quoting=csv.QUOTE_MINIMAL)
-df_fake = pd.read_csv("training_df/Fake.csv", encoding='utf-8', quoting=csv.QUOTE_MINIMAL)
+df_true = pd.read_csv("Linguifai/api/training_df/True.csv")
+df_fake = pd.read_csv("Linguifai/api/training_df/Fake.csv")
+
 
 df_fake = df_fake.drop(['title', 'subject', 'date'], axis=1)
 df_true = df_true.drop(['title', 'subject', 'date'], axis=1)
@@ -40,7 +41,7 @@ df_fake_test = df_fake[5000:10000]
 df_true_test = df_true[5000:10000]
 
 # Diretório para salvar os arquivos de texto
-output_directory = 'api/training_df/arquivos_texto_treino_nn/fake'
+output_directory = 'LinguifAI/api/training_df/arquivos_texto_treino_nn/fake'
 
 # Certifique-se de que o diretório exista ou crie-o
 os.makedirs(output_directory, exist_ok=True)
@@ -56,7 +57,7 @@ for index, row in df_fake_train.iterrows():
 
 print("Arquivos de texto foram criados com sucesso.")
 
-output_directory = 'api/training_df/arquivos_texto_treino_nn/true'
+output_directory = 'LinguifAI/api/training_df/arquivos_texto_treino_nn/true'
 
 # Certifique-se de que o diretório exista ou crie-o
 os.makedirs(output_directory, exist_ok=True)
@@ -72,7 +73,7 @@ for index, row in df_true_train.iterrows():
 
 
 # Diretório para salvar os arquivos de texto
-output_directory = 'api/training_df/arquivos_texto_teste_nn/fake'
+output_directory = 'LinguifAI/api/training_df/arquivos_texto_teste_nn/fake'
 
 # Certifique-se de que o diretório exista ou crie-o
 os.makedirs(output_directory, exist_ok=True)
@@ -88,7 +89,7 @@ for index, row in df_fake_test.iterrows():
 
 print("Arquivos de texto foram criados com sucesso.")
 
-output_directory = 'api/training_df/arquivos_texto_teste_nn/true'
+output_directory = 'LinguifAI/api/training_df/arquivos_texto_teste_nn/true'
 
 # Certifique-se de que o diretório exista ou crie-o
 os.makedirs(output_directory, exist_ok=True)
@@ -102,8 +103,8 @@ for index, row in df_true_test.iterrows():
     with open(filename, 'w', encoding='utf-8') as file:
         file.write(row['text'])
 
-treino_dir = os.path.join("api/training_df/arquivos_texto_treino_nn")
-teste_dir = os.path.join("api/training_df/arquivos_texto_teste_nn")
+treino_dir = os.path.join("LinguifAI/api/training_df/arquivos_texto_treino_nn")
+teste_dir = os.path.join("LinguifAI/api/training_df/arquivos_texto_teste_nn")
 
 train_dataset = tf.keras.utils.text_dataset_from_directory(
     treino_dir,
@@ -172,6 +173,8 @@ predictions = layers.Dense(1, activation="sigmoid", name="predictions")(x)
 
 model = tf.keras.Model(inputs, predictions)
 
+epochs = 5
+
 # Compile the model with binary crossentropy loss and an adam optimizer.
 model.compile(loss="binary_crossentropy", optimizer="adam", metrics=["accuracy"])
 
@@ -179,5 +182,5 @@ model.compile(loss="binary_crossentropy", optimizer="adam", metrics=["accuracy"]
 model.fit(train_ds, epochs=epochs)
 
 # Salvando o pipeline em um arquivo .pkl
-with open("nn_fakenews_model.pkl", "wb") as model_file:
+with open("LinguifAI/api/models/nn_fakenews_model.pkl", "wb") as model_file:
     pickle.dump(model, model_file)
