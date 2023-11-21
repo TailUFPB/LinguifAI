@@ -13,8 +13,8 @@ from tensorflow.keras.layers import Embedding, LSTM, Dense, Bidirectional
 from tensorflow.keras.preprocessing.text import Tokenizer
 from tensorflow.keras.preprocessing.sequence import pad_sequences
 
-df_true = pd.read_csv("training_df/True.csv", encoding='utf-8', quoting=csv.QUOTE_MINIMAL)
-df_fake = pd.read_csv("training_df/Fake.csv", encoding='utf-8', quoting=csv.QUOTE_MINIMAL)
+df_true = pd.read_csv("api/training_df/True.csv", encoding='utf-8', quoting=csv.QUOTE_MINIMAL)
+df_fake = pd.read_csv("api/training_df/Fake.csv", encoding='utf-8', quoting=csv.QUOTE_MINIMAL)
 
 df_fake = df_fake.drop(['title', 'subject', 'date'], axis=1)
 df_true = df_true.drop(['title', 'subject', 'date'], axis=1)
@@ -171,6 +171,7 @@ x = layers.Dropout(0.5)(x)
 predictions = layers.Dense(1, activation="sigmoid", name="predictions")(x)
 
 model = tf.keras.Model(inputs, predictions)
+epochs = 5
 
 # Compile the model with binary crossentropy loss and an adam optimizer.
 model.compile(loss="binary_crossentropy", optimizer="adam", metrics=["accuracy"])
