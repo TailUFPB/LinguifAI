@@ -172,7 +172,6 @@ x = layers.Dropout(0.5)(x)
 predictions = layers.Dense(1, activation="sigmoid", name="predictions")(x)
 
 model = tf.keras.Model(inputs, predictions)
-
 epochs = 5
 
 # Compile the model with binary crossentropy loss and an adam optimizer.
