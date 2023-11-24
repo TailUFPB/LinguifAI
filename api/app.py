@@ -1,8 +1,10 @@
 from flask import Flask, jsonify, request
 from flask_cors import CORS
 from DataProcesser import DataProcesser
+from Neural_Network2 import create_and_train_model
 import os
 import nltk
+import pandas as pd
 import json
 nltk.download('wordnet')
 
@@ -45,6 +47,14 @@ def news_model():
 def emotions_model():
     result = data_processer.classify_emotions()
     return jsonify({"result": result.to_json()})
+
+@app.route('/neural-network',methods=["POST"])
+def train_model():
+    received_data = request.get_json()
+    selected_data = received_data.get('data')
+    selected_label = received_data.get('label')
+    name = received_data.get('name')
+    return create_and_train_model(selected_data,selected_label,name) 
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
