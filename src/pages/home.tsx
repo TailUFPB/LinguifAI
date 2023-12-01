@@ -2,6 +2,7 @@ import { useState } from "react";
 import SelectFileCard from "../components/selectFileCard/selectFileCard";
 import axios from "axios";
 import ResultTable from "../components/resultTable/resultTable";
+import { Menu } from "../components/menu/menu";
 
 export default function Home() {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -27,7 +28,7 @@ export default function Home() {
   const handleSubmit = async () => {
     setIsLoading(true);
     let selectedData = data.map((row) => row[selectedColumn]);
-    console.log(selectedData)
+    console.log(selectedData);
     console.log(selectedClassifier);
     const response = await axios
       .post("http://localhost:5000/classify", {
@@ -89,6 +90,8 @@ export default function Home() {
 
   return (
     <div className="bg-main-darker text-white min-h-screen flex flex-col">
+      <Menu />
+
       <div className="p-8 text-center font-roboto">
         <h1 className="text-3xl font-bold mb-6 mt-6">
           Linguif<span className="text-main-light">AI</span>
