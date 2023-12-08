@@ -1,15 +1,13 @@
-import csv
 import json
 import re
 import string
-import os
 import pandas as pd
 import numpy as np
 import tensorflow as tf
-import pickle
 from tensorflow.keras import layers
 from tensorflow.keras.layers import TextVectorization
 from tensorflow.keras.models import Sequential
+from sklearn.preprocessing import LabelEncoder
 
 def preprocess_text(text):
     text = text.lower()
@@ -22,31 +20,24 @@ def preprocess_text(text):
     text = re.sub('\w*\d\w*', '', text)
     return text
 
-def create_and_train_model(train_texts, train_labels,name, epochs=5):
-    # Cria um DataFrame do Pandas com os textos e rótulos de treino
-    train_df = pd.DataFrame({'text': train_texts, 'label': train_labels})
+def create_and_train_model(train_texts, train_labels, name, epochs=5):
+    label_encoder = LabelEncoder()
+    train_labels_encoded = label_encoder.fit_transform(train_labels)
+
+    num_classes = len(label_encoder.classes_)
+    train_labels_one_hot = tf.keras.utils.to_categorical(train_labels_encoded, num_classes=num_classes)
+
+    print(train_texts)
+    print(train_labels_one_hot)
+
     # Aplica o pré-processamento aos textos
-    train_df['text'] = train_df['text'].apply(preprocess_text)
-
-    # Cria um diretório para armazenar os textos de treino como arquivos individuais
-    output_directory = 'arquivos_texto_treino_nn'
-    os.makedirs(output_directory, exist_ok=True)
-
-    # Escreve cada texto em um arquivo separado dentro do diretório criado
-    for index, row in train_df.iterrows():
-        filename = os.path.join(output_directory, f'texto_{index}.txt')
-        with open(filename, 'w', encoding='utf-8') as file:
-            file.write(row['text'])
-
-    # Diretório de treino para o modelo
-    treino_dir = output_directory
+    #train_df['text'] = train_df['text'].apply(preprocess_text)
 
     # Cria um conjunto de dados de texto usando a API de conjuntos de dados do TensorFlow
-    train_dataset = tf.keras.utils.text_dataset_from_directory(
-        treino_dir,
-        batch_size=32,
-        shuffle=True,
-    )
+    train_dataset = tf.data.Dataset.from_tensor_slices((train_texts, train_labels_one_hot))
+
+    # Embaralha e agrupa os dados
+    train_dataset = train_dataset.shuffle(len(train_texts)).batch(32)
 
     # Parâmetros do modelo
     max_features = 20000
@@ -61,8 +52,7 @@ def create_and_train_model(train_texts, train_labels,name, epochs=5):
     )
 
     # Adapta a camada de vetorização ao conjunto de dados de texto
-    text_ds = train_dataset.map(lambda x, y: x)
-    vectorize_layer.adapt(text_ds)
+    vectorize_layer.adapt(train_dataset.map(lambda x, y: x))
 
     # Função para vetorizar o texto e manter os rótulos
     def vectorize_text(text, label):
@@ -71,39 +61,42 @@ def create_and_train_model(train_texts, train_labels,name, epochs=5):
 
     # Aplica a vetorização ao conjunto de dados de treino
     train_ds = train_dataset.map(vectorize_text)
-    train_ds = train_ds.cache().prefetch(buffer_size=10)
+    train_ds = train_ds.cache().prefetch(buffer_size=tf.data.AUTOTUNE)
 
-    # Define a arquitetura do modelo
-    inputs = tf.keras.Input(shape=(None,), dtype="int64")
-    x = layers.Embedding(max_features, embedding_dim)(inputs)
-    x = layers.Dropout(0.5)(x)
-    x = layers.Conv1D(128, 7, padding="valid", activation="relu", strides=3)(x)
-    x = layers.Conv1D(128, 7, padding="valid", activation="relu", strides=3)(x)
-    x = layers.GlobalMaxPooling1D()(x)
-    x = layers.Dense(128, activation="relu")(x)
-    x = layers.Dropout(0.5)(x)
-    predictions = layers.Dense(1, activation="sigmoid", name="predictions")(x)
+    try:
+        # Define a arquitetura do modelo
+        inputs = tf.keras.Input(shape=(sequence_length,), dtype="int64")
+        x = layers.Embedding(max_features, embedding_dim)(inputs)
+        x = layers.Dropout(0.5)(x)
+        x = layers.Conv1D(128, 7, padding="valid", activation="relu", strides=3)(x)
+        x = layers.Conv1D(128, 7, padding="valid", activation="relu", strides=3)(x)
+        x = layers.GlobalMaxPooling1D()(x)
+        x = layers.Dense(128, activation="relu")(x)
+        x = layers.Dropout(0.5)(x)
+        predictions = layers.Dense(num_classes, activation="softmax", name="predictions")(x)
 
-    # Cria e compila o modelo
-    model = tf.keras.Model(inputs, predictions)
-    model.compile(loss="binary_crossentropy", optimizer="adam", metrics=["accuracy"])
+        # Cria e compila o modelo
+        model = tf.keras.Model(inputs, predictions)
+        model.compile(loss="categorical_crossentropy", optimizer="adam", metrics=["accuracy"])
 
-    # Treina o modelo
-    history = model.fit(train_ds, epochs=epochs)
-    # Nome do arquivo
-    name = f"nn_{name}.pkl"
-    # Saving the model
-    with open(name, "wb") as model_file:
-        pickle.dump(model, model_file)   
+        # Treina o modelo
+        history = model.fit(train_ds, epochs=epochs)
 
-    # Obtém estatísticas do treinamento
-    training_stats = {
-        "loss": history.history['loss'],
-        "accuracy": history.history['accuracy']
-    }
+        # Salva o modelo
+        model_filename = f"models/Trained-Model-{name}.keras"
+        model.save(model_filename)
 
-    # Retorna estatísticas como JSON
-    return json.dumps(training_stats)
+        # Obtém estatísticas do treinamento
+        training_stats = {
+            "loss": history.history['loss'],
+            "accuracy": history.history['accuracy']
+        }
+
+        # Retorna estatísticas como JSON
+        return json.dumps(training_stats)
+
+    except Exception as e:
+        return f"Error during model creation/training: {str(e)}"
 
 '''
 Com o nome do arquivo podemos fazer por exemplo:
