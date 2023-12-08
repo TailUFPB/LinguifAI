@@ -3,12 +3,12 @@ from flask_cors import CORS
 from DataProcesser import DataProcesser
 from Neural_Network2 import create_and_train_model
 from available_classifiers import get_available_classifiers
+
 import os
 import atexit
 import threading
 import pandas as pd
 import nltk
-import pandas as pd
 import json
 nltk.download('wordnet')
 
@@ -61,8 +61,7 @@ def train_model():
     selected_data = received_data.get('data')
     selected_label = received_data.get('label')
     name = received_data.get('name')
-
-    return create_and_train_model(selected_data, selected_label, name)
+    return create_and_train_model(selected_data,selected_label,name)
 
 if __name__ == '__main__':
     server_thread = threading.Thread(target=run_flask_app)
