@@ -1,5 +1,8 @@
 import { useState } from "react";
-import { SelectFileCard } from "../components/selectFileCard/selectFileCard";
+import SelectFileCard from "../components/selectFileCard/selectFileCard";
+import axios from "axios";
+import ResultTable from "../components/resultTable/resultTable";
+import { Menu } from "../components/menu/menu";
 
 export default function Home() {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -10,6 +13,10 @@ export default function Home() {
   const [selectedColumn, setSelectedColumn] = useState<number>(0);
   const [selectedClassifier, setSelectedClassifier] = useState<string>("");
 
+  const [result, setResult] = useState<{ [key: string]: any }>({});
+
+  const [isLoading, setIsLoading] = useState(false);
+
   const handleChangeSelectedColumn = (event: any) => {
     setSelectedColumn(event.target.value);
   };
@@ -19,15 +26,72 @@ export default function Home() {
   };
 
   const handleSubmit = async () => {
+    setIsLoading(true);
     let selectedData = data.map((row) => row[selectedColumn]);
-
     console.log(selectedData);
+    console.log(selectedClassifier);
+    const response = await axios
+      .post("http://localhost:5000/classify", {
+        data: selectedData,
+        classifier: selectedClassifier,
+      })
+      .catch((error) => {
+        console.error(error.response.data);
+      });
 
-    // aqui a gente usa esse dado para a chamada da api
+    if (response && response.data) {
+      const parsedData = JSON.parse(response.data.result);
+      console.log(parsedData);
+
+      const input: any[] = Object.values(parsedData.input_column);
+      const output: any[] = Object.values(parsedData.output_column).flat(1);
+
+      if (input.length === output.length) {
+        // cria um dicionário com os valores de input e output
+        const result = input.reduce((acc, key, index) => {
+          acc[key] = output[index];
+          return acc;
+        }, {} as { [key: string]: any });
+
+        console.log(result);
+        setResult(result);
+      } else {
+        console.error("Os arrays 'input' e 'output' têm tamanhos diferentes.");
+      }
+    }
+
+    setIsLoading(false);
+  };
+
+  const handleDownloadOutputCSV = async () => {
+    // adicionar uma coluna no data
+
+    const finalHeader = header.concat(`${selectedClassifier}_output`);
+    const finalData = data.map((row) =>
+      row.concat(result[row[selectedColumn]])
+    );
+
+    // gera um csv com os dados
+
+    const csv = finalHeader
+      .join(",")
+      .concat("\n")
+      .concat(finalData.map((row) => row.join(",")).join("\n"));
+
+    // cria um link para download do csv
+
+    const csvFile = new Blob([csv], { type: "text/csv" });
+    const csvURL = window.URL.createObjectURL(csvFile);
+    const tempLink = document.createElement("a");
+    tempLink.href = csvURL;
+    tempLink.setAttribute("download", "output.csv");
+    tempLink.click();
   };
 
   return (
     <div className="bg-main-darker text-white min-h-screen flex flex-col">
+      <Menu />
+
       <div className="p-8 text-center font-roboto">
         <h1 className="text-3xl font-bold mb-6 mt-6">
           Linguif<span className="text-main-light">AI</span>
@@ -67,8 +131,9 @@ export default function Home() {
             <option value="" disabled selected className="placeholder-gray-300">
               Selecione um classificador
             </option>
-            <option value="a">Classificador a</option>
-            <option value="b">Classificador B</option>
+            <option value="0">Naive-Bayes Emotions</option>
+            <option value="1">Naive-Bayes News Topics</option>
+            <option value="2">Linear Regression Emotions</option>
           </select>
         </div>
 
@@ -77,9 +142,25 @@ export default function Home() {
             className="w-full bg-main-dark text-white py-2 px-4 hover:bg-main-darker focus:outline-none border-2 border-main-lighter rounded-3xl h-14"
             onClick={handleSubmit}
           >
-            Enviar
+            {isLoading ? "Carregando..." : "Classificar"}
           </button>
         </div>
+
+        {Object.keys(result).length > 0 && (
+          <div
+            className={`w-4/5 relative mx-auto mt-24 border-main-lighter text-white py-4 px-2 placeholder-gray-300 rounded-3xl min-h-min flex flex-col items-center justify-between`}
+          >
+            <ResultTable data={result} classifierName={"classificador tal"} />
+            <div className="w-1/4 relative mx-auto mt-10">
+              <button
+                className="w-full bg-main-dark text-white py-2 px-4 hover:bg-main-darker focus:outline-none border-2 border-main-lighter rounded-3xl h-14"
+                onClick={handleDownloadOutputCSV}
+              >
+                Baixar CSV
+              </button>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

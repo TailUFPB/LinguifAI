@@ -1,5 +1,4 @@
 import { ElementType, Suspense, lazy } from "react";
-import { useLocation } from "react-router-dom";
 import LoadingScreen from "../pages/loadingScreen";
 
 const Loadable = (Component: ElementType) => (props: any) => {
@@ -13,3 +12,4 @@ const Loadable = (Component: ElementType) => (props: any) => {
 };
 
 export const Home = Loadable(lazy(() => import("../pages/home")));
+export const Train = Loadable(lazy(() => import("../pages/train")));

@@ -1,0 +1,38 @@
+name: Create Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  release:
+    name: 🧠 Release
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: write
+      packages: write
+      pull-requests: write
+      issues: read
+    steps:
+    - name: ⬇️ Checkout source
+      uses: actions/checkout@v3
+      
+    - name: ⎔ Setup node package
+      uses: actions/setup-node@v3
+      
+    - name: 🟨 Setup python package
+      uses: actions/setup-python@v3
+      
+    - name: 📦 Install and build Node dependencies
+      run: npm install
+      
+    - name: 🐍 Install and build Python dependencies
+      run: pip install --upgrade pip #-r requirements.txt
+      
+    - name: ✍️ Release Electron app
+      run: npm run build
+      # uses: samuelmeuli/action-electron-builder@v1.6.0
+      # with:
+      #   github_token: ${{ secrets.github_token }}

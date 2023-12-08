@@ -12,7 +12,7 @@ interface props {
   setHeader: (header: string[]) => void;
 }
 
-export function SelectFileCard({
+export default function SelectFileCard({
   selectedFile,
   setSelectedFile,
   setData,
@@ -27,21 +27,6 @@ export function SelectFileCard({
     const file = event.target.files?.[0];
     if (file && file.name.endsWith(".csv")) {
       setSelectedFile(file);
-
-      const formData = new FormData();
-      formData.append("file", file);
-
-      try {
-        const response = await fetch("http://localhost:5000/upload", {
-          method: "POST",
-          body: formData,
-        });
-
-        console.log("Upload do arquivo feito");
-        console.log(response);
-      } catch (error) {
-        console.error("Erro no upload de arquivo: ", error);
-      }
 
       Papa.parse(file, {
         header: true,
@@ -120,7 +105,7 @@ export function SelectFileCard({
           )}
 
           {data.length > 0 && (
-            <CsvTable data={data.slice(1, 5)} head={header} />
+            <CsvTable data={data.slice(0, 4)} head={header} />
           )}
 
           <button
@@ -137,6 +122,7 @@ export function SelectFileCard({
           <input
             type="file"
             id="fileInput"
+            data-testid="fileInput"
             style={{ display: "none" }}
             accept=".csv"
             onChange={handleFileChange}
