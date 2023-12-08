@@ -1,0 +1,17 @@
+.menu-enter {
+    max-width: 0;
+  }
+
+  .menu-enter-active {
+    transition: max-width 700ms;
+    max-width: 100%;
+  }
+
+  .menu-exit {
+    max-width: 100%;
+  }
+
+  .menu-exit-active {
+    transition: max-width 600ms;
+    max-width: 0;
+  }
