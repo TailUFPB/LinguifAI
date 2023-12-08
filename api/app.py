@@ -1,13 +1,14 @@
 from flask import Flask, jsonify, request
 from flask_cors import CORS
 from DataProcesser import DataProcesser
-from available_classifiers import get_available_classifiers
 
+from available_classifiers import get_available_classifiers
 import os
 import atexit
 import threading
 import pandas as pd
 import nltk
+import pandas as pd
 import json
 nltk.download('wordnet')
 
@@ -53,6 +54,14 @@ def get_classifiers():
 def shutdown():
     shutdown_server()
     return 'Server shutting down...'
+
+@app.route('/neural-network',methods=["POST"])
+def train_model():
+    received_data = request.get_json()
+    selected_data = received_data.get('data')
+    selected_label = received_data.get('label')
+    name = received_data.get('name')
+    return create_and_train_model(selected_data,selected_label,name) 
 
 if __name__ == '__main__':
     server_thread = threading.Thread(target=run_flask_app)

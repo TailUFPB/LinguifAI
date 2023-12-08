@@ -1,0 +1,17 @@
+import pandas as pd
+import pickle
+
+def nn_fakenews_precition(texts):
+    model_file = "api/models/nn_fakenews_model.pkl"
+    try:
+        # Carregando o pipeline do arquivo .pkl
+        with open(model_file, 'rb') as model_file:
+            pipeline = pickle.load(model_file)
+
+        # Fazendo previsões para os textos
+        predictions = pipeline.predict(texts)
+
+        return predictions
+    
+    except Exception as e:
+        return str(e)
