@@ -20,7 +20,7 @@ def preprocess_text(text):
     text = re.sub('\w*\d\w*', '', text)
     return text
 
-def create_and_train_model(train_texts, train_labels, name, epochs=5):
+def create_and_train_model(train_texts, train_labels, name, epochs=5, batch_size=32):
     label_encoder = LabelEncoder()
     train_labels_encoded = label_encoder.fit_transform(train_labels)
 
@@ -76,11 +76,11 @@ def create_and_train_model(train_texts, train_labels, name, epochs=5):
         predictions = layers.Dense(num_classes, activation="softmax", name="predictions")(x)
 
         # Cria e compila o modelo
-        model = tf.keras.Model(inputs, predictions)
+        model = tf.keras.Model(inputs, predictions, name)
         model.compile(loss="categorical_crossentropy", optimizer="adam", metrics=["accuracy"])
 
         # Treina o modelo
-        history = model.fit(train_ds, epochs=epochs)
+        history = model.fit(train_ds, epochs=epochs, batch_size=batch_size)
 
         # Salva o modelo
         model_filename = f"models/Trained-Model-{name}.keras"

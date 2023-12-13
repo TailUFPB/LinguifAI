@@ -61,7 +61,9 @@ def train_model():
     selected_data = received_data.get('data')
     selected_label = received_data.get('label')
     name = received_data.get('name')
-    return create_and_train_model(selected_data,selected_label,name)
+    epochs = received_data.get('epochs')
+    batch_size = received_data.get('batch_size')
+    return create_and_train_model(selected_data, selected_label, name, epochs)
 
 if __name__ == '__main__':
     server_thread = threading.Thread(target=run_flask_app)
