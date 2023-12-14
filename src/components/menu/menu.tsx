@@ -14,7 +14,7 @@ export function Menu() {
   return (
     <>
       <button
-        className="text-white fixed top-0 left-0 p-4 focus:outline-none focus:text-white"
+        className="text-white fixed top-0 left-0 p-4 focus:outline-none focus:text-white hover:text-blue-300 transition"
         onClick={toggleMenu}
       >
         {isExpanded ? (
@@ -33,17 +33,17 @@ export function Menu() {
           <div className="p-4 flex justify-between items-center">
             <div className="text-2xl font-bold">Menu</div>
             <button
-              className="text-white focus:outline-none p-2"
+              className="text-white focus:outline-none p-2 hover:text-blue-300 transition"
               onClick={toggleMenu}
             >
               <HiOutlineX className="h-6 w-6" />
             </button>
           </div>
           <ul className="p-4">
-            <li className="my-2">
+            <li className="my-2 hover:text-blue-300 transition">
               <Link to="/">Classificar</Link>
             </li>
-            <li className="my-2">
+            <li className="my-2 hover:text-blue-300 transition">
               <Link to="/train">Treinar</Link>
             </li>
           </ul>
