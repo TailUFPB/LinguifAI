@@ -27,8 +27,8 @@ def create_and_train_model(train_texts, train_labels, name, epochs=5):
     num_classes = len(label_encoder.classes_)
     train_labels_one_hot = tf.keras.utils.to_categorical(train_labels_encoded, num_classes=num_classes)
 
-    print(train_texts)
-    print(train_labels_one_hot)
+    #print(train_texts)
+    #print(train_labels_one_hot)
 
     # Aplica o pré-processamento aos textos
     #train_df['text'] = train_df['text'].apply(preprocess_text)
