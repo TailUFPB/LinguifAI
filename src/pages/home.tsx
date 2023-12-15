@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import SelectFileCard from "../components/selectFileCard/selectFileCard";
 import axios from "axios";
 import ResultTable from "../components/resultTable/resultTable";
@@ -13,9 +13,24 @@ export default function Home() {
   const [selectedColumn, setSelectedColumn] = useState<number>(0);
   const [selectedClassifier, setSelectedClassifier] = useState<string>("");
 
+  const [classifiers, setClassifiers] = useState<{ [key: string]: string }>({});
+
   const [result, setResult] = useState<{ [key: string]: any }>({});
 
   const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    const fetchClassifiers = async () => {
+      try {
+        const response = await axios.get("http://localhost:5000/get-classifiers");
+        setClassifiers(response.data);
+      } catch (error) {
+        console.error('Erro ao buscar classificadores:', error);
+      }
+    };
+
+    fetchClassifiers();
+  }, []);
 
   const handleChangeSelectedColumn = (event: any) => {
     setSelectedColumn(event.target.value);
@@ -131,9 +146,11 @@ export default function Home() {
             <option value="" disabled selected className="placeholder-gray-300">
               Selecione um classificador
             </option>
-            <option value="0">Naive-Bayes Emotions</option>
-            <option value="1">Naive-Bayes News Topics</option>
-            <option value="2">Linear Regression Emotions</option>
+            {Object.entries(classifiers).map(([value, label]) => (
+            <option key={value} value={value}>
+              {label}
+            </option>
+          ))}
           </select>
         </div>
 
