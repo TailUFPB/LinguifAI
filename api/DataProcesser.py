@@ -1,7 +1,13 @@
-import pandas as pd
 from NbNewsModel import news_prediction
 from NbEmotionsModel import make_prediction
 from NbLinRegressionModel import make_prediction_nblin
+from available_classifiers import get_available_classifiers
+from tensorflow.keras.models import load_model
+
+import pandas as pd
+import numpy as np
+import tensorflow as tf
+import pickle
 import nltk
 import re
 from nltk.corpus import stopwords
@@ -13,13 +19,19 @@ class DataProcesser():
     stopwords_english = stopwords.words('english')
 
     def handle_classify(self, df, classifier):
-        classifier_switcher = {
-            0: self.classify_emotions,
-            1: self.nb_news_application,
-            2: self.lin_regression_model
-        }
+        classifier_switcher = get_available_classifiers() # id: nome_arquivo
+        model_name = classifier_switcher[classifier]
+        if model_name.endswith('.pkl'):
+            return self.pretrained_predict(df, model_name)
+        elif model_name.endswith('.keras'):
+            return self.trained_predict(df, model_name)
+        #classifier_switcher = {
+        #    0: self.classify_emotions,
+        #    1: self.nb_news_application,
+        #    2: self.lin_regression_model
+        #}
 
-        return classifier_switcher.get(classifier, lambda: "Invalid Classifier")(df)
+        #return classifier_switcher.get(classifier, lambda: "Invalid Classifier")(df)
 
     def generate_statistics(self, df):
         unique_labels = df['output_column'].unique()
@@ -58,4 +70,26 @@ class DataProcesser():
         df['output_column'] = df['input_column'].apply(news_prediction)
         return df
 
+    def pretrained_predict(self, df, model_name):
+        model_file = f'api/models/{model_name}'
+        with open(model_file, 'rb') as model:
+            pipeline = pickle.load(model)
+
+        texts_to_predict = df['input_column']
+        predictions = pipeline.predict(texts_to_predict)
+        df['output_column'] = predictions
+        return df
+
+    def trained_predict(self, df, model_name):
+        model_file = f'api/models/{model_name}'
+        model = load_model(model_file)
+
+        raw_text = df['input_column'].tolist()
+
+        predictions = model.predict(raw_text)
+        predicted_labels = tf.argmax(predictions, axis=1).numpy()
+
+        df['output_column'] = predicted_labels.astype(str)
+
+        return df
     ##TODO métodos com o processamento de classificação

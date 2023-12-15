@@ -27,12 +27,6 @@ def create_and_train_model(train_texts, train_labels, name, epochs=5):
     num_classes = len(label_encoder.classes_)
     train_labels_one_hot = tf.keras.utils.to_categorical(train_labels_encoded, num_classes=num_classes)
 
-    #print(train_texts)
-    #print(train_labels_one_hot)
-
-    # Aplica o pré-processamento aos textos
-    #train_df['text'] = train_df['text'].apply(preprocess_text)
-
     # Cria um conjunto de dados de texto usando a API de conjuntos de dados do TensorFlow
     train_dataset = tf.data.Dataset.from_tensor_slices((train_texts, train_labels_one_hot))
 
@@ -54,36 +48,25 @@ def create_and_train_model(train_texts, train_labels, name, epochs=5):
     # Adapta a camada de vetorização ao conjunto de dados de texto
     vectorize_layer.adapt(train_dataset.map(lambda x, y: x))
 
-    # Função para vetorizar o texto e manter os rótulos
-    def vectorize_text(text, label):
-        text = tf.expand_dims(text, -1)
-        return vectorize_layer(text), label
-
-    # Aplica a vetorização ao conjunto de dados de treino
-    train_ds = train_dataset.map(vectorize_text)
-    train_ds = train_ds.cache().prefetch(buffer_size=tf.data.AUTOTUNE)
+    # Define a arquitetura do modelo
+    model = tf.keras.Sequential([
+        vectorize_layer,
+        layers.Embedding(max_features, embedding_dim),
+        layers.Conv1D(128, 7, padding="valid", activation="relu", strides=3),
+        layers.Conv1D(128, 7, padding="valid", activation="relu", strides=3),
+        layers.GlobalMaxPooling1D(),
+        layers.Dense(128, activation="relu"),
+        layers.Dropout(0.5),
+        layers.Dense(num_classes, activation="softmax", name="predictions")
+    ])
+    model.compile(loss="categorical_crossentropy", optimizer="adam", metrics=["accuracy"])
 
     try:
-        # Define a arquitetura do modelo
-        inputs = tf.keras.Input(shape=(sequence_length,), dtype="int64")
-        x = layers.Embedding(max_features, embedding_dim)(inputs)
-        x = layers.Dropout(0.5)(x)
-        x = layers.Conv1D(128, 7, padding="valid", activation="relu", strides=3)(x)
-        x = layers.Conv1D(128, 7, padding="valid", activation="relu", strides=3)(x)
-        x = layers.GlobalMaxPooling1D()(x)
-        x = layers.Dense(128, activation="relu")(x)
-        x = layers.Dropout(0.5)(x)
-        predictions = layers.Dense(num_classes, activation="softmax", name="predictions")(x)
-
-        # Cria e compila o modelo
-        model = tf.keras.Model(inputs, predictions)
-        model.compile(loss="categorical_crossentropy", optimizer="adam", metrics=["accuracy"])
-
         # Treina o modelo
-        history = model.fit(train_ds, epochs=epochs)
+        history = model.fit(train_dataset, epochs=epochs)
 
         # Salva o modelo
-        model_filename = f"models/Trained-Model-{name}.keras"
+        model_filename = f"api/models/Trained-Model-{name}.keras"
         model.save(model_filename)
 
         # Obtém estatísticas do treinamento
