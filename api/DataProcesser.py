@@ -8,9 +8,11 @@ import pandas as pd
 import numpy as np
 import tensorflow as tf
 import pickle
-import nltk
 import re
+import joblib
+import string
 from nltk.corpus import stopwords
+import nltk
 # mais imports
 
 class DataProcesser():
@@ -44,19 +46,17 @@ class DataProcesser():
 
         return statistics
 
-    def preprocess_text(self, texto):
-        if self.input_column is not None:  # Verifique se a coluna foi definida
-            # tiro tudo que não for texto e espaço
-            texto = re.sub('[^a-z\s]', '', texto.lower())
-            # tokenizo em palavras e elimino as stopwords
-            palavras = [w for w in texto.split(
-            ) if w not in set(self.stopwords_english)]
-            palavras = [w for w in texto if nltk.corpus.wordnet.synsets(w)]
-            # texto_junto = ' '.join(texto)
-            # junto as palavras novamente com espaços
-            return ''.join(palavras)
-        else:
-            return "Coluna não escolhida. Escolha a coluna primeiro."
+    def preprocess_text(self, text):
+        text = text.lower()
+        text = re.sub('\[.*?\]', '', text)
+        text = re.sub("\\W", " ", text)
+        text = re.sub('https?://\S+|www\.\S+', '', text)
+        text = re.sub('<.*?>+', '', text)
+        text = re.sub('[%s]' % re.escape(string.punctuation), '', text)
+        text = re.sub('\n', '', text)
+        text = re.sub('\w*\d\w*', '', text)
+
+        return text
 
     def classify_emotions(self, df):
         df['output_column'] = df['input_column'].apply(make_prediction)
@@ -84,12 +84,20 @@ class DataProcesser():
         model_file = f'api/models/{model_name}'
         model = load_model(model_file)
 
+        encoder_re = r'Trained-Model-(.*?).keras'
+        encoder_name = re.search(encoder_re, model_name).group(1)
+
+        label_map_filename = f"api\encoders/LabelMapping-{encoder_name}.joblib"
+        label_encoder = joblib.load(label_map_filename)
+
         raw_text = df['input_column'].tolist()
+        test_texts = [self.preprocess_text(text) for text in raw_text]
 
-        predictions = model.predict(raw_text)
-        predicted_labels = tf.argmax(predictions, axis=1).numpy()
+        predictions = model.predict(test_texts)
+        predicted_labels_encoded = tf.argmax(predictions, axis=1).numpy()
+        predicted_labels = [label_encoder.classes_[label] for label in predicted_labels_encoded]
 
-        df['output_column'] = predicted_labels.astype(str)
+        df['output_column'] = predicted_labels
 
         return df
     ##TODO métodos com o processamento de classificação

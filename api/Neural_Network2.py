@@ -4,6 +4,8 @@ import string
 import pandas as pd
 import numpy as np
 import tensorflow as tf
+import joblib
+
 from tensorflow.keras import layers
 from tensorflow.keras.layers import TextVectorization
 from tensorflow.keras.models import Sequential
@@ -26,6 +28,9 @@ def create_and_train_model(train_texts, train_labels, name, epochs=5):
 
     num_classes = len(label_encoder.classes_)
     train_labels_one_hot = tf.keras.utils.to_categorical(train_labels_encoded, num_classes=num_classes)
+
+    label_mapping_file = f"api\encoders/LabelMapping-{name}.joblib"
+    joblib.dump(label_encoder, label_mapping_file)
 
     # Cria um conjunto de dados de texto usando a API de conjuntos de dados do TensorFlow
     train_dataset = tf.data.Dataset.from_tensor_slices((train_texts, train_labels_one_hot))
@@ -80,40 +85,3 @@ def create_and_train_model(train_texts, train_labels, name, epochs=5):
 
     except Exception as e:
         return f"Error during model creation/training: {str(e)}"
-
-'''
-Com o nome do arquivo podemos fazer por exemplo:
-
-saved_model_filename = Neural_Network(texts_train, labels_train)
-
-Carregar o modelo treinado a partir do arquivo:
-with open(saved_model_filename, "rb") as model_file:
-    loaded_model = pickle.load(model_file)
-
-Agora, podemos usar loaded_model para fazer previsões, por exemplo:
-predictions = loaded_model.predict(new_texts)
-
-'''
-'''
-TESTE:
-
-df_true = pd.read_csv("Linguifai/api/training_df/True.csv")
-df_fake = pd.read_csv("Linguifai/api/training_df/Fake.csv")
-
-
-df_fake = df_fake.drop(['title', 'subject', 'date'], axis=1)
-df_true = df_true.drop(['title', 'subject', 'date'], axis=1)
-
-
-df_fake['text'] = df_fake["text"]
-df_true['text'] = df_true["text"]
-
-df_fake_train = df_fake[:5000]
-df_true_train = df_true[:5000]
-
-textos = df_fake_train['text'].tolist() + df_true_train['text'].tolist()
-labels = [0] * len(df_fake_train) + [1] * len(df_true_train)
-
-create_and_train_model(textos,labels,"Teste")
-
-'''
