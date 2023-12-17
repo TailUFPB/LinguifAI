@@ -8,7 +8,7 @@ from tensorflow.keras import layers
 from tensorflow.keras.layers import TextVectorization
 from tensorflow.keras.models import Sequential
 from sklearn.preprocessing import LabelEncoder
-
+import joblib
 def preprocess_text(text):
     text = text.lower()
     text = re.sub('\[.*?\]', '', text)
@@ -20,12 +20,17 @@ def preprocess_text(text):
     text = re.sub('\w*\d\w*', '', text)
     return text
 
-def create_and_train_model(train_texts, train_labels, name, epochs=5):
+def create_and_train_model(train_texts, train_labels, name, epochs=5, batch_size=32):
     label_encoder = LabelEncoder()
     train_labels_encoded = label_encoder.fit_transform(train_labels)
 
     num_classes = len(label_encoder.classes_)
     train_labels_one_hot = tf.keras.utils.to_categorical(train_labels_encoded, num_classes=num_classes)
+
+    # Salva o mapeamento de rótulos em um arquivo
+    label_mapping_filename = f"models/LabelMapping-{name}.joblib"
+    joblib.dump(label_encoder, label_mapping_filename)
+
 
     print(train_texts)
     print(train_labels_one_hot)
@@ -76,11 +81,11 @@ def create_and_train_model(train_texts, train_labels, name, epochs=5):
         predictions = layers.Dense(num_classes, activation="softmax", name="predictions")(x)
 
         # Cria e compila o modelo
-        model = tf.keras.Model(inputs, predictions)
+        model = tf.keras.Model(inputs, predictions, name)
         model.compile(loss="categorical_crossentropy", optimizer="adam", metrics=["accuracy"])
 
         # Treina o modelo
-        history = model.fit(train_ds, epochs=epochs)
+        history = model.fit(train_ds, epochs=epochs, batch_size=batch_size)
 
         # Salva o modelo
         model_filename = f"models/Trained-Model-{name}.keras"
@@ -97,6 +102,36 @@ def create_and_train_model(train_texts, train_labels, name, epochs=5):
 
     except Exception as e:
         return f"Error during model creation/training: {str(e)}"
+
+def predict_with_label_mapping_nn(model_name, test_texts):
+    # Cria uma camada de vetorização de texto
+    vectorize_layer = TextVectorization(
+        max_tokens=20000,
+        output_mode="int",
+        output_sequence_length=500,
+    )
+    # Carrega o modelo treinado
+    model = tf.keras.models.load_model(f"models/Trained-Model-{model_name}.keras")
+
+    # Carrega o mapeamento de rótulos
+    label_mapping_filename = f"models/LabelMapping-{model_name}.joblib"
+    label_encoder = joblib.load(label_mapping_filename)
+
+    # Aplica o pré-processamento aos textos de teste
+    test_texts = [preprocess_text(text) for text in test_texts]
+
+    # Vetoriza os textos de teste usando a mesma camada de vetorização
+    test_ds = vectorize_layer(np.array(test_texts)).numpy()
+
+    # Faz previsões
+    predictions = model.predict(test_ds)
+
+    # Destransforma as previsões usando o mapeamento de rótulos
+    predicted_labels_encoded = np.argmax(predictions, axis=1)
+    predicted_labels = [label_encoder.classes_[label] for label in predicted_labels_encoded]
+
+    return predicted_labels
+
 
 '''
 Com o nome do arquivo podemos fazer por exemplo:
