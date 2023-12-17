@@ -25,7 +25,46 @@ export default function Train() {
     setSelectedLabel(event.target.value);
   };
 
-  const handleSubmit = async () => {};
+  const handleSubmit = async () => {
+    setIsLoading(true);
+    let selectedData = data.map((row) => row[selectedColumn]);
+    console.log(selectedLabel)
+    //let labels = data.map((row) => row[selectedLabel])
+    const response = await axios
+      .post("http://localhost:5000/neural-network", {
+        data: selectedData,
+        label: selectedLabel,
+        name: "Teste-Front",
+        epochs: 5,
+        batch_size: 32
+      })
+      .catch((error) => {
+        console.error(error.response.data);
+      });
+
+    if (response && response.data) {
+      const parsedData = JSON.parse(response.data.result);
+      console.log(parsedData);
+
+      const input: any[] = Object.values(parsedData.input_column);
+      const output: any[] = Object.values(parsedData.output_column).flat(1);
+
+      if (input.length === output.length) {
+        // cria um dicionário com os valores de input e output
+        const result = input.reduce((acc, key, index) => {
+          acc[key] = output[index];
+          return acc;
+        }, {} as { [key: string]: any });
+
+        console.log(result);
+        setResult(result);
+      } else {
+        console.error("Os arrays 'input' e 'output' têm tamanhos diferentes.");
+      }
+    }
+
+    setIsLoading(false);
+  };
 
   return (
     <div className="bg-main-darker text-white min-h-screen flex flex-col">

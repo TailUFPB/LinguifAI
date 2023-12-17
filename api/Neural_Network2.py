@@ -22,7 +22,7 @@ def preprocess_text(text):
     text = re.sub('\w*\d\w*', '', text)
     return text
 
-def create_and_train_model(train_texts, train_labels, name, epochs=5):
+def create_and_train_model(train_texts, train_labels, name, epochs=5, batch_size=32):
     label_encoder = LabelEncoder()
     train_labels_encoded = label_encoder.fit_transform(train_labels)
 
@@ -68,7 +68,7 @@ def create_and_train_model(train_texts, train_labels, name, epochs=5):
 
     try:
         # Treina o modelo
-        history = model.fit(train_dataset, epochs=epochs)
+        history = model.fit(train_dataset, epochs=epochs, batch_size=batch_size)
 
         # Salva o modelo
         model_filename = f"api/models/Trained-Model-{name}.keras"

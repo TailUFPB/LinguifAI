@@ -58,10 +58,16 @@ def shutdown():
 @app.route('/neural-network',methods=["POST"])
 def train_model():
     received_data = request.get_json()
+
     selected_data = received_data.get('data')
     selected_label = received_data.get('label')
     name = received_data.get('name')
-    return create_and_train_model(selected_data,selected_label,name)
+
+    epochs = received_data.get('epochs')
+    batch_size = received_data.get('batch_size')
+    print(selected_label)
+
+    return create_and_train_model(selected_data, selected_label, name, epochs, batch_size)
 
 if __name__ == '__main__':
     server_thread = threading.Thread(target=run_flask_app)
