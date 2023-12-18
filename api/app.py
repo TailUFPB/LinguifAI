@@ -10,6 +10,7 @@ import threading
 import pandas as pd
 import nltk
 import json
+import asyncio
 nltk.download('wordnet')
 
 app = Flask(__name__)
@@ -19,6 +20,8 @@ CORS(app)  # Permite todas as origens por padrão (não recomendado para produç
 app.config['JSONIFY_PRETTYPRINT_REGULAR'] = True
 
 data_processer = DataProcesser()
+
+loop = asyncio.get_event_loop()
 
 def run_flask_app():
     global server_thread
@@ -76,14 +79,26 @@ def train_model():
         print("Batch Size: " + str(batch_size))
         print("Learning Rate: " + str(learning_rate))
         print("\n")
-
-        return jsonify({"message": "Received data successfully."})
     else:
         return jsonify({"message": "No data received."}), 400
 
-    return create_and_train_model(selected_data, selected_label, name, epochs, batch_size)
+    create_and_train_model(selected_data, selected_label, name, epochs, batch_size)
+        
+    return jsonify({"message": "Model train started successfully."}), 200 
+
+@app.route('/training-status', methods=['GET'])
+def get_training_status():
+    try:
+        with open('training_progress.json', 'r') as file:
+            data = json.load(file)
+            training_status = data.get('training_in_progress', False)
+            progress = data.get('training_progress', 0)
+            return jsonify({'training_in_progress': training_status, 'training_progress': progress})
+    except FileNotFoundError:
+        return jsonify({'training_in_progress': False, 'training_progress': 0})
 
 if __name__ == '__main__':
     server_thread = threading.Thread(target=run_flask_app)
     server_thread.start()
     atexit.register(shutdown_server)
+
