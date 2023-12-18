@@ -82,6 +82,14 @@ def train_model():
     else:
         return jsonify({"message": "No data received."}), 400
 
+    # reseta status
+    training_progress = {
+        'training_progress': 1,
+        'training_in_progress': True
+    }
+    with open('training_progress.json', 'w') as file:
+        json.dump(training_progress, file)
+
     create_and_train_model(selected_data, selected_label, name, epochs, batch_size)
         
     return jsonify({"message": "Model train started successfully."}), 200 

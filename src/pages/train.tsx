@@ -25,6 +25,7 @@ export default function Train() {
 
   const handleSubmit = async () => {
     setIsLoading(true);
+    setLoadingProgress(1);
 
     let selectedData = data.map((row) => ({
       value: row[selectedColumn],
@@ -105,7 +106,11 @@ export default function Train() {
           "http://localhost:5000/training-status"
         );
         const { training_progress, training_in_progress } = response.data;
-        setLoadingProgress(training_in_progress ? training_progress : 1);
+        setLoadingProgress(
+          training_in_progress || training_progress === 100
+            ? training_progress
+            : 1
+        );
       } catch (error) {
         console.error("Erro ao buscar progresso:", error);
       }
@@ -277,10 +282,9 @@ export default function Train() {
                 {isLoading && (
                   <div className="relative w-full">
                     <div className="bg-main-bold flex rounded-lg h-10 absolute top-0 left-0 w-full text-white">
-                      {`Treinamento em ${loadingProgress}%`}
                     </div>
                     <div
-                      className="bg-blue-500 h-10 rounded-lg absolute top-0 left-0 w-full"
+                      className="bg-blue-500 h-10 rounded-lg absolute top-0 left-0 w-full transition-width duration-500"
                       style={{ width: `${loadingProgress}%` }}
                     ></div>
                     <div className="flex items-center justify-center h-10 absolute top-0 left-0 w-full text-white">
@@ -291,7 +295,7 @@ export default function Train() {
 
                 <button
                   className={`w-full bg-main-dark text-white py-2 px-4 hover:bg-main-darker focus:outline-none border-2 border-main-lighter rounded-3xl h-14 ${
-                    isLoading ? "opacity-0 pointer-events-none" : ""
+                    (isLoading) ? "opacity-0 pointer-events-none" : ""
                   }`}
                   onClick={handleSubmit}
                   disabled={isLoading}
