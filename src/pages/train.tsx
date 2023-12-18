@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import SelectFileCard from "../components/selectFileCard/selectFileCard";
 import axios from "axios";
 import ResultTable from "../components/resultTable/resultTable";
@@ -93,6 +93,28 @@ export default function Train() {
   const toggleAdvancedOptions = () => {
     setAdvancedOptionsVisible(!advancedOptionsVisible);
   };
+
+  // carregamento
+
+  const [loadingProgress, setLoadingProgress] = useState(0);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await axios.get(
+          "http://localhost:5000/training-status"
+        );
+        const { training_progress, training_in_progress } = response.data;
+        setLoadingProgress(training_in_progress ? training_progress : 1);
+      } catch (error) {
+        console.error("Erro ao buscar progresso:", error);
+      }
+    };
+
+    const interval = setInterval(fetchData, 3000);
+
+    return () => clearInterval(interval);
+  }, []);
 
   return (
     <div className="bg-main-darker text-white min-h-screen flex flex-col">
@@ -251,12 +273,32 @@ export default function Train() {
             )}
 
             <div className="xl:w-1/2 sm:w-10/12  relative mx-auto mt-10">
-              <button
-                className="w-full bg-main-dark text-white py-2 px-4 hover:bg-main-darker focus:outline-none border-2 border-main-lighter rounded-3xl h-14"
-                onClick={handleSubmit}
-              >
-                {isLoading ? "Carregando..." : "Treinar"}
-              </button>
+              <div className="relative w-full">
+                {isLoading && (
+                  <div className="relative w-full">
+                    <div className="bg-main-bold flex rounded-lg h-10 absolute top-0 left-0 w-full text-white">
+                      {`Treinamento em ${loadingProgress}%`}
+                    </div>
+                    <div
+                      className="bg-blue-500 h-10 rounded-lg absolute top-0 left-0 w-full"
+                      style={{ width: `${loadingProgress}%` }}
+                    ></div>
+                    <div className="flex items-center justify-center h-10 absolute top-0 left-0 w-full text-white">
+                      {`Treinamento em ${loadingProgress}%`}
+                    </div>
+                  </div>
+                )}
+
+                <button
+                  className={`w-full bg-main-dark text-white py-2 px-4 hover:bg-main-darker focus:outline-none border-2 border-main-lighter rounded-3xl h-14 ${
+                    isLoading ? "opacity-0 pointer-events-none" : ""
+                  }`}
+                  onClick={handleSubmit}
+                  disabled={isLoading}
+                >
+                  {isLoading ? "Carregando..." : "Treinar"}
+                </button>
+              </div>
             </div>
           </>
         )}
