@@ -124,7 +124,6 @@ export default function Home() {
 
         {selectedFile && (
           <>
-            (
             <div className="w-1/3 relative mx-auto mt-24">
               <select
                 className="w-full bg-main-dark border-2 border-main-lighter rounded-3xl py-2 px-4 hover:bg-main-darker text-white focus:outline-none h-14"
@@ -190,7 +189,6 @@ export default function Home() {
                 </div>
               </div>
             )}
-            )
           </>
         )}
       </div>
