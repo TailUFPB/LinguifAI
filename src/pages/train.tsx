@@ -11,9 +11,7 @@ export default function Train() {
   const [header, setHeader] = useState<string[]>([]);
 
   const [selectedColumn, setSelectedColumn] = useState<number>(0);
-  const [selectedLabel, setSelectedLabel] = useState<string>("");
-
-  const [result, setResult] = useState<{ [key: string]: any }>({});
+  const [selectedLabel, setSelectedLabel] = useState<number>(0);
 
   const [isLoading, setIsLoading] = useState(false);
 
@@ -27,43 +25,73 @@ export default function Train() {
 
   const handleSubmit = async () => {
     setIsLoading(true);
-    let selectedData = data.map((row) => row[selectedColumn]);
-    console.log(selectedLabel)
-    //let labels = data.map((row) => row[selectedLabel])
+
+    let selectedData = data.map((row) => ({
+      value: row[selectedColumn],
+      label: row[selectedLabel],
+    }));
+
+    let selectedLabels = data.map((row) => row[selectedLabel]);
+    let selectedValues = data.map((row) => row[selectedColumn]);
+
+    const sendData = {
+      data: selectedValues,
+      label: selectedLabels,
+      batch_size: batchSize || 16,
+      epochs: epochs || 50,
+      learning_rate: learningRate || 0.001,
+      name: modelName || "trained-model",
+    };
+
+    console.log(sendData);
+
     const response = await axios
-      .post("http://localhost:5000/neural-network", {
-        data: selectedData,
-        label: selectedLabel,
-        name: "Teste-Front",
-        epochs: 5,
-        batch_size: 32
-      })
+      .post("http://localhost:5000/neural-network", sendData)
       .catch((error) => {
         console.error(error.response.data);
       });
 
     if (response && response.data) {
-      const parsedData = JSON.parse(response.data.result);
-      console.log(parsedData);
-
-      const input: any[] = Object.values(parsedData.input_column);
-      const output: any[] = Object.values(parsedData.output_column).flat(1);
-
-      if (input.length === output.length) {
-        // cria um dicionário com os valores de input e output
-        const result = input.reduce((acc, key, index) => {
-          acc[key] = output[index];
-          return acc;
-        }, {} as { [key: string]: any });
-
-        console.log(result);
-        setResult(result);
-      } else {
-        console.error("Os arrays 'input' e 'output' têm tamanhos diferentes.");
-      }
+      console.log(response.data);
     }
-
     setIsLoading(false);
+  };
+
+  const [batchSize, setBatchSize] = useState<number>(16);
+  const [epochs, setEpochs] = useState<number>(50);
+  const [learningRate, setLearningRate] = useState<number>(0.001);
+  const [modelName, setModelName] = useState<string>("");
+
+  const handleBatchSizeChange = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const value = parseInt(event.target.value);
+    setBatchSize(value);
+  };
+
+  const handleEpochsChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const value = parseInt(event.target.value);
+    setEpochs(value);
+  };
+
+  const handleLearningRateChange = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const value = parseFloat(event.target.value);
+    setLearningRate(value);
+  };
+
+  const handleModelNameChange = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const value = event.target.value;
+    setModelName(value);
+  };
+
+  const [advancedOptionsVisible, setAdvancedOptionsVisible] = useState(false);
+
+  const toggleAdvancedOptions = () => {
+    setAdvancedOptionsVisible(!advancedOptionsVisible);
   };
 
   return (
@@ -86,44 +114,152 @@ export default function Train() {
           />
         }
 
-        <div className="w-1/3 relative mx-auto mt-24">
-          <select
-            className="w-full bg-main-dark border-2 border-main-lighter rounded-3xl py-2 px-4 hover:bg-main-darker text-white focus:outline-none h-14"
-            onChange={handleChangeSelectedColumn}
-          >
-            <option value="" disabled selected className="placeholder-gray-300">
-              Selecione a coluna de entrada
-            </option>
-            {header.length > 0 &&
-              header.map((column: string, index: number) => {
-                return <option value={index}>{column}</option>;
-              })}
-          </select>
-        </div>
+        {selectedFile && (
+          <>
+            <div className="xl:w-1/2 sm:w-10/12 relative mx-auto mt-24">
+              <label
+                htmlFor="modelName"
+                className="block text-white mb-2 left-0"
+              >
+                Nome do modelo
+              </label>
+              <input
+                id="modelName"
+                placeholder="Insira o nome do modelo..."
+                type="text"
+                className="w-full bg-main-dark border-2 border-main-lighter rounded-3xl py-2 px-4 hover:bg-main-darker text-white focus:outline-none h-14"
+                onChange={handleModelNameChange}
+              />
+            </div>
 
-        <div className="w-1/3 relative mx-auto mt-10">
-          <select
-            className="w-full bg-main-dark border-2 border-main-lighter rounded-3xl py-2 px-4 hover:bg-main-darker text-white focus:outline-none h-14"
-            onChange={handleChangeSelectedColumn}
-          >
-            <option value="" disabled selected className="placeholder-gray-300">
-              Selecione a coluna de label
-            </option>
-            {header.length > 0 &&
-              header.map((column: string, index: number) => {
-                return <option value={index}>{column}</option>;
-              })}
-          </select>
-        </div>
+            <div className="xl:w-1/2 sm:w-10/12 relative mx-auto mt-10">
+              <label
+                htmlFor="selectedColumn"
+                className="block text-white mb-2 left-0"
+              >
+                Coluna de entrada
+              </label>
+              <select
+                id="selectedColumn"
+                className="w-full bg-main-dark border-2 border-main-lighter rounded-3xl py-2 px-4 hover:bg-main-darker text-white focus:outline-none h-14"
+                onChange={handleChangeSelectedColumn}
+              >
+                <option
+                  value=""
+                  disabled
+                  selected
+                  className="placeholder-gray-300"
+                >
+                  Selecione a coluna de entrada
+                </option>
+                {header.length > 0 &&
+                  header.map((column: string, index: number) => {
+                    return <option value={index}>{column}</option>;
+                  })}
+              </select>
+            </div>
 
-        <div className="w-1/4 relative mx-auto mt-10">
-          <button
-            className="w-full bg-main-dark text-white py-2 px-4 hover:bg-main-darker focus:outline-none border-2 border-main-lighter rounded-3xl h-14"
-            onClick={handleSubmit}
-          >
-            {isLoading ? "Carregando..." : "Treinar"}
-          </button>
-        </div>
+            <div className="xl:w-1/2 sm:w-10/12 relative mx-auto mt-10">
+              <label
+                htmlFor="selectedLabel"
+                className="block text-white mb-2 left-0"
+              >
+                Coluna de label
+              </label>
+              <select
+                id="selectedLabel"
+                className="w-full bg-main-dark border-2 border-main-lighter rounded-3xl py-2 px-4 hover:bg-main-darker text-white focus:outline-none h-14"
+                onChange={handleChangeSelectedLabel}
+              >
+                <option
+                  value=""
+                  disabled
+                  selected
+                  className="placeholder-gray-300"
+                >
+                  Selecione a coluna de label
+                </option>
+                {header.length > 0 &&
+                  header.map((column: string, index: number) => {
+                    return <option value={index}>{column}</option>;
+                  })}
+              </select>
+            </div>
+
+            <button
+              className="mt-10 bg-main-bold hover:bg-main-light text-white font-bold py-2 px-4 rounded-lg"
+              onClick={toggleAdvancedOptions}
+              style={{ cursor: "pointer" }}
+            >
+              {advancedOptionsVisible
+                ? "Esconder Parâmetros Avançados"
+                : "Exibir Parâmetros Avançados"}
+            </button>
+
+            {advancedOptionsVisible && (
+              <div className="xl:w-1/2 sm:w-10/12 input-group flex justify-between m-auto mt-10 mb-20">
+                <div>
+                  <label
+                    htmlFor="batchSize"
+                    className="block text-white mb-2 left-0"
+                  >
+                    Batch Size
+                  </label>
+                  <input
+                    type="number"
+                    id="batchSize"
+                    className="w-full bg-main-dark border-2 border-main-lighter rounded-3xl py-2 px-4 hover:bg-main-darker text-white focus:outline-none h-14"
+                    placeholder="Enter Batch Size..."
+                    value={batchSize}
+                    onChange={handleBatchSizeChange}
+                  />
+                </div>
+
+                <div>
+                  <label
+                    htmlFor="epochs"
+                    className="block text-white mb-2 left-0"
+                  >
+                    Epochs
+                  </label>
+                  <input
+                    type="number"
+                    className="w-full bg-main-dark border-2 border-main-lighter rounded-3xl py-2 px-4 hover:bg-main-darker text-white focus:outline-none h-14"
+                    placeholder="Enter Epochs..."
+                    value={epochs}
+                    onChange={handleEpochsChange}
+                  />
+                </div>
+
+                <div>
+                  <label
+                    htmlFor="learningRate"
+                    className="block text-white mb-2 left-0"
+                  >
+                    Learning Rate
+                  </label>
+                  <input
+                    type="number"
+                    step="0.01"
+                    className="w-full bg-main-dark border-2 border-main-lighter rounded-3xl py-2 px-4 hover:bg-main-darker text-white focus:outline-none h-14"
+                    placeholder="Enter Learning Rate..."
+                    value={learningRate}
+                    onChange={handleLearningRateChange}
+                  />
+                </div>
+              </div>
+            )}
+
+            <div className="xl:w-1/2 sm:w-10/12  relative mx-auto mt-10">
+              <button
+                className="w-full bg-main-dark text-white py-2 px-4 hover:bg-main-darker focus:outline-none border-2 border-main-lighter rounded-3xl h-14"
+                onClick={handleSubmit}
+              >
+                {isLoading ? "Carregando..." : "Treinar"}
+              </button>
+            </div>
+          </>
+        )}
       </div>
     </div>
   );

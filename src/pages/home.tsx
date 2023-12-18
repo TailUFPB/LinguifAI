@@ -22,10 +22,12 @@ export default function Home() {
   useEffect(() => {
     const fetchClassifiers = async () => {
       try {
-        const response = await axios.get("http://localhost:5000/get-classifiers");
+        const response = await axios.get(
+          "http://localhost:5000/get-classifiers"
+        );
         setClassifiers(response.data);
       } catch (error) {
-        console.error('Erro ao buscar classificadores:', error);
+        console.error("Erro ao buscar classificadores:", error);
       }
     };
 
@@ -43,8 +45,6 @@ export default function Home() {
   const handleSubmit = async () => {
     setIsLoading(true);
     let selectedData = data.map((row) => row[selectedColumn]);
-    console.log(selectedData);
-    console.log(selectedClassifier);
     const response = await axios
       .post("http://localhost:5000/classify", {
         data: selectedData,
@@ -56,7 +56,6 @@ export default function Home() {
 
     if (response && response.data) {
       const parsedData = JSON.parse(response.data.result);
-      console.log(parsedData);
 
       const input: any[] = Object.values(parsedData.input_column);
       const output: any[] = Object.values(parsedData.output_column).flat(1);
@@ -71,7 +70,7 @@ export default function Home() {
         console.log(result);
         setResult(result);
       } else {
-        console.error("Os arrays 'input' e 'output' têm tamanhos diferentes.");
+        console.error("Os arrays 'input' e 'output' tem tamanhos diferentes.");
       }
     }
 
@@ -123,60 +122,76 @@ export default function Home() {
           />
         }
 
-        <div className="w-1/3 relative mx-auto mt-24">
-          <select
-            className="w-full bg-main-dark border-2 border-main-lighter rounded-3xl py-2 px-4 hover:bg-main-darker text-white focus:outline-none h-14"
-            onChange={handleChangeSelectedColumn}
-          >
-            <option value="" disabled selected className="placeholder-gray-300">
-              Selecione a coluna de entrada
-            </option>
-            {header.length > 0 &&
-              header.map((column: string, index: number) => {
-                return <option value={index}>{column}</option>;
-              })}
-          </select>
-        </div>
-
-        <div className="w-1/3 relative mx-auto mt-10">
-          <select
-            className="w-full bg-main-dark border-2 border-main-lighter rounded-3xl py-2 px-4 hover:bg-main-darker text-white focus:outline-none h-14"
-            onChange={handleChangeSelectedClassifier}
-          >
-            <option value="" disabled selected className="placeholder-gray-300">
-              Selecione um classificador
-            </option>
-            {Object.entries(classifiers).map(([value, label]) => (
-            <option key={value} value={value}>
-              {label}
-            </option>
-          ))}
-          </select>
-        </div>
-
-        <div className="w-1/4 relative mx-auto mt-10">
-          <button
-            className="w-full bg-main-dark text-white py-2 px-4 hover:bg-main-darker focus:outline-none border-2 border-main-lighter rounded-3xl h-14"
-            onClick={handleSubmit}
-          >
-            {isLoading ? "Carregando..." : "Classificar"}
-          </button>
-        </div>
-
-        {Object.keys(result).length > 0 && (
-          <div
-            className={`w-4/5 relative mx-auto mt-24 border-main-lighter text-white py-4 px-2 placeholder-gray-300 rounded-3xl min-h-min flex flex-col items-center justify-between`}
-          >
-            <ResultTable data={result} classifierName={"classificador tal"} />
+        {selectedFile && (
+          <>
+            (
+            <div className="w-1/3 relative mx-auto mt-24">
+              <select
+                className="w-full bg-main-dark border-2 border-main-lighter rounded-3xl py-2 px-4 hover:bg-main-darker text-white focus:outline-none h-14"
+                onChange={handleChangeSelectedColumn}
+              >
+                <option
+                  value=""
+                  disabled
+                  selected
+                  className="placeholder-gray-300"
+                >
+                  Selecione a coluna de entrada
+                </option>
+                {header.length > 0 &&
+                  header.map((column: string, index: number) => {
+                    return <option value={index}>{column}</option>;
+                  })}
+              </select>
+            </div>
+            <div className="w-1/3 relative mx-auto mt-10">
+              <select
+                className="w-full bg-main-dark border-2 border-main-lighter rounded-3xl py-2 px-4 hover:bg-main-darker text-white focus:outline-none h-14"
+                onChange={handleChangeSelectedClassifier}
+              >
+                <option
+                  value=""
+                  disabled
+                  selected
+                  className="placeholder-gray-300"
+                >
+                  Selecione um classificador
+                </option>
+                {Object.entries(classifiers).map(([value, label]) => (
+                  <option key={value} value={value}>
+                    {label}
+                  </option>
+                ))}
+              </select>
+            </div>
             <div className="w-1/4 relative mx-auto mt-10">
               <button
                 className="w-full bg-main-dark text-white py-2 px-4 hover:bg-main-darker focus:outline-none border-2 border-main-lighter rounded-3xl h-14"
-                onClick={handleDownloadOutputCSV}
+                onClick={handleSubmit}
               >
-                Baixar CSV
+                {isLoading ? "Carregando..." : "Classificar"}
               </button>
             </div>
-          </div>
+            {Object.keys(result).length > 0 && (
+              <div
+                className={`w-4/5 relative mx-auto mt-24 border-main-lighter text-white py-4 px-2 placeholder-gray-300 rounded-3xl min-h-min flex flex-col items-center justify-between`}
+              >
+                <ResultTable
+                  data={result}
+                  classifierName={"classificador tal"}
+                />
+                <div className="w-1/4 relative mx-auto mt-10">
+                  <button
+                    className="w-full bg-main-dark text-white py-2 px-4 hover:bg-main-darker focus:outline-none border-2 border-main-lighter rounded-3xl h-14"
+                    onClick={handleDownloadOutputCSV}
+                  >
+                    Baixar CSV
+                  </button>
+                </div>
+              </div>
+            )}
+            )
+          </>
         )}
       </div>
     </div>

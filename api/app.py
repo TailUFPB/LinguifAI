@@ -57,15 +57,29 @@ def shutdown():
 
 @app.route('/neural-network',methods=["POST"])
 def train_model():
-    received_data = request.get_json()
+    received_data = request.json
 
-    selected_data = received_data.get('data')
-    selected_label = received_data.get('label')
-    name = received_data.get('name')
+    if received_data:
+        selected_data = received_data.get('data')
+        selected_label = received_data.get('label')
+        epochs = received_data.get('epochs')
+        batch_size = received_data.get('batch_size')
+        learning_rate = received_data.get('learning_rate')
+        name = received_data.get('name')
 
-    epochs = received_data.get('epochs')
-    batch_size = received_data.get('batch_size')
-    print(selected_label)
+        #
+        print("\n")
+        print("Received data: " + str(len(selected_data))) 
+        print("Recivied label: " + str(len(selected_label)))
+        print("Name: " + str(name))
+        print("Epochs: " + str(epochs))
+        print("Batch Size: " + str(batch_size))
+        print("Learning Rate: " + str(learning_rate))
+        print("\n")
+
+        return jsonify({"message": "Received data successfully."})
+    else:
+        return jsonify({"message": "No data received."}), 400
 
     return create_and_train_model(selected_data, selected_label, name, epochs, batch_size)
 
