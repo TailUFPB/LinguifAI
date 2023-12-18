@@ -11,7 +11,7 @@ from tensorflow.keras.layers import TextVectorization
 from tensorflow.keras.models import Sequential
 from sklearn.preprocessing import LabelEncoder
 from tensorflow.keras.callbacks import Callback
-
+import joblib
 def preprocess_text(text):
     text = text.lower()
     text = re.sub('\[.*?\]', '', text)
@@ -38,7 +38,7 @@ class TrainingProgressCallback(Callback):
 
     def update_progress(self, logs):
         total_epochs = self.params['epochs']
-        current_batch = self.model._train_counter  
+        current_batch = self.model._train_counter
         total_batches = self.params['steps'] * total_epochs
         percent_complete = int((current_batch / total_batches) * 100)
 
@@ -60,7 +60,7 @@ class TrainingProgressCallback(Callback):
             'training_in_progress': training_in_progress,
             'epochs': total_epochs,
             'total_batches': total_batches,
-            'current_batch': current_batch            
+            'current_batch': current_batch
         }
 
         print(training_progress2)
@@ -68,12 +68,14 @@ class TrainingProgressCallback(Callback):
         with open('training_progress.json', 'w') as file:
             json.dump(training_progress, file)
 
-def create_and_train_model(train_texts, train_labels, name, epochs=5, batch_size=32):
+def create_and_train_model(train_texts, train_labels, name, epochs=5, batch_size=32, batch_size=32):
     label_encoder = LabelEncoder()
     train_labels_encoded = label_encoder.fit_transform(train_labels)
 
     num_classes = len(label_encoder.classes_)
     train_labels_one_hot = tf.keras.utils.to_categorical(train_labels_encoded, num_classes=num_classes)
+
+    # Salva o mapeamento de rótulos em um arquivo
 
     label_mapping_file = f"api/encoders/LabelMapping-{name}.joblib"
     joblib.dump(label_encoder, label_mapping_file)

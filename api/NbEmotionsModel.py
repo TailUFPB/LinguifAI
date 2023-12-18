@@ -1,18 +1,17 @@
 import pandas as pd
 import pickle
 
-# bag of words
-from sklearn.feature_extraction.text import TfidfVectorizer
+def news_prediction(texts):
+    model_file = "./models/emotion_pipeline.pkl"
+    try:
+        # Carregando o pipeline do arquivo .pkl
+        with open(model_file, 'rb') as model_file:
+            pipeline = pickle.load(model_file)
 
-#tfidf_vectorizer = TfidfVectorizer(use_idf=True)
+        # Fazendo previsões para os textos
+        predictions = pipeline.predict([texts])
 
-def make_prediction(my_sentence):
-    with open("./models/nb_emotion.pkl", "rb") as f:
-        model = pickle.load(f)
+        return predictions[0]
 
-    with open("./models/tfidf_vectorizer_em.pkl", 'rb') as f:
-        tfidf_vectorizer = pickle.load(f)
-
-    new_sentence = tfidf_vectorizer.transform([my_sentence])
-    prediction = model.predict(new_sentence)
-    return prediction[0]
+    except Exception as e:
+        return str(e)

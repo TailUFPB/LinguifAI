@@ -72,7 +72,7 @@ def train_model():
 
         #
         print("\n")
-        print("Received data: " + str(len(selected_data))) 
+        print("Received data: " + str(len(selected_data)))
         print("Recivied label: " + str(len(selected_label)))
         print("Name: " + str(name))
         print("Epochs: " + str(epochs))
@@ -83,8 +83,8 @@ def train_model():
         return jsonify({"message": "No data received."}), 400
 
     create_and_train_model(selected_data, selected_label, name, epochs, batch_size)
-        
-    return jsonify({"message": "Model train started successfully."}), 200 
+
+    return jsonify({"message": "Model train started successfully."}), 200
 
 @app.route('/training-status', methods=['GET'])
 def get_training_status():
