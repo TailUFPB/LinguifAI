@@ -23,3 +23,7 @@ api/__pycache__/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+
+training_progress.json
+api/encoders
+api/models/*.keras
