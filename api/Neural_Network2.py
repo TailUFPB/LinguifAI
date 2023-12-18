@@ -68,7 +68,7 @@ class TrainingProgressCallback(Callback):
         with open('training_progress.json', 'w') as file:
             json.dump(training_progress, file)
 
-def create_and_train_model(train_texts, train_labels, name, epochs=5, batch_size=32, batch_size=32):
+def create_and_train_model(train_texts, train_labels, name, epochs=5, batch_size=32):
     label_encoder = LabelEncoder()
     train_labels_encoded = label_encoder.fit_transform(train_labels)
 

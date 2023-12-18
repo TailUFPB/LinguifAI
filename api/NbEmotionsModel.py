@@ -2,7 +2,7 @@ import pandas as pd
 import pickle
 
 def news_prediction(texts):
-    model_file = "./models/emotion_pipeline.pkl"
+    model_file = "/api/models/emotion_pipeline.pkl"
     try:
         # Carregando o pipeline do arquivo .pkl
         with open(model_file, 'rb') as model_file:
