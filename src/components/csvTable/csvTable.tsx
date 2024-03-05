@@ -9,7 +9,7 @@ interface Props {
 export default function CsvTable({ data, head }: Props) {
   return (
     <div className="csv-div border-grey">
-      <table className="csv-table">
+      <table className="csv-table min-w-full">
         <thead>
           <tr className="rounded-3xl bg-main-darker">
             {head.map((headTitle, index) => {

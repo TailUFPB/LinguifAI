@@ -4,11 +4,14 @@ import string
 import pandas as pd
 import numpy as np
 import tensorflow as tf
+import joblib
+
 from tensorflow.keras import layers
 from tensorflow.keras.layers import TextVectorization
 from tensorflow.keras.models import Sequential
 from sklearn.preprocessing import LabelEncoder
-import joblib
+from tensorflow.keras.callbacks import Callback
+
 def preprocess_text(text):
     text = text.lower()
     text = re.sub('\[.*?\]', '', text)
@@ -20,6 +23,51 @@ def preprocess_text(text):
     text = re.sub('\w*\d\w*', '', text)
     return text
 
+class TrainingProgressCallback(Callback):
+    def __init__(self):
+        super(TrainingProgressCallback, self).__init__()
+        self.batch_count = 0
+
+    def on_batch_end(self, batch, logs=None):
+        self.batch_count += 1
+        if self.batch_count % 50 == 0:
+            self.update_progress(logs)
+
+    def on_epoch_end(self, epoch, logs=None):
+        self.update_progress(logs)
+
+    def update_progress(self, logs):
+        total_epochs = self.params['epochs']
+        current_batch = self.model._train_counter  
+        total_batches = self.params['steps'] * total_epochs
+        percent_complete = int((current_batch / total_batches) * 100)
+
+        # Definir o status de treinamento como True
+        training_in_progress = True
+
+        # Verificar se a época atual é a última
+        if current_batch == total_batches:
+            training_in_progress = False
+
+        # Salvar o progresso em um arquivo JSON
+        training_progress = {
+            'training_progress': percent_complete,
+            'training_in_progress': training_in_progress
+        }
+
+        training_progress2 = {
+            'training_progress': percent_complete,
+            'training_in_progress': training_in_progress,
+            'epochs': total_epochs,
+            'total_batches': total_batches,
+            'current_batch': current_batch            
+        }
+
+        print(training_progress2)
+
+        with open('training_progress.json', 'w') as file:
+            json.dump(training_progress, file)
+
 def create_and_train_model(train_texts, train_labels, name, epochs=5, batch_size=32):
     label_encoder = LabelEncoder()
     train_labels_encoded = label_encoder.fit_transform(train_labels)
@@ -27,16 +75,8 @@ def create_and_train_model(train_texts, train_labels, name, epochs=5, batch_size
     num_classes = len(label_encoder.classes_)
     train_labels_one_hot = tf.keras.utils.to_categorical(train_labels_encoded, num_classes=num_classes)
 
-    # Salva o mapeamento de rótulos em um arquivo
-    label_mapping_filename = f"models/LabelMapping-{name}.joblib"
-    joblib.dump(label_encoder, label_mapping_filename)
-
-
-    print(train_texts)
-    print(train_labels_one_hot)
-
-    # Aplica o pré-processamento aos textos
-    #train_df['text'] = train_df['text'].apply(preprocess_text)
+    label_mapping_file = f"api/encoders/LabelMapping-{name}.joblib"
+    joblib.dump(label_encoder, label_mapping_file)
 
     # Cria um conjunto de dados de texto usando a API de conjuntos de dados do TensorFlow
     train_dataset = tf.data.Dataset.from_tensor_slices((train_texts, train_labels_one_hot))
@@ -59,36 +99,26 @@ def create_and_train_model(train_texts, train_labels, name, epochs=5, batch_size
     # Adapta a camada de vetorização ao conjunto de dados de texto
     vectorize_layer.adapt(train_dataset.map(lambda x, y: x))
 
-    # Função para vetorizar o texto e manter os rótulos
-    def vectorize_text(text, label):
-        text = tf.expand_dims(text, -1)
-        return vectorize_layer(text), label
-
-    # Aplica a vetorização ao conjunto de dados de treino
-    train_ds = train_dataset.map(vectorize_text)
-    train_ds = train_ds.cache().prefetch(buffer_size=tf.data.AUTOTUNE)
+    # Define a arquitetura do modelo
+    model = tf.keras.Sequential([
+        vectorize_layer,
+        layers.Embedding(max_features, embedding_dim),
+        layers.Conv1D(128, 7, padding="valid", activation="relu", strides=3),
+        layers.Conv1D(128, 7, padding="valid", activation="relu", strides=3),
+        layers.GlobalMaxPooling1D(),
+        layers.Dense(128, activation="relu"),
+        layers.Dropout(0.5),
+        layers.Dense(num_classes, activation="softmax", name="predictions")
+    ])
+    model.compile(loss="categorical_crossentropy", optimizer="adam", metrics=["accuracy"])
 
     try:
-        # Define a arquitetura do modelo
-        inputs = tf.keras.Input(shape=(sequence_length,), dtype="int64")
-        x = layers.Embedding(max_features, embedding_dim)(inputs)
-        x = layers.Dropout(0.5)(x)
-        x = layers.Conv1D(128, 7, padding="valid", activation="relu", strides=3)(x)
-        x = layers.Conv1D(128, 7, padding="valid", activation="relu", strides=3)(x)
-        x = layers.GlobalMaxPooling1D()(x)
-        x = layers.Dense(128, activation="relu")(x)
-        x = layers.Dropout(0.5)(x)
-        predictions = layers.Dense(num_classes, activation="softmax", name="predictions")(x)
-
-        # Cria e compila o modelo
-        model = tf.keras.Model(inputs, predictions, name)
-        model.compile(loss="categorical_crossentropy", optimizer="adam", metrics=["accuracy"])
-
+        progress_callback = TrainingProgressCallback()
         # Treina o modelo
-        history = model.fit(train_ds, epochs=epochs, batch_size=batch_size)
+        history = model.fit(train_dataset, epochs=epochs, batch_size=batch_size, callbacks=[progress_callback])
 
         # Salva o modelo
-        model_filename = f"models/Trained-Model-{name}.keras"
+        model_filename = f"api/models/Trained-Model-{name}.keras"
         model.save(model_filename)
 
         # Obtém estatísticas do treinamento
@@ -102,70 +132,3 @@ def create_and_train_model(train_texts, train_labels, name, epochs=5, batch_size
 
     except Exception as e:
         return f"Error during model creation/training: {str(e)}"
-
-def predict_with_label_mapping_nn(model_name, test_texts):
-    # Cria uma camada de vetorização de texto
-    vectorize_layer = TextVectorization(
-        max_tokens=20000,
-        output_mode="int",
-        output_sequence_length=500,
-    )
-    # Carrega o modelo treinado
-    model = tf.keras.models.load_model(f"models/Trained-Model-{model_name}.keras")
-
-    # Carrega o mapeamento de rótulos
-    label_mapping_filename = f"models/LabelMapping-{model_name}.joblib"
-    label_encoder = joblib.load(label_mapping_filename)
-
-    # Aplica o pré-processamento aos textos de teste
-    test_texts = [preprocess_text(text) for text in test_texts]
-
-    # Vetoriza os textos de teste usando a mesma camada de vetorização
-    test_ds = vectorize_layer(np.array(test_texts)).numpy()
-
-    # Faz previsões
-    predictions = model.predict(test_ds)
-
-    # Destransforma as previsões usando o mapeamento de rótulos
-    predicted_labels_encoded = np.argmax(predictions, axis=1)
-    predicted_labels = [label_encoder.classes_[label] for label in predicted_labels_encoded]
-
-    return predicted_labels
-
-
-'''
-Com o nome do arquivo podemos fazer por exemplo:
-
-saved_model_filename = Neural_Network(texts_train, labels_train)
-
-Carregar o modelo treinado a partir do arquivo:
-with open(saved_model_filename, "rb") as model_file:
-    loaded_model = pickle.load(model_file)
-
-Agora, podemos usar loaded_model para fazer previsões, por exemplo:
-predictions = loaded_model.predict(new_texts)
-
-'''
-'''
-TESTE:
-
-df_true = pd.read_csv("Linguifai/api/training_df/True.csv")
-df_fake = pd.read_csv("Linguifai/api/training_df/Fake.csv")
-
-
-df_fake = df_fake.drop(['title', 'subject', 'date'], axis=1)
-df_true = df_true.drop(['title', 'subject', 'date'], axis=1)
-
-
-df_fake['text'] = df_fake["text"]
-df_true['text'] = df_true["text"]
-
-df_fake_train = df_fake[:5000]
-df_true_train = df_true[:5000]
-
-textos = df_fake_train['text'].tolist() + df_true_train['text'].tolist()
-labels = [0] * len(df_fake_train) + [1] * len(df_true_train)
-
-create_and_train_model(textos,labels,"Teste")
-
-'''

@@ -1,8 +1,13 @@
 import pandas as pd
 import pickle
 
-def news_prediction(texts):
-    model_file = "./models/emotion_pipeline.pkl"
+# bag of words
+from sklearn.feature_extraction.text import TfidfVectorizer
+
+#tfidf_vectorizer = TfidfVectorizer(use_idf=True)
+
+def make_prediction(my_sentence):
+    model_file = "./models/emotions_pipeline.pkl"
     try:
         # Carregando o pipeline do arquivo .pkl
         with open(model_file, 'rb') as model_file:
