@@ -6,11 +6,11 @@ import numpy as np
 import tensorflow as tf
 import joblib
 
-from tensorflow.keras import layers
-from tensorflow.keras.layers import TextVectorization
-from tensorflow.keras.models import Sequential
+from tensorflow.python.keras import layers
+from tensorflow.python.keras.layers import TextVectorization
+from tensorflow.python.keras.models import Sequential
 from sklearn.preprocessing import LabelEncoder
-from tensorflow.keras.callbacks import Callback
+from tensorflow.python.keras.callbacks import Callback
 
 def preprocess_text(text):
     text = text.lower()

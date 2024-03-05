@@ -2,7 +2,7 @@ from NbNewsModel import news_prediction
 from NbEmotionsModel import make_prediction
 from NbLinRegressionModel import make_prediction_nblin
 from available_classifiers import get_available_classifiers
-from tensorflow.keras.models import load_model
+from tensorflow.python.keras.models import load_model
 
 import pandas as pd
 import numpy as np
@@ -11,8 +11,9 @@ import pickle
 import re
 import joblib
 import string
-from nltk.corpus import stopwords
+
 import nltk
+from nltk.corpus import stopwords
 # mais imports
 
 class DataProcesser():

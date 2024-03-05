@@ -14,7 +14,7 @@ def make_prediction(my_sentence):
             pipeline = pickle.load(model_file)
 
         # Fazendo previsões para os textos
-        predictions = pipeline.predict([texts])
+        predictions = pipeline.predict([my_sentence])
 
         return predictions[0]
 
