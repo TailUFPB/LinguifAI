@@ -24,7 +24,6 @@ data_processer = DataProcesser()
 loop = asyncio.get_event_loop()
 
 def run_flask_app():
-    global server_thread
     app.run(host='0.0.0.0', port=5000, debug=True, use_reloader=False)
 
 def shutdown_server():
@@ -73,7 +72,7 @@ def train_model():
         #
         print("\n")
         print("Received data: " + str(len(selected_data))) 
-        print("Recivied label: " + str(len(selected_label)))
+        print("Received label: " + str(len(selected_label)))
         print("Name: " + str(name))
         print("Epochs: " + str(epochs))
         print("Batch Size: " + str(batch_size))
@@ -105,8 +104,11 @@ def get_training_status():
     except FileNotFoundError:
         return jsonify({'training_in_progress': False, 'training_progress': 0})
 
-if __name__ == '__main__':
-    server_thread = threading.Thread(target=run_flask_app)
-    server_thread.start()
-    atexit.register(shutdown_server)
+#@app.teardown_appcontext
+#def teardown_appcontext(error=None):
+    #shutdown_server()
 
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=5000)
+    #server_thread = threading.Thread(target=run_flask_app)
+    #server_thread.start()

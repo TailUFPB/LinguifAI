@@ -4,13 +4,17 @@ import string
 import pandas as pd
 import numpy as np
 import tensorflow as tf
+import os
 import joblib
 
+from sklearn.feature_extraction.text import TfidfVectorizer
+
 from tensorflow.python.keras import layers
-from tensorflow.python.keras.layers import TextVectorization
 from tensorflow.python.keras.models import Sequential
 from sklearn.preprocessing import LabelEncoder
 from tensorflow.python.keras.callbacks import Callback
+
+dirname = os.path.dirname(__file__)
 
 def preprocess_text(text):
     text = text.lower()
@@ -75,41 +79,28 @@ def create_and_train_model(train_texts, train_labels, name, epochs=5, batch_size
     num_classes = len(label_encoder.classes_)
     train_labels_one_hot = tf.keras.utils.to_categorical(train_labels_encoded, num_classes=num_classes)
 
+    #label_mapping_file = os.path.join(dirname, rf"api/encoders/LabelMapping-{name}.joblib")
     label_mapping_file = f"api/encoders/LabelMapping-{name}.joblib"
     joblib.dump(label_encoder, label_mapping_file)
 
+    tfidf_vectorizer = TfidfVectorizer(max_features=20000)
+    train_texts_tfidf = tfidf_vectorizer.fit_transform(train_texts)
+
     # Cria um conjunto de dados de texto usando a API de conjuntos de dados do TensorFlow
-    train_dataset = tf.data.Dataset.from_tensor_slices((train_texts, train_labels_one_hot))
+    train_dataset = tf.data.Dataset.from_tensor_slices((train_texts_tfidf.toarray(), train_labels_one_hot))
 
     # Embaralha e agrupa os dados
     train_dataset = train_dataset.shuffle(len(train_texts)).batch(32)
 
     # Parâmetros do modelo
-    max_features = 20000
-    embedding_dim = 128
-    sequence_length = 500
-
-    # Cria uma camada de vetorização de texto
-    vectorize_layer = TextVectorization(
-        max_tokens=max_features,
-        output_mode="int",
-        output_sequence_length=sequence_length,
-    )
-
-    # Adapta a camada de vetorização ao conjunto de dados de texto
-    vectorize_layer.adapt(train_dataset.map(lambda x, y: x))
+    num_features = train_texts_tfidf.shape[1]
 
     # Define a arquitetura do modelo
     model = tf.keras.Sequential([
-        vectorize_layer,
-        layers.Embedding(max_features, embedding_dim),
-        layers.Conv1D(128, 7, padding="valid", activation="relu", strides=3),
-        layers.Conv1D(128, 7, padding="valid", activation="relu", strides=3),
-        layers.GlobalMaxPooling1D(),
-        layers.Dense(128, activation="relu"),
-        layers.Dropout(0.5),
-        layers.Dense(num_classes, activation="softmax", name="predictions")
+        tf.keras.layers.Dense(64, activation='relu', input_shape=(num_features,)),
+        tf.keras.layers.Dense(num_classes, activation='softmax')
     ])
+
     model.compile(loss="categorical_crossentropy", optimizer="adam", metrics=["accuracy"])
 
     try:

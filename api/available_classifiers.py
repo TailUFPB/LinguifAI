@@ -2,7 +2,7 @@ import os
 import pickle
 
 def get_available_classifiers():
-    model_folder = 'api\models'
+    model_folder = 'api/models'
 
     # Verifica se o diretório 'models' existe
     if not os.path.exists(model_folder):

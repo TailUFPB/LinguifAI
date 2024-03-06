@@ -14,6 +14,7 @@ import string
 
 import nltk
 from nltk.corpus import stopwords
+nltk.download('stopwords')
 # mais imports
 
 class DataProcesser():
