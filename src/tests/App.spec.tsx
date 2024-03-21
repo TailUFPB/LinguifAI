@@ -4,6 +4,8 @@ import App from "../App";
 
 test("✅ renderiza o componente App sem erros", () => {
   render(
+    <Router>
       <App />
+    </Router>
   );
 });
