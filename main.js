@@ -2,41 +2,57 @@ const { app, BrowserWindow } = require("electron");
 const childProcess = require("child_process");
 const path = require("path");
 const axios = require("axios");
-const url = require("url");
 
-var processes = [];
+let flaskServerProcess;
 
-/*
-const child = childProcess.spawn("python", ["./api/app.py"], {
-  detached: false,
-  stdio: "ignore",
-});
+function installDependencies() {
+  // Execute pip install command to install dependencies from requirements.txt
+  childProcess.execSync("pip install -r ./resources/app/requirements.txt", { stdio: "inherit" });
+}
 
-processes.push(child);
-*/
+function startFlaskServer() {
+  installDependencies();
+
+  flaskServerProcess = childProcess.spawn("python", ["./resources/app/api/app.py"], {
+    detached: false,
+    stdio: ["ignore", "pipe", "pipe"], // Capture stdout and stderr
+  });
+
+  // Capture stdout
+  flaskServerProcess.stdout.on("data", (data) => {
+    console.log(`Flask server stdout: ${data}`);
+  });
+
+  // Capture stderr
+  flaskServerProcess.stderr.on("data", (data) => {
+    console.error(`Flask server stderr: ${data}`);
+  });
+
+  flaskServerProcess.on("error", (err) => {
+    console.error("Error starting Flask server:", err);
+  });
+
+  flaskServerProcess.on("close", (code) => {
+    console.log("Flask server exited with code", code);
+  });
+}
+
+function shutdownFlaskServer() {
+  if (flaskServerProcess) {
+    flaskServerProcess.kill();
+    flaskServerProcess = null;
+  }
+}
+
 function createWindow() {
-  // cria a janela
   const win = new BrowserWindow({
     width: 800,
     height: 600,
-    show: false, // Ocultar a janela até que esteja pronta
-    //fullscreen: true,
+    show: false,
   });
-  //win.loadURL("http://localhost:3000/"); // carrega a página hospedada localmente
-  win.loadFile(path.join(__dirname, "./build/index.html")); // carrega a build do react
 
-  /*
-  win.loadURL(
-    url.format({
-      pathname: path.join(__dirname, "./build/index.html"), // relative path to the HTML-file
-      protocol: "file:",
-      slashes: true,
-    })
-  );
+  win.loadFile(path.join(__dirname, "./build/index.html"));
 
-  */
-
-  // Quando a janela estiver pronta, maximize-a
   win.once("ready-to-show", () => {
     win.maximize();
     win.show();
@@ -44,29 +60,26 @@ function createWindow() {
 
   win.webContents.openDevTools();
 
-  win.on("close", () => {});
+  win.on("close", () => {
+    shutdownFlaskServer();
+  });
 }
 
 app.whenReady().then(() => {
+  startFlaskServer();
   createWindow();
+  
   app.on("activate", () => {
     if (BrowserWindow.getAllWindows().length === 0) createWindow();
   });
 });
 
-app.on("before-quit", () => {});
+app.on("before-quit", () => {
+  shutdownFlaskServer();
+});
 
 app.on("window-all-closed", () => {
   if (process.platform !== "darwin") {
-    //console.log("Fechando")
-    axios.get("http://127.0.0.1:5000/shutdown").then(response => {
-
-    }).catch(error => {
-
-    })
-    setTimeout(() => {
-      app.quit();
-    }, 2000);
-
+    app.quit();
   }
 });
