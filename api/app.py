@@ -12,7 +12,6 @@ import nltk
 import json
 import asyncio
 
-print("hi")
 nltk.download('wordnet')
 
 app = Flask(__name__)
