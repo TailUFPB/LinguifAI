@@ -45,6 +45,7 @@ class TrainingProgressCallback(Callback):
         current_batch = self.model._train_counter  
         total_batches = self.params['steps'] * total_epochs
         percent_complete = int((current_batch / total_batches) * 100)
+        raise ValueError(percent_complete)
 
         # Definir o status de treinamento como True
         training_in_progress = True
@@ -95,15 +96,15 @@ def create_and_train_model(train_texts, train_labels, name, epochs=5, batch_size
 
     # Define a arquitetura do modelo
     model = tf.keras.Sequential([
-        tf.keras.layers.Embedding(input_dim=num_features, output_dim=64),
-        tf.keras.layers.SimpleRNN(64),
+        tf.keras.layers.Dense(64, activation='relu', input_shape=(num_features,)),
         tf.keras.layers.Dense(num_classes, activation='softmax')
     ])
-    
+
     model.compile(loss="categorical_crossentropy", optimizer="adam", metrics=["accuracy"])
 
     try:
         progress_callback = TrainingProgressCallback()
+
         history = model.fit(train_dataset, epochs=epochs, batch_size=batch_size, callbacks=[progress_callback])
 
         model_filename = f"api/models/{str(num_classes)}-Trained-Model-{name}.weights.h5"
