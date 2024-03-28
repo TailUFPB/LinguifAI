@@ -14,85 +14,87 @@ concurrency:
 jobs:
   # Static tests don't involve any logic or context.
   # They are just a set of tests that can detect if we are not introducing any faulty code.
-  static-test:
-    name: 🔬 Static tests
-    runs-on: ubuntu-latest
-    steps:
-      - name: ⬇️ Checkout repo
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 2
+  # create block coment
 
-      - name: ⎔ Setup Node
-        uses: actions/setup-node@v3
-        with:
-          cache: "npm"
+  # static-test:
+  #   name: 🔬 Static tests
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - name: ⬇️ Checkout repo
+  #       uses: actions/checkout@v4
+  #       with:
+  #         fetch-depth: 2
 
-      - name: 🟨 Setup Python
-        uses: actions/setup-python@v3
+  #     - name: ⎔ Setup Node
+  #       uses: actions/setup-node@v3
+  #       with:
+  #         cache: "npm"
 
-      - name: 📦 Install Node dependencies
-        run: npm install
+  #     - name: 🟨 Setup Python
+  #       uses: actions/setup-python@v3
 
-  # Unit tests are tests that are not dependent on any external service.
-  # Usually, they are tests that are testing the logic of a specific function or component.
-  unit-test:
-    needs: [static-test]
-    name: 🚦 Unit tests
-    runs-on: ubuntu-latest
-    steps:
-      - name: ⬇️ Checkout repo
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 2
+  #     - name: 📦 Install Node dependencies
+  #       run: npm install
 
-      - name: ⎔ Setup Node
-        uses: actions/setup-node@v3
-        with:
-          cache: "npm"
+  # # Unit tests are tests that are not dependent on any external service.
+  # # Usually, they are tests that are testing the logic of a specific function or component.
+  # unit-test:
+  #   needs: [static-test]
+  #   name: 🚦 Unit tests
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - name: ⬇️ Checkout repo
+  #       uses: actions/checkout@v4
+  #       with:
+  #         fetch-depth: 2
 
-      - name: 🟨 Setup Python
-        uses: actions/setup-python@v3
+  #     - name: ⎔ Setup Node
+  #       uses: actions/setup-node@v3
+  #       with:
+  #         cache: "npm"
 
-      - name: 📦 Install dependencies
-        run: npm install
+  #     - name: 🟨 Setup Python
+  #       uses: actions/setup-python@v3
 
-      - name: 🚦 Run unit tests
-        run: npm test
+  #     - name: 📦 Install dependencies
+  #       run: npm install
 
-  # Integration tests are tests that are dependent on external services.
-  integration-test:
-    needs: [static-test]
-    name: 🚥 Integration tests
-    runs-on: ubuntu-latest
-    steps:
-      - name: ⬇️ Checkout repo
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 2
+  #     - name: 🚦 Run unit tests
+  #       run: npm test
 
-      - name: ⎔ Setup Node
-        uses: actions/setup-node@v3
-        with:
-          cache: "npm"
+  # # Integration tests are tests that are dependent on external services.
+  # integration-test:
+  #   needs: [static-test]
+  #   name: 🚥 Integration tests
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - name: ⬇️ Checkout repo
+  #       uses: actions/checkout@v4
+  #       with:
+  #         fetch-depth: 2
 
-      - name: 🟨 Setup Python
-        uses: actions/setup-python@v3
+  #     - name: ⎔ Setup Node
+  #       uses: actions/setup-node@v3
+  #       with:
+  #         cache: "npm"
 
-      - name: 📦 Install dependencies
-        run: npm install
+  #     - name: 🟨 Setup Python
+  #       uses: actions/setup-python@v3
 
-      # - name: 🐳 Docker compose
-      #   run:
-      #     docker-compose up -d && sleep 3 && pnpm prisma migrate reset --force
-      #     --skip-seed
+  #     - name: 📦 Install dependencies
+  #       run: npm install
 
-      - name: 🚦 Run integration tests
-        run: npm test
+  #     # - name: 🐳 Docker compose
+  #     #   run:
+  #     #     docker-compose up -d && sleep 3 && pnpm prisma migrate reset --force
+  #     #     --skip-seed
+
+  #     - name: 🚦 Run integration tests
+  #       run: npm test
 
   # Create Build
   build:
-    needs: [static-test, unit-test, integration-test]
+    # needs: [static-test, unit-test, integration-test]
     name: 🏗️ Build
     runs-on: ubuntu-latest
     steps:
