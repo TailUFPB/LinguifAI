@@ -2,7 +2,7 @@ name: CI
 # Controls when the workflow will run
 on:
   push:
-    branches: ["main"]
+    branches: ["develop"]
   pull_request:
     types: [opened, synchronize]
 
@@ -148,7 +148,7 @@ jobs:
           files: |
             ./dist/LinguifAI-win32-x64/LinguifAI.exe
           tag_name: v${{ steps.get_latest_release.outputs.new_version }}
-          release_name: Release v${{ steps.get_latest_release.outputs.new_version }}
-          draft: true
+          name: Release v${{ steps.get_latest_release.outputs.new_version }}
+          prerelease: true
           body: |
             Descrição do release aqui
