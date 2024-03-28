@@ -97,12 +97,16 @@ def train_model():
 def get_training_status():
     try:
         with open('training_progress.json', 'r') as file:
-            data = json.load(file)
+            try:
+                data = json.load(file)
+            except json.decoder.JSONDecodeError:
+                return jsonify({'training_in_progress': True, 'training_progress': 0})
             training_status = data.get('training_in_progress', False)
             progress = data.get('training_progress', 0)
             return jsonify({'training_in_progress': training_status, 'training_progress': progress})
     except FileNotFoundError:
         return jsonify({'training_in_progress': False, 'training_progress': 0})
+
 
 #@app.teardown_appcontext
 #def teardown_appcontext(error=None):

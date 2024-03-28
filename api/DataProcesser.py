@@ -1,3 +1,4 @@
+
 from NbNewsModel import news_prediction
 from NbEmotionsModel import make_prediction
 from NbLinRegressionModel import make_prediction_nblin
@@ -11,6 +12,7 @@ import pickle
 import re
 import joblib
 import string
+import os
 
 import nltk
 from nltk.corpus import stopwords
@@ -27,7 +29,7 @@ class DataProcesser():
         model_name = classifier_switcher[classifier]
         if model_name.endswith('.pkl'):
             return self.pretrained_predict(df, model_name)
-        elif model_name.endswith('.keras'):
+        elif model_name.endswith('.h5'):
             return self.trained_predict(df, model_name)
         #classifier_switcher = {
         #    0: self.classify_emotions,
@@ -49,7 +51,7 @@ class DataProcesser():
         return statistics
 
     def preprocess_text(self, text):
-        text = text.lower()
+        text = str(text).lower()
         text = re.sub('\[.*?\]', '', text)
         text = re.sub("\\W", " ", text)
         text = re.sub('https?://\S+|www\.\S+', '', text)
@@ -82,9 +84,19 @@ class DataProcesser():
         df['output_column'] = predictions
         return df
 
+    def load_weights_and_model(self, name):
+        model_filename = f"api/models/{name}"
+        num_classes = model_filename[model_filename.index("/") + 1, model_filename.index("-")]
+        model = tf.keras.Sequential([
+            tf.keras.layers.Embedding(input_dim=20000, output_dim=128),
+            tf.keras.layers.LSTM(64),
+            tf.keras.layers.Dense(int(num_classes), activation='softmax')
+        ])
+        model.load_weights(model_filename)
+        return model
+    
     def trained_predict(self, df, model_name):
-        model_file = f'api/models/{model_name}'
-        model = load_model(model_file)
+        model = self.load_weights_and_model(model_name)
 
         encoder_re = r'Trained-Model-(.*?).keras'
         encoder_name = re.search(encoder_re, model_name).group(1)
@@ -102,4 +114,7 @@ class DataProcesser():
         df['output_column'] = predicted_labels
 
         return df
+    
+
     ##TODO métodos com o processamento de classificação
+

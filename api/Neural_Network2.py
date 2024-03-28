@@ -17,7 +17,7 @@ from tensorflow.python.keras.callbacks import Callback
 dirname = os.path.dirname(__file__)
 
 def preprocess_text(text):
-    text = text.lower()
+    text = str(text).lower()
     text = re.sub('\[.*?\]', '', text)
     text = re.sub("\\W", " ", text)
     text = re.sub('https?://\S+|www\.\S+', '', text)
@@ -84,6 +84,8 @@ def create_and_train_model(train_texts, train_labels, name, epochs=5, batch_size
     joblib.dump(label_encoder, label_mapping_file)
 
     tfidf_vectorizer = TfidfVectorizer(max_features=20000)
+    
+    train_texts = [preprocess_text(text) for text in train_texts]
     train_texts_tfidf = tfidf_vectorizer.fit_transform(train_texts)
 
     # Cria um conjunto de dados de texto usando a API de conjuntos de dados do TensorFlow
