@@ -92,7 +92,7 @@ jobs:
 
   # Create Build
   build:
-    needs: [static-test]
+    needs: [static-test, unit-test, integration-test]
     name: 🏗️ Build
     runs-on: ubuntu-latest
     steps:
