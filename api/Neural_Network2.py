@@ -79,7 +79,6 @@ def create_and_train_model(train_texts, train_labels, name, epochs=5, batch_size
     num_classes = len(label_encoder.classes_)
     train_labels_one_hot = tf.keras.utils.to_categorical(train_labels_encoded, num_classes=num_classes)
 
-    #label_mapping_file = os.path.join(dirname, rf"api/encoders/LabelMapping-{name}.joblib")
     label_mapping_file = f"api/encoders/LabelMapping-{name}.joblib"
     joblib.dump(label_encoder, label_mapping_file)
 
@@ -88,10 +87,7 @@ def create_and_train_model(train_texts, train_labels, name, epochs=5, batch_size
     train_texts = [preprocess_text(text) for text in train_texts]
     train_texts_tfidf = tfidf_vectorizer.fit_transform(train_texts)
 
-    # Cria um conjunto de dados de texto usando a API de conjuntos de dados do TensorFlow
     train_dataset = tf.data.Dataset.from_tensor_slices((train_texts_tfidf.toarray(), train_labels_one_hot))
-
-    # Embaralha e agrupa os dados
     train_dataset = train_dataset.shuffle(len(train_texts)).batch(32)
 
     # Parâmetros do modelo
@@ -99,29 +95,28 @@ def create_and_train_model(train_texts, train_labels, name, epochs=5, batch_size
 
     # Define a arquitetura do modelo
     model = tf.keras.Sequential([
-        tf.keras.layers.Dense(64, activation='relu', input_shape=(num_features,)),
+        tf.keras.layers.Embedding(input_dim=num_features, output_dim=64),
+        tf.keras.layers.SimpleRNN(64),
         tf.keras.layers.Dense(num_classes, activation='softmax')
     ])
-
+    
     model.compile(loss="categorical_crossentropy", optimizer="adam", metrics=["accuracy"])
 
     try:
         progress_callback = TrainingProgressCallback()
-        # Treina o modelo
         history = model.fit(train_dataset, epochs=epochs, batch_size=batch_size, callbacks=[progress_callback])
 
-        # Salva o modelo
-        model_filename = f"api/models/Trained-Model-{name}.keras"
-        model.save(model_filename)
+        model_filename = f"api/models/{str(num_classes)}-Trained-Model-{name}.weights.h5"
+        model.save_weights(model_filename)
 
-        # Obtém estatísticas do treinamento
         training_stats = {
             "loss": history.history['loss'],
             "accuracy": history.history['accuracy']
         }
 
-        # Retorna estatísticas como JSON
         return json.dumps(training_stats)
 
     except Exception as e:
         return f"Error during model creation/training: {str(e)}"
+
+
