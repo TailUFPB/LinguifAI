@@ -3,8 +3,6 @@ name: CI
 on:
   push:
     branches: ["main"]
-  pull_request:
-    types: [opened, synchronize]
 
 # Prevent duplicate workflows from running
 concurrency:
