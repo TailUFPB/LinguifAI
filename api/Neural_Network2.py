@@ -95,7 +95,8 @@ def create_and_train_model(train_texts, train_labels, name, epochs=5, batch_size
 
     # Define a arquitetura do modelo
     model = tf.keras.Sequential([
-        tf.keras.layers.Dense(64, activation='relu', input_shape=(num_features,)),
+        tf.keras.layers.Embedding(input_dim=num_features, output_dim=64),
+        tf.keras.layers.SimpleRNN(64),
         tf.keras.layers.Dense(num_classes, activation='softmax')
     ])
     
