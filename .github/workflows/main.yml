@@ -128,8 +128,13 @@ jobs:
       - name: 📦 Electron Package
         run: npx electron-packager . LinguifAI --platform=win32 --arch=x64 --out=dist
 
-      - name: 📦 Upload Artifact
-        uses: actions/upload-artifact@v2
+      - name: Create Release
+        id: create_release
+        uses: softprops/action-gh-release@v1
         with:
-          name: LinguifAI
-          path: dist/LinguifAI-win32-x64/LinguifAI.exe
+          files: |
+            ./dist/LinguifAI-win32-x64/LinguifAI.exe
+          tag_name: v0.0.1 # Substitua pelo número da versão do seu release
+          release_name: Release v0.0.1 # Nome do release
+          body: |
+            Descrição do release aqui
