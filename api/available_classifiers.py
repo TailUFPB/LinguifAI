@@ -13,7 +13,7 @@ def get_available_classifiers():
     classifiers = {}
 
     for file in model_files:
-        if file.endswith('.pkl') or file.endswith('.keras'):
+        if file.endswith('.pkl') or file.endswith('.keras') or file.endswith('.h5'):
             classifiers[len(classifiers)] = file
 
     return classifiers

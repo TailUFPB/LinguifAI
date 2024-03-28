@@ -5,6 +5,7 @@ from NbLinRegressionModel import make_prediction_nblin
 from available_classifiers import get_available_classifiers
 from tensorflow.python.keras.models import load_model
 
+import scipy as sp
 import pandas as pd
 import numpy as np
 import tensorflow as tf
@@ -13,6 +14,7 @@ import re
 import joblib
 import string
 import os
+from sklearn.feature_extraction.text import TfidfVectorizer
 
 import nltk
 from nltk.corpus import stopwords
@@ -49,6 +51,7 @@ class DataProcesser():
         }
 
         return statistics
+    
 
     def preprocess_text(self, text):
         text = str(text).lower()
@@ -59,8 +62,9 @@ class DataProcesser():
         text = re.sub('[%s]' % re.escape(string.punctuation), '', text)
         text = re.sub('\n', '', text)
         text = re.sub('\w*\d\w*', '', text)
-
+        
         return text
+
 
     def classify_emotions(self, df):
         df['output_column'] = df['input_column'].apply(make_prediction)
@@ -86,7 +90,7 @@ class DataProcesser():
 
     def load_weights_and_model(self, name):
         model_filename = f"api/models/{name}"
-        num_classes = model_filename[model_filename.index("/") + 1, model_filename.index("-")]
+        num_classes = model_filename[model_filename.index("s") + 2 : model_filename.index("-")]
         model = tf.keras.Sequential([
             tf.keras.layers.Embedding(input_dim=20000, output_dim=128),
             tf.keras.layers.LSTM(64),
@@ -98,20 +102,31 @@ class DataProcesser():
     def trained_predict(self, df, model_name):
         model = self.load_weights_and_model(model_name)
 
-        encoder_re = r'Trained-Model-(.*?).keras'
-        encoder_name = re.search(encoder_re, model_name).group(1)
+        
+        encoder_name = model_name[model_name.index('l') + 2 : model_name.index('.')]
 
         label_map_filename = f"api\encoders/LabelMapping-{encoder_name}.joblib"
         label_encoder = joblib.load(label_map_filename)
 
         raw_text = df['input_column'].tolist()
-        test_texts = [self.preprocess_text(text) for text in raw_text]
+        
+        # prediction (nao sei como fazer agora)                      
+        # vectorizer = TfidfVectorizer(max_features=20000)
+        # raw_text = [self.preprocess_text(text).encode("utf-8") for text in raw_text]
+        # vectorizer.fit_transform(raw_text)
+        # vectorized_data = vectorizer.transform(raw_text)
 
-        predictions = model.predict(test_texts)
-        predicted_labels_encoded = tf.argmax(predictions, axis=1).numpy()
-        predicted_labels = [label_encoder.classes_[label] for label in predicted_labels_encoded]
+        # vectorized_data = np.asarray(vectorized_data.todense())
 
-        df['output_column'] = predicted_labels
+        # # Make predictions using the model
+    
+        # predictions = model.predict(vectorized_data)
+
+        # predicted_labels_encoded = tf.argmax(predictions, axis=1).numpy()
+
+        # predicted_labels = [label_encoder.classes_[label] for label in predicted_labels_encoded]
+
+        # df['output_column'] = predicted_labels
 
         return df
     
