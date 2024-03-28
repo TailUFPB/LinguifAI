@@ -139,8 +139,8 @@ jobs:
               repo: context.repo.repo
             });
             const latestRelease = response.data.tag_name;
-            const versionParts = latestRelease.split('.');
-            const newVersion = `${parseInt(versionParts[0])}.${parseInt(versionParts[1]) + 1}.${parseInt(versionParts[2])}`;
+            const versionParts = latestRelease.replace(/^v/, '').split('.');
+            const newVersion = `${parseInt(versionParts[0])}.${parseInt(versionParts[1])}.${parseInt(versionParts[2]) + 1}`;
             console.log(`::set-output name=new_version::${newVersion}`);
       
 
