@@ -55,25 +55,6 @@
   },
   "devDependencies": {
     "electron": "^26.1.0",
-    "electron-builder": "^24.13.3",
     "tailwindcss": "^3.3.3"
-  },
-  "build": {
-    "appId": "com.example.myapp",
-    "productName": "MyApp",
-    "directories": {
-      "output": "dist"
-    },
-    "files": [
-      "build/**/*",
-      "node_modules/**/*",
-      "main.js"
-    ],
-    "extraResources": [
-      {
-        "from": "./api",
-        "to": "api"
-      }
-    ]
   }
 }
