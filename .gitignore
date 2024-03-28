@@ -27,3 +27,4 @@ yarn-error.log*
 training_progress.json
 api/encoders
 api/models/*.keras
+/dist
