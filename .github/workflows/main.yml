@@ -127,6 +127,22 @@ jobs:
 
       - name: 📦 Electron Package
         run: npx electron-packager . LinguifAI --platform=win32 --arch=x64 --out=dist
+      
+      - name: Get latest release number
+        id: get_latest_release
+        uses: actions/github-script@v4
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const response = await github.repos.getLatestRelease({
+              owner: context.repo.owner,
+              repo: context.repo.repo
+            });
+            const latestRelease = response.data.tag_name;
+            const versionParts = latestRelease.split('.');
+            const newVersion = `${parseInt(versionParts[0])}.${parseInt(versionParts[1]) + 1}.${parseInt(versionParts[2])}`;
+            console.log(`::set-output name=new_version::${newVersion}`);
+      
 
       - name: Create Release
         id: create_release
@@ -134,7 +150,7 @@ jobs:
         with:
           files: |
             ./dist/LinguifAI-win32-x64/LinguifAI.exe
-          tag_name: v0.0.1 # Substitua pelo número da versão do seu release
-          release_name: Release v0.0.1 # Nome do release
+          tag_name: v${{ steps.get_latest_release.outputs.new_version }}
+          release_name: Release v${{ steps.get_latest_release.outputs.new_version }}
           body: |
             Descrição do release aqui
