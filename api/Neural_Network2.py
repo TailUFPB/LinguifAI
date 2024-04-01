@@ -45,7 +45,6 @@ class TrainingProgressCallback(Callback):
         current_batch = self.model._train_counter  
         total_batches = self.params['steps'] * total_epochs
         percent_complete = int((current_batch / total_batches) * 100)
-        raise ValueError(percent_complete)
 
         # Definir o status de treinamento como True
         training_in_progress = True
