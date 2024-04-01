@@ -104,7 +104,7 @@ def create_and_train_model(train_texts, train_labels, name, epochs=5, batch_size
     try:
         progress_callback = TrainingProgressCallback()
 
-        history = model.fit(train_dataset, epochs=epochs, batch_size=batch_size, callbacks=[progress_callback])
+        history = model.fit(train_dataset, epochs=epochs, batch_size=batch_size)
 
         model_filename = f"api/models/{str(num_classes)}-Trained-Model-{name}.weights.h5"
         model.save_weights(model_filename)
