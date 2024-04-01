@@ -11,7 +11,12 @@ import pandas as pd
 import nltk
 import json
 import asyncio
+import logging
 nltk.download('wordnet')
+
+
+# log = logging.getLogger('werkzeug')
+# log.setLevel(logging.ERROR)
 
 app = Flask(__name__)
 server_thread = None
@@ -83,12 +88,13 @@ def train_model():
 
     # reseta status
     training_progress = {
-        'training_progress': 1,
+        'training_progress': 0,
         'training_in_progress': True
     }
     with open('training_progress.json', 'w') as file:
         json.dump(training_progress, file)
 
+    print("Beginning training")
     create_and_train_model(selected_data, selected_label, name, epochs, batch_size)
         
     return jsonify({"message": "Model train started successfully."}), 200 
@@ -113,6 +119,6 @@ def get_training_status():
     #shutdown_server()
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000)
+    app.run(host='127.0.0.1', port=5000, debug=True)
     #server_thread = threading.Thread(target=run_flask_app)
     #server_thread.start()

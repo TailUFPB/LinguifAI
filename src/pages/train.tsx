@@ -25,7 +25,7 @@ export default function Train() {
 
   const handleSubmit = async () => {
     setIsLoading(true);
-    setLoadingProgress(1);
+    setLoadingProgress(0);
 
     let selectedData = data.map((row) => ({
       value: row[selectedColumn],
@@ -51,23 +51,23 @@ export default function Train() {
     let retryCount = 0;
 
 
-    const url = "http://localhost:5000/neural-network";
+    // const url = "http://localhost:5000/neural-network";
 
     
-    async function postData(url: string, data: { data: any[]; label: any[]; batch_size: number; epochs: number; learning_rate: number; name: string; }) {
-      try {
-        const response = await axios.post(url, data);
-      } catch (error) {
-        if (retryCount < maxRetries) {
-          retryCount++;
-          console.error(`Error occurred, retrying (attempt ${retryCount})...`);
-          postData(url, data); // Retry recursively
-        } else {
-          console.error("Max retry limit reached. Unable to post data.");
-          throw error; // Throw the error after maximum retries
-        }
-      }
-    }
+    // async function postData(url: string, data: { data: any[]; label: any[]; batch_size: number; epochs: number; learning_rate: number; name: string; }) {
+    //   try {
+    //     const response = await axios.post(url, data);
+    //   } catch (error) {
+    //     if (retryCount < maxRetries) {
+    //       retryCount++;
+    //       console.error(`Error occurred, retrying (attempt ${retryCount})...`);
+    //       postData(url, data); // Retry recursively
+    //     } else {
+    //       console.error("Max retry limit reached. Unable to post data.");
+    //       throw error; // Throw the error after maximum retries
+    //     }
+    //   }
+    // }
 
     await axios
       .post("http://localhost:5000/neural-network", sendData)
@@ -141,7 +141,7 @@ export default function Train() {
         setLoadingProgress(
           training_in_progress || training_progress === 100
             ? training_progress
-            : 1
+            : 0
         );
       } catch (error) {
         console.error("Erro ao buscar progresso:", error);

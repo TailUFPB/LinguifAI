@@ -33,14 +33,17 @@ class TrainingProgressCallback(Callback):
         self.batch_count = 0
 
     def on_batch_end(self, batch, logs=None):
+        print("batch end")
         self.batch_count += 1
         if self.batch_count % 50 == 0:
             self.update_progress(logs)
 
     def on_epoch_end(self, epoch, logs=None):
+        print("epoch end")
         self.update_progress(logs)
 
     def update_progress(self, logs):
+        print("updating progress")
         total_epochs = self.params['epochs']
         current_batch = self.model._train_counter  
         total_batches = self.params['steps'] * total_epochs
@@ -99,12 +102,20 @@ def create_and_train_model(train_texts, train_labels, name, epochs=5, batch_size
         tf.keras.layers.Dense(num_classes, activation='softmax')
     ])
 
+
     model.compile(loss="categorical_crossentropy", optimizer="adam", metrics=["accuracy"])
 
     try:
         progress_callback = TrainingProgressCallback()
-
-        history = model.fit(train_dataset, epochs=epochs, batch_size=batch_size)
+        
+        print("train")
+        print(train_dataset)
+        print("epochs")
+        print(epochs)
+        print("batch_size")
+        print(batch_size)
+        # history = model.fit(train_dataset, epochs=epochs, batch_size=batch_size, verbose=2, callbacks=[progress_callback])
+        history = model.fit(train_dataset, epochs=epochs, batch_size=batch_size, verbose=2)
 
         model_filename = f"api/models/{str(num_classes)}-Trained-Model-{name}.weights.h5"
         model.save_weights(model_filename)
@@ -118,5 +129,4 @@ def create_and_train_model(train_texts, train_labels, name, epochs=5, batch_size
 
     except Exception as e:
         return f"Error during model creation/training: {str(e)}"
-
 
