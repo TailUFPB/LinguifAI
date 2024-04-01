@@ -4,6 +4,7 @@ from DataProcesser import DataProcesser
 from Neural_Network2 import create_and_train_model
 from available_classifiers import get_available_classifiers
 
+import time
 import os
 import atexit
 import threading
@@ -14,9 +15,6 @@ import asyncio
 import logging
 nltk.download('wordnet')
 
-
-# log = logging.getLogger('werkzeug')
-# log.setLevel(logging.ERROR)
 
 app = Flask(__name__)
 server_thread = None
@@ -94,8 +92,7 @@ def train_model():
     with open('training_progress.json', 'w') as file:
         json.dump(training_progress, file)
 
-    print("Beginning training")
-    create_and_train_model(selected_data, selected_label, name, epochs, batch_size)
+    create_and_train_model(selected_data, selected_label, name, epochs, batch_size, learning_rate)
         
     return jsonify({"message": "Model train started successfully."}), 200 
 
@@ -106,7 +103,16 @@ def get_training_status():
             try:
                 data = json.load(file)
             except json.decoder.JSONDecodeError:
-                return jsonify({'training_in_progress': True, 'training_progress': 0})
+                try:
+                    time.sleep(1)
+                    data = json.load(file)
+                except json.decoder.JSONDecodeError:
+                    try:
+                        time.sleep(1)
+                        data = json.load(file)
+                    except json.decoder.JSONDecodeError:
+                        print("error!")
+                        return jsonify({'training_in_progress': True, 'training_progress': 0})
             training_status = data.get('training_in_progress', False)
             progress = data.get('training_progress', 0)
             return jsonify({'training_in_progress': training_status, 'training_progress': progress})
@@ -114,11 +120,5 @@ def get_training_status():
         return jsonify({'training_in_progress': False, 'training_progress': 0})
 
 
-#@app.teardown_appcontext
-#def teardown_appcontext(error=None):
-    #shutdown_server()
-
 if __name__ == '__main__':
     app.run(host='127.0.0.1', port=5000, debug=True)
-    #server_thread = threading.Thread(target=run_flask_app)
-    #server_thread.start()

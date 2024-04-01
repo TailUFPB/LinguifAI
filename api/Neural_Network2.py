@@ -6,6 +6,7 @@ import numpy as np
 import tensorflow as tf
 import os
 import joblib
+import keras
 
 from sklearn.feature_extraction.text import TfidfVectorizer
 
@@ -28,54 +29,32 @@ def preprocess_text(text):
     return text
 
 class TrainingProgressCallback(Callback):
-    def __init__(self):
+    def __init__(self, epochs):
         super(TrainingProgressCallback, self).__init__()
-        self.batch_count = 0
+        self.epochs = epochs
+        self.epoch_num = 0
+
+
+    def on_epoch_begin(self, epoch, logs=None):
+        self.epoch_step = 0
+        self.epoch_num += 1
 
     def on_batch_end(self, batch, logs=None):
-        print("batch end")
-        self.batch_count += 1
-        if self.batch_count % 50 == 0:
-            self.update_progress(logs)
+        self.epoch_step += 1
+        progress = self.epoch_step / self.params["steps"] / self.epochs * 100 + self.epoch_num / self.epochs * 100
 
-    def on_epoch_end(self, epoch, logs=None):
-        print("epoch end")
-        self.update_progress(logs)
-
-    def update_progress(self, logs):
-        print("updating progress")
-        total_epochs = self.params['epochs']
-        current_batch = self.model._train_counter  
-        total_batches = self.params['steps'] * total_epochs
-        percent_complete = int((current_batch / total_batches) * 100)
-
-        # Definir o status de treinamento como True
-        training_in_progress = True
-
-        # Verificar se a época atual é a última
-        if current_batch == total_batches:
-            training_in_progress = False
-
-        # Salvar o progresso em um arquivo JSON
         training_progress = {
-            'training_progress': percent_complete,
-            'training_in_progress': training_in_progress
+            'training_progress': progress,
+            'training_in_progress': True
         }
-
-        training_progress2 = {
-            'training_progress': percent_complete,
-            'training_in_progress': training_in_progress,
-            'epochs': total_epochs,
-            'total_batches': total_batches,
-            'current_batch': current_batch            
-        }
-
-        print(training_progress2)
-
         with open('training_progress.json', 'w') as file:
             json.dump(training_progress, file)
+        # print(progress)
+        # with open('training_progress.json', 'w') as file:
+        #     json.dump(training_progress, file)
 
-def create_and_train_model(train_texts, train_labels, name, epochs=5, batch_size=32):
+
+def create_and_train_model(train_texts, train_labels, name, epochs=5, batch_size=32, learning_rate=0.001):
     label_encoder = LabelEncoder()
     train_labels_encoded = label_encoder.fit_transform(train_labels)
 
@@ -103,19 +82,14 @@ def create_and_train_model(train_texts, train_labels, name, epochs=5, batch_size
     ])
 
 
-    model.compile(loss="categorical_crossentropy", optimizer="adam", metrics=["accuracy"])
+    model.compile(loss="categorical_crossentropy", optimizer=keras.optimizers.Adam(learning_rate=learning_rate), metrics=["accuracy"])
 
     try:
-        progress_callback = TrainingProgressCallback()
+        progress_callback = TrainingProgressCallback(epochs=epochs)
         
-        print("train")
-        print(train_dataset)
-        print("epochs")
-        print(epochs)
-        print("batch_size")
-        print(batch_size)
-        # history = model.fit(train_dataset, epochs=epochs, batch_size=batch_size, verbose=2, callbacks=[progress_callback])
-        history = model.fit(train_dataset, epochs=epochs, batch_size=batch_size, verbose=2)
+        # history = model.fit(train_dataset, epochs=epochs, batch_size=batch_size, verbose=2)
+
+        history = model.fit(train_dataset, epochs=epochs, batch_size=batch_size, verbose=2, callbacks=[progress_callback])
 
         model_filename = f"api/models/{str(num_classes)}-Trained-Model-{name}.weights.h5"
         model.save_weights(model_filename)

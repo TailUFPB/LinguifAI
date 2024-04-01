@@ -51,35 +51,19 @@ export default function Train() {
     let retryCount = 0;
 
 
-    // const url = "http://localhost:5000/neural-network";
-
-    
-    // async function postData(url: string, data: { data: any[]; label: any[]; batch_size: number; epochs: number; learning_rate: number; name: string; }) {
-    //   try {
-    //     const response = await axios.post(url, data);
-    //   } catch (error) {
-    //     if (retryCount < maxRetries) {
-    //       retryCount++;
-    //       console.error(`Error occurred, retrying (attempt ${retryCount})...`);
-    //       postData(url, data); // Retry recursively
-    //     } else {
-    //       console.error("Max retry limit reached. Unable to post data.");
-    //       throw error; // Throw the error after maximum retries
-    //     }
-    //   }
-    // }
+    const url = "http://localhost:5000/neural-network";
 
     await axios
-      .post("http://localhost:5000/neural-network", sendData)
+      .post(url, sendData)
       .catch(async (error) => {
         await axios
-          .post("http://localhost:5000/neural-network", sendData)
+          .post(url, sendData)
           .catch(async (error) => {
             await axios
-              .post("http://localhost:5000/neural-network", sendData)
+              .post(url, sendData)
               .catch(async (error) => {
                 await axios
-                  .post("http://localhost:5000/neural-network", sendData)
+                  .post(url, sendData)
                   .catch((error) => {
                     console.error(error.response.data);
                   })
