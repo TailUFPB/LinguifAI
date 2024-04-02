@@ -84,6 +84,7 @@ class DataProcesser():
             pipeline = pickle.load(model)
 
         texts_to_predict = df['input_column']
+        texts_to_predict = [str(text) for text in texts_to_predict]
         predictions = pipeline.predict(texts_to_predict)
         df['output_column'] = predictions
         return df

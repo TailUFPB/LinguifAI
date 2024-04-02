@@ -34,9 +34,10 @@ class TrainingProgressCallback(Callback):
         self.epochs = epochs
         self.epoch_num = 0
 
-
     def on_epoch_begin(self, epoch, logs=None):
         self.epoch_step = 0
+
+    def on_epoch_end(self, epoch, logs=None):
         self.epoch_num += 1
 
     def on_batch_end(self, batch, logs=None):

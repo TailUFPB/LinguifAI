@@ -6,13 +6,10 @@ from available_classifiers import get_available_classifiers
 
 import time
 import os
-import atexit
-import threading
 import pandas as pd
 import nltk
 import json
 import asyncio
-import logging
 nltk.download('wordnet')
 
 
