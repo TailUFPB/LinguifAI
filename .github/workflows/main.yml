@@ -99,8 +99,14 @@ jobs:
         with:
           node-version: "14"
 
-      - name: Install Wine
+      - name: Install Wine64
         run: sudo apt update && sudo apt install wine64
+
+      - name: Install Wine32
+        run: |
+          sudo dpkg --add-architecture i386
+          sudo apt-get update
+          sudo apt-get install wine32
 
       - name: ⬇️ Checkout repo
         uses: actions/checkout@v4
@@ -121,8 +127,13 @@ jobs:
       - name: 🏗️ Build
         run: npm run build
 
-      - name: 📦 Electron Package
-        run: npx electron-packager . LinguifAI --platform=win32 --arch=x64 --out=dist
+      #- name: 📦 Electron Package
+      #  run: npx electron-packager . LinguifAI --platform=win32 --arch=x64 --out=dist
+
+      - name: 📦 Electron Builder
+        run: npm run electron:package:win
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Get latest release number
         id: get_latest_release
@@ -136,17 +147,20 @@ jobs:
             });
             const latestRelease = response.data.tag_name;
             const versionParts = latestRelease.replace(/^v/, '').split('.');
-            const newVersion = `${parseInt(versionParts[0])}.${parseInt(versionParts[1])}.${parseInt(versionParts[2]) + 1}`;
+            const newVersion = `${parseInt(versionParts[0])}.${parseInt(versionParts[1]) + 1}.0`;
             console.log(`::set-output name=new_version::${newVersion}`);
+
+      - name: Rename file
+        run: mv dist/LinguifAI\ Setup\ 0.1.0.exe dist/LinguifAI\ Setup\ ${{ steps.get_latest_release.outputs.new_version }}.exe
 
       - name: Create Release
         id: create_release
         uses: softprops/action-gh-release@v1
         with:
           files: |
-            ./dist/LinguifAI-win32-x64/LinguifAI.exe
+            ./dist/LinguifAI\ Setup\ ${{ steps.get_latest_release.outputs.new_version }}.exe
           tag_name: v${{ steps.get_latest_release.outputs.new_version }}
-          release_name: Release v${{ steps.get_latest_release.outputs.new_version }}
-          draft: true
+          name: Release v${{ steps.get_latest_release.outputs.new_version }}
+          prerelease: true
           body: |
             Descrição do release aqui

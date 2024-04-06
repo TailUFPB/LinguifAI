@@ -4,18 +4,23 @@ from DataProcesser import DataProcesser
 from Neural_Network2 import create_and_train_model
 from available_classifiers import get_available_classifiers
 
+import time
 import os
-import atexit
-import threading
 import pandas as pd
 import nltk
 import json
 import asyncio
+import logging
 nltk.download('wordnet')
+
 
 app = Flask(__name__)
 server_thread = None
 CORS(app)  # Permite todas as origens por padrão (não recomendado para produção)
+
+log = logging.getLogger('werkzeug')
+log.disabled = True
+
 
 app.config['JSONIFY_PRETTYPRINT_REGULAR'] = True
 
@@ -43,9 +48,10 @@ def upload_file():
 
     df = pd.DataFrame(selected_data, columns=['input_column'])
     result = data_processer.handle_classify(df, selected_classifier)
-    stats = data_processer.generate_statistics(result)
+    # stats = data_processer.generate_statistics(result)
 
-    return jsonify({'result': result.to_json(), 'stats': stats})
+    return jsonify({'result': result.to_json()})
+    # return jsonify({'result': result.to_json(), 'stats': stats})
 
 @app.route('/get-classifiers', methods=["GET"])
 def get_classifiers():
@@ -57,7 +63,7 @@ def shutdown():
     shutdown_server()
     return 'Server shutting down...'
 
-@app.route('/neural-network',methods=["POST"])
+@app.route('/neural-network', methods=["POST"])
 def train_model():
     received_data = request.json
 
@@ -83,13 +89,15 @@ def train_model():
 
     # reseta status
     training_progress = {
-        'training_progress': 1,
+        'training_progress': 0,
         'training_in_progress': True
     }
     with open('training_progress.json', 'w') as file:
         json.dump(training_progress, file)
 
-    create_and_train_model(selected_data, selected_label, name, epochs, batch_size)
+    df = pd.DataFrame({'input_text': selected_data, 'labels': selected_label})
+
+    create_and_train_model(df, name, epochs, batch_size, learning_rate)
         
     return jsonify({"message": "Model train started successfully."}), 200 
 
@@ -100,7 +108,16 @@ def get_training_status():
             try:
                 data = json.load(file)
             except json.decoder.JSONDecodeError:
-                return jsonify({'training_in_progress': True, 'training_progress': 0})
+                try:
+                    time.sleep(1)
+                    data = json.load(file)
+                except json.decoder.JSONDecodeError:
+                    try:
+                        time.sleep(1)
+                        data = json.load(file)
+                    except json.decoder.JSONDecodeError:
+                        print("error!")
+                        return jsonify({'training_in_progress': True, 'training_progress': 0})
             training_status = data.get('training_in_progress', False)
             progress = data.get('training_progress', 0)
             return jsonify({'training_in_progress': training_status, 'training_progress': progress})
@@ -108,11 +125,11 @@ def get_training_status():
         return jsonify({'training_in_progress': False, 'training_progress': 0})
 
 
-#@app.teardown_appcontext
-#def teardown_appcontext(error=None):
-    #shutdown_server()
-
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000)
-    #server_thread = threading.Thread(target=run_flask_app)
-    #server_thread.start()
+    training_progress = {
+        'training_progress': 0,
+        'training_in_progress': True
+    }
+    with open('training_progress.json', 'w') as file:
+        json.dump(training_progress, file)
+    app.run(host='0.0.0.0', port=5000, debug=False)

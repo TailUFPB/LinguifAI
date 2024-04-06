@@ -1,7 +1,12 @@
 {
   "name": "LinguifAI",
+  "description": "",
+  "author": {
+    "name": "TailLinguifAI",
+    "email": ""
+  },
   "version": "0.1.0",
-  "main": "main.js",
+  "main": "./public/electron.js",
   "homepage": "./",
   "private": true,
   "dependencies": {
@@ -17,7 +22,6 @@
     "@types/react": "^18.2.21",
     "@types/react-dom": "^18.2.7",
     "axios": "^1.6.0",
-    "electron-packager": "^17.1.2",
     "electron-process": "^0.2.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
@@ -30,6 +34,7 @@
     "typescript": "^4.9.5"
   },
   "scripts": {
+    "start2": "set BROWSER=NONE && react-scripts start",
     "start": "concurrently \"npm run start:react\" \"npm run start:flask\"",
     "start:react": "react-scripts start",
     "start:flask": "python api/app.py",
@@ -37,7 +42,11 @@
     "ciBuild": "CI=true react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "electron": "electron ."
+    "electron": "electron .",
+    "start-electron": "set ELECTRON_START_URL=http://localhost:3000/ && electron .",
+    "pack": "electron-builder --dir",
+    "dist": "electron-builder",
+    "electron:package:win": "npm run build && electron-builder -w -c.extraMetadata.main=build/electron.js"
   },
   "eslintConfig": {
     "extends": [
@@ -60,6 +69,38 @@
   "devDependencies": {
     "concurrently": "^8.2.2",
     "electron": "^26.1.0",
+    "electron-builder": "^24.13.3",
+    "electron-packager": "^17.1.2",
     "tailwindcss": "^3.3.3"
+  },
+  "build": {
+    "appId": "LinguifAI",
+    "win": {
+      "target": [
+        "nsis"
+      ]
+    },
+    "files": [
+      "build/**/*",
+      "node_modules/**/*",
+      "resources/**/*"
+    ],
+    "directories": {
+      "buildResources": "build"
+    },
+    "extraFiles": [
+      {
+        "from": "api",
+        "to": "api",
+        "filter": [
+          "**/*"
+        ]
+      }
+    ],
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "license": "license.md"
+    }
   }
 }

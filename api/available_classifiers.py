@@ -1,10 +1,11 @@
 import os
-import pickle
 
 def get_available_classifiers():
     model_folder = 'api/models'
 
     # Verifica se o diretório 'models' existe
+
+    ## retorna o path atual
     if not os.path.exists(model_folder):
         return []
 
@@ -13,7 +14,6 @@ def get_available_classifiers():
     classifiers = {}
 
     for file in model_files:
-        if file.endswith('.pkl') or file.endswith('.keras') or file.endswith('.h5'):
-            classifiers[len(classifiers)] = file
+        classifiers[len(classifiers)] = file
 
     return classifiers
