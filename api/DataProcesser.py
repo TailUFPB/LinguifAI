@@ -95,13 +95,6 @@ class DataProcesser():
         else:
             raise FileNotFoundError(f"Model file '{model_filename}' not found.")
 
-    def predict_with_model(self, data, model):
-        # Convert data to PyTorch tensor if needed
-        data_tensor = torch.tensor(data, dtype=torch.float32)
-        # Perform prediction
-        predictions = model(data_tensor)
-        return predictions
-
     def trained_predict(self, df, model_name):
         label_map_filename = f"api/encoders/LabelMapping-{model_name}.joblib"
         label_encoder = joblib.load(label_map_filename)
