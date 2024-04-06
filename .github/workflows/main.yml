@@ -102,6 +102,12 @@ jobs:
       - name: Install Wine
         run: sudo apt update && sudo apt install wine64
 
+      - name: Install Wine32
+        run: |
+          sudo dpkg --add-architecture i386
+          sudo apt-get update
+          sudo apt-get install wine32
+
       - name: ⬇️ Checkout repo
         uses: actions/checkout@v4
         with:
@@ -123,7 +129,7 @@ jobs:
 
       #- name: 📦 Electron Package
       #  run: npx electron-packager . LinguifAI --platform=win32 --arch=x64 --out=dist
-  
+
       - name: 📦 Electron Builder
         run: npm run electron:package:win
 
@@ -143,8 +149,8 @@ jobs:
             console.log(`::set-output name=new_version::${newVersion}`);
 
       - name: Rename file
-        run: mv .dist/LinguifAI\ Setup\ 0.1.0.exe .dist/LinguifAI\ Setup\ ${{ steps.get_latest_release.outputs.new_version }}.exe    
-      
+        run: mv .dist/LinguifAI\ Setup\ 0.1.0.exe .dist/LinguifAI\ Setup\ ${{ steps.get_latest_release.outputs.new_version }}.exe
+
       - name: Create Release
         id: create_release
         uses: softprops/action-gh-release@v1
