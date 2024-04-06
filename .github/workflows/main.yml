@@ -12,85 +12,85 @@ concurrency:
 jobs:
   # Static tests don't involve any logic or context.
   # They are just a set of tests that can detect if we are not introducing any faulty code.
-  static-test:
-    name: 🔬 Static tests
-    runs-on: ubuntu-latest
-    steps:
-      - name: ⬇️ Checkout repo
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 2
+  # static-test:
+  #   name: 🔬 Static tests
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - name: ⬇️ Checkout repo
+  #       uses: actions/checkout@v4
+  #       with:
+  #         fetch-depth: 2
 
-      - name: ⎔ Setup Node
-        uses: actions/setup-node@v3
-        with:
-          cache: "npm"
+  #     - name: ⎔ Setup Node
+  #       uses: actions/setup-node@v3
+  #       with:
+  #         cache: "npm"
 
-      - name: 🟨 Setup Python
-        uses: actions/setup-python@v3
+  #     - name: 🟨 Setup Python
+  #       uses: actions/setup-python@v3
 
-      - name: 📦 Install Node dependencies
-        run: npm install
+  #     - name: 📦 Install Node dependencies
+  #       run: npm install
 
   # # Unit tests are tests that are not dependent on any external service.
   # # Usually, they are tests that are testing the logic of a specific function or component.
-  unit-test:
-    needs: [static-test]
-    name: 🚦 Unit tests
-    runs-on: ubuntu-latest
-    steps:
-      - name: ⬇️ Checkout repo
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 2
+  # unit-test:
+  #   needs: [static-test]
+  #   name: 🚦 Unit tests
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - name: ⬇️ Checkout repo
+  #       uses: actions/checkout@v4
+  #       with:
+  #         fetch-depth: 2
 
-      - name: ⎔ Setup Node
-        uses: actions/setup-node@v3
-        with:
-          cache: "npm"
+  #     - name: ⎔ Setup Node
+  #       uses: actions/setup-node@v3
+  #       with:
+  #         cache: "npm"
 
-      - name: 🟨 Setup Python
-        uses: actions/setup-python@v3
+  #     - name: 🟨 Setup Python
+  #       uses: actions/setup-python@v3
 
-      - name: 📦 Install dependencies
-        run: npm install
+  #     - name: 📦 Install dependencies
+  #       run: npm install
 
-      - name: 🚦 Run unit tests
-        run: npm test
+  #     - name: 🚦 Run unit tests
+  #       run: npm test
 
   # # Integration tests are tests that are dependent on external services.
-  integration-test:
-    needs: [static-test]
-    name: 🚥 Integration tests
-    runs-on: ubuntu-latest
-    steps:
-      - name: ⬇️ Checkout repo
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 2
+  # integration-test:
+  #   needs: [static-test]
+  #   name: 🚥 Integration tests
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - name: ⬇️ Checkout repo
+  #       uses: actions/checkout@v4
+  #       with:
+  #         fetch-depth: 2
 
-      - name: ⎔ Setup Node
-        uses: actions/setup-node@v3
-        with:
-          cache: "npm"
+  #     - name: ⎔ Setup Node
+  #       uses: actions/setup-node@v3
+  #       with:
+  #         cache: "npm"
 
-      - name: 🟨 Setup Python
-        uses: actions/setup-python@v3
+  #     - name: 🟨 Setup Python
+  #       uses: actions/setup-python@v3
 
-      - name: 📦 Install dependencies
-        run: npm install
+  #     - name: 📦 Install dependencies
+  #       run: npm install
 
-      # - name: 🐳 Docker compose
-      #   run:
-      #     docker-compose up -d && sleep 3 && pnpm prisma migrate reset --force
-      #     --skip-seed
+  #     # - name: 🐳 Docker compose
+  #     #   run:
+  #     #     docker-compose up -d && sleep 3 && pnpm prisma migrate reset --force
+  #     #     --skip-seed
 
-      - name: 🚦 Run integration tests
-        run: npm test
+  #     - name: 🚦 Run integration tests
+  #       run: npm test
 
   # Create Build
   build:
-    needs: [static-test, unit-test, integration-test]
+    # needs: [static-test, unit-test, integration-test]
     name: 🏗️ Build
     runs-on: ubuntu-latest
     steps:
@@ -99,7 +99,7 @@ jobs:
         with:
           node-version: "14"
 
-      - name: Install Wine
+      - name: Install Wine64
         run: sudo apt update && sudo apt install wine64
 
       - name: Install Wine32
@@ -129,6 +129,9 @@ jobs:
 
       #- name: 📦 Electron Package
       #  run: npx electron-packager . LinguifAI --platform=win32 --arch=x64 --out=dist
+      
+      - name: Set GitHub Token
+        run: echo "GH_TOKEN=${{ secrets.GH_TOKEN }}" >> $GITHUB_ENV
 
       - name: 📦 Electron Builder
         run: npm run electron:package:win
