@@ -5,6 +5,8 @@ def get_available_classifiers():
     model_folder = 'api/models'
 
     # Verifica se o diretório 'models' existe
+
+    ## retorna o path atual
     if not os.path.exists(model_folder):
         return []
 
