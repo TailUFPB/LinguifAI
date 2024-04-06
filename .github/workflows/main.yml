@@ -160,7 +160,7 @@ jobs:
           files: |
             ./dist/LinguifAI\ Setup\ ${{ steps.get_latest_release.outputs.new_version }}.exe
           tag_name: v${{ steps.get_latest_release.outputs.new_version }}
-          release_name: Release v${{ steps.get_latest_release.outputs.new_version }}
+          name: Release v${{ steps.get_latest_release.outputs.new_version }}
           draft: true
           body: |
             Descrição do release aqui
