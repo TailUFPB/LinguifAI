@@ -10,12 +10,17 @@ import pandas as pd
 import nltk
 import json
 import asyncio
+import logging
 nltk.download('wordnet')
 
 
 app = Flask(__name__)
 server_thread = None
 CORS(app)  # Permite todas as origens por padrão (não recomendado para produção)
+
+log = logging.getLogger('werkzeug')
+log.disabled = True
+
 
 app.config['JSONIFY_PRETTYPRINT_REGULAR'] = True
 
@@ -43,9 +48,10 @@ def upload_file():
 
     df = pd.DataFrame(selected_data, columns=['input_column'])
     result = data_processer.handle_classify(df, selected_classifier)
-    stats = data_processer.generate_statistics(result)
+    # stats = data_processer.generate_statistics(result)
 
-    return jsonify({'result': result.to_json(), 'stats': stats})
+    return jsonify({'result': result.to_json()})
+    # return jsonify({'result': result.to_json(), 'stats': stats})
 
 @app.route('/get-classifiers', methods=["GET"])
 def get_classifiers():
@@ -57,7 +63,7 @@ def shutdown():
     shutdown_server()
     return 'Server shutting down...'
 
-@app.route('/neural-network',methods=["POST"])
+@app.route('/neural-network', methods=["POST"])
 def train_model():
     received_data = request.json
 
@@ -89,7 +95,9 @@ def train_model():
     with open('training_progress.json', 'w') as file:
         json.dump(training_progress, file)
 
-    create_and_train_model(selected_data, selected_label, name, epochs, batch_size, learning_rate)
+    df = pd.DataFrame({'input_text': selected_data, 'labels': selected_label})
+
+    create_and_train_model(df, name, epochs, batch_size, learning_rate)
         
     return jsonify({"message": "Model train started successfully."}), 200 
 
@@ -118,4 +126,10 @@ def get_training_status():
 
 
 if __name__ == '__main__':
-    app.run(host='127.0.0.1', port=5000, debug=True)
+    training_progress = {
+        'training_progress': 0,
+        'training_in_progress': True
+    }
+    with open('training_progress.json', 'w') as file:
+        json.dump(training_progress, file)
+    app.run(host='0.0.0.0', port=5000, debug=False)

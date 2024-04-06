@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import SelectFileCard from "../components/selectFileCard/selectFileCard";
 import axios from "axios";
 import ResultTable from "../components/resultTable/resultTable";
@@ -47,10 +47,6 @@ export default function Train() {
     console.log(sendData);
 
 
-    const maxRetries = 3;
-    let retryCount = 0;
-
-
     const url = "http://localhost:5000/neural-network";
 
     await axios
@@ -65,7 +61,7 @@ export default function Train() {
                 await axios
                   .post(url, sendData)
                   .catch((error) => {
-                    console.error(error.response.data);
+                    throw new Error(error);
                   })
                 })
               })
@@ -114,25 +110,42 @@ export default function Train() {
   // carregamento
 
   const [loadingProgress, setLoadingProgress] = useState(0);
+  const prevLoadingProgressRef = useRef<number>(0); // Explicitly type prevLoadingProgressRef
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get(
-          "http://localhost:5000/training-status"
-        );
+        const response = await axios.get("http://localhost:5000/training-status");
         const { training_progress, training_in_progress } = response.data;
-        setLoadingProgress(
-          training_in_progress || training_progress === 100
-            ? training_progress
-            : 0
-        );
+        const newProgress: number = training_in_progress || training_progress === 100 ? training_progress : 0; // Explicitly type newProgress
+        updateLoadingProgress(newProgress);
       } catch (error) {
-        console.error("Erro ao buscar progresso:", error);
+        console.error("Error fetching progress:", error);
       }
     };
 
-    const interval = setInterval(fetchData, 3000);
+    const updateLoadingProgress = (newProgress: number) => { // Explicitly type newProgress parameter
+      const duration = 1000; // Duration in milliseconds for the transition
+      const startTime = Date.now();
+      const startProgress = prevLoadingProgressRef.current;
+      
+      const updateProgress = () => {
+        const elapsedTime = Date.now() - startTime;
+        const progress = Math.min(1, elapsedTime / duration); // Ensure progress doesn't exceed 1
+        const interpolatedProgress = startProgress + (newProgress - startProgress) * progress;
+        setLoadingProgress(interpolatedProgress);
+
+        if (progress < 1) {
+          requestAnimationFrame(updateProgress);
+        } else {
+          prevLoadingProgressRef.current = newProgress;
+        }
+      };
+
+      updateProgress();
+    };
+
+    const interval = setInterval(fetchData, 1050);
 
     return () => clearInterval(interval);
   }, []);
@@ -301,10 +314,10 @@ export default function Train() {
                     </div>
                     <div
                       className="bg-blue-500 h-10 rounded-lg absolute top-0 left-0 w-full transition-width duration-500"
-                      style={{ width: `${loadingProgress}%` }}
+                      style={{ width: `${loadingProgress.toFixed(2)}%` }}
                     ></div>
                     <div className="flex items-center justify-center h-10 absolute top-0 left-0 w-full text-white">
-                      {`Treinamento em ${loadingProgress}%`}
+                      {`Treinamento em ${loadingProgress.toFixed(2)}%`}
                     </div>
                   </div>
                 )}
