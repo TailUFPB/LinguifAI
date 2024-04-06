@@ -141,16 +141,16 @@ jobs:
             const versionParts = latestRelease.replace(/^v/, '').split('.');
             const newVersion = `${parseInt(versionParts[0])}.${parseInt(versionParts[1])}.${parseInt(versionParts[2]) + 1}`;
             console.log(`::set-output name=new_version::${newVersion}`);
-  
+
       - name: Rename file
-        run: mv .dist/LinguifAI\ Setup\ 0.1.0.exe .dist/LinguifAI\ Setup\ ${{ steps.get_latest_release.outputs.new_version }}.exe
+        run: mv dist/LinguifAI\ Setup\ 0.1.0.exe dist/LinguifAI\ Setup\ ${{ steps.get_latest_release.outputs.new_version }}.exe
 
       - name: Create Release
         id: create_release
         uses: softprops/action-gh-release@v1
         with:
           files: |
-            .dist/LinguifAI\ Setup\ ${{ steps.get_latest_release.outputs.new_version }}.exe
+            ./dist/LinguifAI\ Setup\ ${{ steps.get_latest_release.outputs.new_version }}.exe
           tag_name: v${{ steps.get_latest_release.outputs.new_version }}
           name: Release v${{ steps.get_latest_release.outputs.new_version }}
           prerelease: true
