@@ -108,7 +108,6 @@ class DataProcesser():
             partial(Neural_Network2.tokenize, stop_words=stop_words),
         )
 
-        # Replace rare words with <UNK>
         all_tokens = [sublst for lst in df.tokens.tolist() for sublst in lst]
         common_tokens = set(list(zip(
             *Counter(all_tokens).most_common(20000)))[0])
@@ -120,7 +119,6 @@ class DataProcesser():
             ),
         )
 
-        # Remove sequences with only <UNK>
         df = df[df.tokens.progress_apply(
             lambda tokens: any(token != '<UNK>' for token in tokens),
         )]
@@ -130,7 +128,6 @@ class DataProcesser():
         })
         self.token2idx = {token: idx for idx, token in enumerate(vocab)}
 
-        # Add a padding idx
         self.token2idx['<PAD>'] = max(self.token2idx.values()) + 1
 
         self.idx2token = {idx: token for token, idx in self.token2idx.items()}
@@ -138,9 +135,6 @@ class DataProcesser():
         df['indexed_tokens'] = df.tokens.apply(
             lambda tokens: [self.token2idx[token] for token in tokens],
         )
-
-        # Decode predictions using label_encoder
-
 
         predictions = []
         for input_column_row in df['indexed_tokens']:
@@ -150,10 +144,8 @@ class DataProcesser():
                 prediction = np.argmax(logits, axis=1)[0]
                 predictions.append(prediction)
 
-        # Decode predictions using label encoder
         decoded_predictions = label_encoder.inverse_transform(predictions)
 
-        # Assign decoded predictions back to the DataFrame
         df['output_column'] = decoded_predictions
 
         return df
