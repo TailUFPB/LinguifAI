@@ -1,5 +1,6 @@
 Emotions_found = {}
-with open(r'C:\Users\camer\Downloads\output (1).csv', 'r') as f:
+CSV_PATH = r'C:\Users\camer\Downloads\output (1).csv'
+with open(CSV_PATH, 'r') as f:
     next(f)
     for line in f:
         if line[line.rfind(',')+1:-1] == '':
