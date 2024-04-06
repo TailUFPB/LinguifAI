@@ -124,8 +124,8 @@ jobs:
       #- name: 📦 Electron Package
       #  run: npx electron-packager . LinguifAI --platform=win32 --arch=x64 --out=dist
 
-      # - name: 📦 Electron Builder
-      #   run: npm run electron:package:win
+      - name: 📦 Electron Builder
+        run: npm run electron:package:win
 
       - name: Get latest release number
         id: get_latest_release
