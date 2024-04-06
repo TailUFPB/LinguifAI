@@ -99,8 +99,14 @@ jobs:
         with:
           node-version: "14"
 
-      - name: Install Wine
+      - name: Install Wine64
         run: sudo apt update && sudo apt install wine64
+
+      - name: Install Wine32
+        run: |
+          sudo dpkg --add-architecture i386
+          sudo apt-get update
+          sudo apt-get install wine32
 
       - name: ⬇️ Checkout repo
         uses: actions/checkout@v4
@@ -126,6 +132,8 @@ jobs:
 
       - name: 📦 Electron Builder
         run: npm run electron:package:win
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Get latest release number
         id: get_latest_release
