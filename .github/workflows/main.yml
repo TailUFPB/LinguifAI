@@ -129,12 +129,11 @@ jobs:
 
       #- name: 📦 Electron Package
       #  run: npx electron-packager . LinguifAI --platform=win32 --arch=x64 --out=dist
-      
-      - name: Set GitHub Token
-        run: echo "GH_TOKEN=${{ secrets.GH_TOKEN }}" >> $GITHUB_ENV
 
       - name: 📦 Electron Builder
         run: npm run electron:package:win
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Get latest release number
         id: get_latest_release
