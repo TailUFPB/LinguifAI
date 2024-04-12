@@ -46,6 +46,9 @@ export function Menu() {
             <li className="my-2 hover:text-blue-300 transition">
               <Link to="/train">Treinar</Link>
             </li>
+            <li className="my-2 hover:text-blue-300 transition">
+              <Link to="/about">Sobre</Link>
+            </li>
           </ul>
         </nav>
       </CSSTransition>
