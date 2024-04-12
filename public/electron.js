@@ -23,7 +23,7 @@ function startFlaskServer() {
     ? "./api/app.py"
     : "./api/app.py";
 
-  flaskServerProcess = childProcess.spawn("python3", [pythonPath], {
+  flaskServerProcess = childProcess.spawn("python", [pythonPath], {
     detached: false,
     stdio: ["ignore", "pipe", "pipe"],
   });
