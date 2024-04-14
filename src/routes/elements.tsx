@@ -13,3 +13,4 @@ const Loadable = (Component: ElementType) => (props: any) => {
 
 export const Home = Loadable(lazy(() => import("../pages/home")));
 export const Train = Loadable(lazy(() => import("../pages/train")));
+export const About = Loadable(lazy(() => import("../pages/about")));
