@@ -1,10 +1,4 @@
-import pandas as pd
 import pickle
-
-# bag of words
-from sklearn.feature_extraction.text import TfidfVectorizer
-
-#tfidf_vectorizer = TfidfVectorizer(use_idf=True)
 
 def make_prediction(my_sentence):
     model_file = "./models/emotions_pipeline.pkl"
