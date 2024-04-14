@@ -147,7 +147,7 @@ jobs:
             });
             const latestRelease = response.data.tag_name;
             const versionParts = latestRelease.replace(/^v/, '').split('.');
-            const newVersion = `${parseInt(versionParts[0])}.${parseInt(versionParts[1]) + 1}.0`;
+            const newVersion = `${parseInt(versionParts[0])}.${parseInt(versionParts[1])}.${parseInt(versionParts[2]) + 1}`;
             console.log(`::set-output name=new_version::${newVersion}`);
 
       - name: Rename file
