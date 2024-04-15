@@ -95,6 +95,13 @@
         "filter": [
           "**/*"
         ]
+      },
+      {
+        "from": "build/assets",
+        "to": "assets",
+        "filter": [
+          "**/*"
+        ]
       }
     ],
     "nsis": {
