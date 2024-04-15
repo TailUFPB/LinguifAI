@@ -148,7 +148,7 @@ jobs:
 
             const preReleases = response.data.filter(release => release.prerelease);
             const latestPreRelease = preReleases[0]; // Assumindo que a primeira pré-release na lista é a mais recente
-            const preReleaseTag = latestPreRelease.tag_name;
+            const preReleaseTag = latestPreRelease.name;
             const versionParts = preReleaseTag.replace(/^v/, '').split('.');
             const newVersion = `${parseInt(versionParts[0])}.${parseInt(versionParts[1])}.${parseInt(versionParts[2]) + 1}`;
             console.log(`::set-output name=new_version::${newVersion}`);
@@ -163,7 +163,7 @@ jobs:
           files: |
             ./dist/LinguifAI\ Setup\ ${{ steps.get_latest_release.outputs.new_version }}.exe
           tag_name: v${{ steps.get_latest_release.outputs.new_version }}
-          name: Release v${{ steps.get_latest_release.outputs.new_version }}
+          name: v${{ steps.get_latest_release.outputs.new_version }}
           prerelease: true
           body: |
             Descrição do release aqui
