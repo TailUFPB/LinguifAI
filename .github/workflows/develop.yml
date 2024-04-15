@@ -147,13 +147,6 @@ jobs:
               per_page: 10
             });
 
-
-
-            console.log(response.data[0].name);
-            console.log(response.data[0]);
-            console.log(response.data[0]);
-            console.log(response.data[0]);
-
             const latestPreRelease = response.data[0]; 
             const preReleaseTag = latestPreRelease.name;
             const versionParts = preReleaseTag.replace(/^v/, '').split('.');
