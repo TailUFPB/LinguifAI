@@ -141,13 +141,16 @@ jobs:
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
-            const response = await github.repos.getLatestRelease({
+            const response = await github.repos.listReleases({
               owner: context.repo.owner,
-              repo: context.repo.repo
-            });
-            const latestRelease = response.data.tag_name;
-            const versionParts = latestRelease.replace(/^v/, '').split('.');
-            const newVersion = `${parseInt(versionParts[0])}.${parseInt(versionParts[1]) + 1}.0`;
+              repo: context.repo.repo,
+              per_page: 10
+            });    
+
+            const latestPreRelease = response.data[0];
+            const preReleaseTag = latestPreRelease.name;
+            const versionParts = preReleaseTag.replace(/^v/, '').split('.');
+            const newVersion = `${parseInt(versionParts[0])}.${parseInt(versionParts[1])+1}.0`;
             console.log(`::set-output name=new_version::${newVersion}`);
 
       - name: Rename file
@@ -160,7 +163,7 @@ jobs:
           files: |
             ./dist/LinguifAI\ Setup\ ${{ steps.get_latest_release.outputs.new_version }}.exe
           tag_name: v${{ steps.get_latest_release.outputs.new_version }}
-          name: Release v${{ steps.get_latest_release.outputs.new_version }}
+          name: v${{ steps.get_latest_release.outputs.new_version }}
           prerelease: true
           body: |
             Descrição do release aqui

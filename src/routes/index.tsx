@@ -1,5 +1,5 @@
 import { Navigate, useRoutes } from "react-router-dom";
-import { Home, Train } from "./elements";
+import { Home, Train, About } from "./elements";
 
 export default function Router() {
   return useRoutes([
@@ -10,6 +10,10 @@ export default function Router() {
     {
       path: "/train",
       element: <Train />,
+    },
+    {
+      path: "/about",
+      element: <About />,
     },
     { path: "*", element: <Navigate to="/404" replace /> },
     { path: "/404", element: <>404</> },

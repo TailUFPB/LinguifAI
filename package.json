@@ -100,7 +100,7 @@
     "nsis": {
       "oneClick": false,
       "allowToChangeInstallationDirectory": true,
-      "license": "license.md"
+      "license": "LICENSE"
     }
   }
 }
