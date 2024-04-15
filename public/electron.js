@@ -17,7 +17,7 @@ function installDependencies() {
 }
 
 function startFlaskServer() {
-  //installDependencies();
+  installDependencies();
 
   const pythonPath = process.env.ELECTRON_START_URL
     ? "./api/app.py"

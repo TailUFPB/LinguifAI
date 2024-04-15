@@ -135,19 +135,22 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Get latest release number
-        id: get_latest_release
+      - name: Get latest pre-release number
+        id: get_latest_pre_release
         uses: actions/github-script@v4
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
-            const response = await github.repos.getLatestRelease({
+            const response = await github.repos.listReleases({
               owner: context.repo.owner,
-              repo: context.repo.repo
+              repo: context.repo.repo,
             });
-            const latestRelease = response.data.tag_name;
-            const versionParts = latestRelease.replace(/^v/, '').split('.');
-            const newVersion = `${parseInt(versionParts[0])}.${parseInt(versionParts[1])}.${parseInt(versionParts[2]) + 2}`;
+
+            const preReleases = response.data.filter(release => release.prerelease);
+            const latestPreRelease = preReleases[0]; // Assumindo que a primeira pré-release na lista é a mais recente
+            const preReleaseTag = latestPreRelease.tag_name;
+            const versionParts = preReleaseTag.replace(/^v/, '').split('.');
+            const newVersion = `${parseInt(versionParts[0])}.${parseInt(versionParts[1])}.${parseInt(versionParts[2]) + 1}`;
             console.log(`::set-output name=new_version::${newVersion}`);
 
       - name: Rename file
