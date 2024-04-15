@@ -1,7 +1,6 @@
 
 from NbNewsModel import news_prediction
 from NbEmotionsModel import make_prediction
-from NbLinRegressionModel import make_prediction_nblin
 from available_classifiers import get_available_classifiers
 
 import Neural_Network2
