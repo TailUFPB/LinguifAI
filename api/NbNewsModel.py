@@ -1,4 +1,3 @@
-import pandas as pd
 import pickle
 
 def news_prediction(texts):

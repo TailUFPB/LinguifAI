@@ -53,7 +53,7 @@ export default function About() {
       photo: "/assets/thiago.jpg",
     },
   ];
-
+ //comment
   return (
     <div className="bg-main-darker text-white min-h-screen flex flex-col">
       <Menu />
