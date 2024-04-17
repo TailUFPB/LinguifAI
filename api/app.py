@@ -90,7 +90,8 @@ def train_model():
     # reseta status
     training_progress = {
         'training_progress': 0,
-        'training_in_progress': True
+        'training_in_progress': True,
+        'cancel_requested': False
     }
     with open('training_progress.json', 'w') as file:
         json.dump(training_progress, file)
@@ -120,9 +121,23 @@ def get_training_status():
                         return jsonify({'training_in_progress': True, 'training_progress': 0})
             training_status = data.get('training_in_progress', False)
             progress = data.get('training_progress', 0)
-            return jsonify({'training_in_progress': training_status, 'training_progress': progress})
+            cancel_request = data.get('cancel_requested', False)
+            return jsonify({'training_in_progress': training_status, 'training_progress': progress, 'cancel_requested': cancel_request})
     except FileNotFoundError:
-        return jsonify({'training_in_progress': False, 'training_progress': 0})
+        return jsonify({'training_in_progress': False, 'training_progress': 0, 'cancel_requested': False})
+    
+@app.route('/cancel-training', methods=['POST'])
+def cancel_training():
+    try:
+        with open('training_progress.json', 'r+') as file:
+            data = json.load(file)
+            data['cancel_requested'] = True
+            file.seek(0)
+            json.dump(data, file)
+            file.truncate()
+        return jsonify({'message': 'Cancellation requested.'}), 200
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 
 
 if __name__ == '__main__':

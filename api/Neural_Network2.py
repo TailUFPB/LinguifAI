@@ -354,6 +354,14 @@ def create_and_train_model(df, name, epochs = 10, batch_size = 32, learning_rate
     n_epochs = 0
     train_losses, valid_losses = [], []
     for curr_epoch in range(epochs):
+
+        # Check if there was a request to cancel the training process
+        with open('training_progress.json', 'r') as file:
+            data = json.load(file)
+            if data.get('cancel_requested', False):
+                print("Training canceled!")
+                return
+
         train_loss = train_epoch(model, optimizer, scheduler, train_loader, criterion, curr_epoch, epochs)
         valid_loss = validate_epoch(model, valid_loader, criterion)
 
