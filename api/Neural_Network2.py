@@ -276,13 +276,16 @@ def train_epoch(model, optimizer, scheduler, train_loader, criterion, curr_epoch
         total += len(target)
         num_iters += 1
         if num_iters % 20 == 0:
-            with open('training_progress.json', 'w') as f:
-                progress = 100 * (curr_epoch + num_iters/len(train_loader)) / num_total_epochs
-                training_progress = {
+            with open('training_progress.json', 'r+') as f:
+                data = json.load(f)
+                progress = 100 * (curr_epoch + num_iters / len(train_loader)) / num_total_epochs
+                data.update({
                     'training_progress': progress,
                     'training_in_progress': True
-                }
-                json.dump(training_progress, f)
+                })
+                f.seek(0)
+                json.dump(data, f)
+                f.truncate()
 
     return total_loss / total
 

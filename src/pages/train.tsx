@@ -344,6 +344,16 @@ export default function Train() {
                 >
                   {isLoading ? "Carregando..." : "Treinar"}
                 </button>
+
+                {isLoading && (
+                  <button
+                    className="mt-3 bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-lg"
+                    onClick={handleCancelTraining}
+                    disabled={isCancelling}
+                  >
+                    {isCancelling ? 'Cancelando...' : 'Cancelar Treinamento'}
+                  </button>
+                )}
               </div>
             </div>
           </>
