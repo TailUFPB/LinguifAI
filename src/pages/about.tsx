@@ -53,7 +53,7 @@ export default function About() {
       photo: "./assets/thiago.jpg",
     },
   ];
- //comment
+  //comment
   return (
     <div className="bg-main-darker text-white min-h-screen flex flex-col">
       <Menu />
@@ -108,7 +108,7 @@ export default function About() {
 
         <h2 className="text-2xl font-semibold mb-4">Conheça a Equipe:</h2>
 
-        <div className="grid grid-cols-2 md:grid-cols-7 gap-6">
+        <div className="grid grid-cols-2 md:grid-cols-4 limit:grid-cols-7 gap-6">
           {teamMembers.map((member, index) => (
             <div key={index} className="text-center">
               <img

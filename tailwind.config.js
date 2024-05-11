@@ -3,6 +3,9 @@ module.exports = {
   content: ["./src/**/*.{js,jsx,ts,tsx}"],
   theme: {
     extend: {
+      screens: {
+        limit: "1190px",
+      },
       colors: {
         main: {
           darker: "#000624",
