@@ -25,7 +25,6 @@ a = Analysis(
     runtime_hooks=[],
     excludes=[],
     noarchive=False,
-    optimize=0,
 )
 
 # Define PYZ (Python Zip) configuration
