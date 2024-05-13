@@ -53,10 +53,14 @@ jobs:
       - name: 📦 Install dependencies
         run: npm install
         
-      - name: 🏗️ Create python exe
+      - name: 🏗️ Install pyinstaller
         run: |
           pip install pyinstaller
-          pyinstaller app.spec
+    
+      - name: Package Flask Application
+        uses: JackMcKew/pyinstaller-action-windows@main
+        with:
+          path: api
           
       - name: 📦 Electron Builder
         run: npm run electron:package:win
