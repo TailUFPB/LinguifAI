@@ -59,7 +59,9 @@ jobs:
 
       - name: 🏗️ Build
         run: |
-          conda run -n base pyinstaller app.spec
+          pip install pyinstaller
+          pyinstaller api/app.py
+          
 
 >>>>>>> fc61a863 (Update develop.yml)
       - name: 📦 Electron Builder
