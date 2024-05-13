@@ -14,6 +14,7 @@ jobs:
     strategy:
       fail-fast: false
     steps:
+<<<<<<< HEAD
       - name: ⬇️ Checkout repo
         uses: actions/checkout@v4
         with:
@@ -25,14 +26,17 @@ jobs:
           activate-environment: default
           environment-file: api/environment.yml
 
+=======
+>>>>>>> fc61a863 (Update develop.yml)
       - name: ⬇️ Checkout repo
         uses: actions/checkout@v4
         with:
           fetch-depth: 2
 
-      - name: ⎔ Setup Node
-        uses: actions/setup-node@v3
+      - name: Set up Miniconda
+        uses: conda-incubator/setup-miniconda@v2
         with:
+<<<<<<< HEAD
           cache: "npm"
 
       - name: 🟨 Setup Python
@@ -49,6 +53,15 @@ jobs:
       - name: Install dependencies
         run: npm install
 
+=======
+          activate-environment: default
+          environment-file: environment.yml
+
+      - name: 🏗️ Build
+        run: |
+          conda run -n base pyinstaller app.spec
+
+>>>>>>> fc61a863 (Update develop.yml)
       - name: 📦 Electron Builder
         run: npm run electron:package:win
         env:
