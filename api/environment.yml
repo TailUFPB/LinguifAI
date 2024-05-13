@@ -1,15 +1,16 @@
 name: LinguifAI
 channels:
   - defaults
+  - pytorch
 dependencies:
-  - flask=2.3.2
-  - flask-cors=4.0.0
-  - pandas=2.0.3
-  - nltk=3.8.1
-  - scikit-learn=1.3.0
-  - numpy=1.25.2
-  - matplotlib=3.7.1
-  - seaborn=0.13.0
-  - tensorflow=2.6.0  # Updated to a version compatible with Conda
-  - keras=2.6.0        # Updated to a version compatible with Conda
-  - torchtext=0.17.2
+  - flask
+  - flask-cors
+  - pandas
+  - nltk
+  - scikit-learn
+  - numpy
+  - matplotlib
+  - seaborn
+  - tensorflow
+  - keras
+  - torchtext
