@@ -18,7 +18,7 @@ jobs:
           fetch-depth: 2
 
       - name: Set up conda
-        uses: conda-incubator/setup-anaconda@v2
+        uses: s-weigand/setup-conda@v1
         with:
           activate-environment: default
           environment-file: environment.yml
