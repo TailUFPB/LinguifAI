@@ -7,7 +7,7 @@ export default function About() {
       name: "Jonas Gabriel",
       linkedin: "https://www.linkedin.com/in/jonas-gabriel-araujo/",
       github: "https://github.com/jonasgabriel18",
-      photo: "../build/assets/jonas.jpg",
+      photo: "../../assets/jonas.jpg",
     },
 
     {
@@ -15,21 +15,21 @@ export default function About() {
       linkedin:
         "https://www.linkedin.com/in/luiz-gusttavo-oliveira-de-souza-7538091b1/",
       github: "https://github.com/GusttavoOliveira",
-      photo: "../build/assets/luiz.jpg",
+      photo: "../../../assets/luiz.jpg",
     },
 
     {
       name: "Bertrand Lira",
       linkedin: "https://www.linkedin.com/in/bertrand-lira-veloso-52aa4926a/",
       github: "https://github.com/BertrandLira",
-      photo: "../build/assets/bertrand.jpg",
+      photo: "../assets/bertrand.jpg",
     },
 
     {
       name: "Cameron Maloney",
       linkedin: "https://www.linkedin.com/in/cameronmal/",
       github: "https://github.com/cmaloney111",
-      photo: "../build/assets/cameron.jpg",
+      photo: "assets/cameron.jpg",
     },
 
     {
@@ -43,17 +43,17 @@ export default function About() {
       name: "Thauã Magalhães",
       linkedin: "https://www.linkedin.com/in/thaua-lucas/",
       github: "https://github.com/tahaluh",
-      photo: "../build/assets/thaua.jpg",
+      photo: "../../../../assets/thaua.jpg",
     },
 
     {
       name: "Thiago Rodrigues",
       linkedin: "https://www.linkedin.com/in/thiago-rodrigues-b8a328249/",
       github: "https://github.com/tahaluh",
-      photo: "../build/assets/thiago.jpg",
+      photo: "thiago.jpg",
     },
   ];
-  
+
   return (
     <div className="bg-main-darker text-white min-h-screen flex flex-col">
       <Menu />
