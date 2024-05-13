@@ -3,8 +3,6 @@
 # Import necessary modules
 from PyInstaller.utils.hooks import collect_data_files
 from PyInstaller.utils.hooks import collect_submodules
-from PyInstaller.utils.hooks import copy_metadata
-from PyInstaller.utils.hooks import copy_metadata_recursive
 from PyInstaller.utils.hooks import collect_dynamic_libs
 
 # Specify the entry point Python script
