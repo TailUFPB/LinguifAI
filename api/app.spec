@@ -1,36 +1,20 @@
 # -*- mode: python ; coding: utf-8 -*-
 
-# Import necessary modules
-# from PyInstaller.utils.hooks import collect_data_files
-from PyInstaller.utils.hooks import collect_submodules
-from PyInstaller.utils.hooks import collect_dynamic_libs
-
-# Specify the entry point Python script
-entry_point = 'app.py'
-
-# Collect necessary data files and binaries
-# datas = collect_data_files('sklearn')
-hiddenimports = collect_submodules('sklearn')
-binaries = collect_dynamic_libs('sklearn')
-
-# Define Analysis configuration
 a = Analysis(
-    [entry_point],
-    pathex=[],
-    binaries=binaries,
+    ['api\\app.py'],
+    pathex=['C:\\Users\\camer\\anaconda3\\envs\\LinguifAI\\Lib\\site-packages', 'C:\\Users\\camer\\AppData\\Roaming\\Python\\Python310\\site-packages\\sklearn'],
+    binaries=[],
     datas=[],
-    hiddenimports=hiddenimports,
+    hiddenimports=['sklearn'],
     hookspath=[],
     hooksconfig={},
     runtime_hooks=[],
     excludes=[],
     noarchive=False,
+    optimize=0,
 )
-
-# Define PYZ (Python Zip) configuration
 pyz = PYZ(a.pure)
 
-# Define EXE (Executable) configuration
 exe = EXE(
     pyz,
     a.scripts,
@@ -48,12 +32,10 @@ exe = EXE(
     codesign_identity=None,
     entitlements_file=None,
 )
-
-# Define COLLECT configuration
 coll = COLLECT(
     exe,
-    binaries,
-    datas,
+    a.binaries,
+    a.datas,
     strip=False,
     upx=True,
     upx_exclude=[],
