@@ -27,6 +27,7 @@ jobs:
         run: |
           pip install pyinstaller
           pyinstaller api/app.py
+          npm install
           
 
       - name: 📦 Electron Builder
