@@ -1,10 +1,5 @@
 # -*- mode: python ; coding: utf-8 -*-
 
-# Import necessary modules
-# from PyInstaller.utils.hooks import collect_data_files
-from PyInstaller.utils.hooks import collect_submodules
-from PyInstaller.utils.hooks import collect_dynamic_libs
-
 # Specify the entry point Python script
 entry_point = 'app.py'
 
