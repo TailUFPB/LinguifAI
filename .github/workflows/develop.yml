@@ -34,7 +34,7 @@ jobs:
           fetch-depth: 2
 
       - name: Set up conda
-        uses: s-weigand/setup-conda@v1
+        uses: conda-incubator/setup-miniconda@v2
         with:
 <<<<<<< HEAD
           cache: "npm"
@@ -55,7 +55,7 @@ jobs:
 
 =======
           activate-environment: default
-          environment-file: environment.yml
+          environment-file: api/environment.yml
 
       - name: 🏗️ Build
         run: |
