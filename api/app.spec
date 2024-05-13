@@ -1,7 +1,7 @@
 # -*- mode: python ; coding: utf-8 -*-
 
 # Import necessary modules
-from PyInstaller.utils.hooks import collect_data_files
+# from PyInstaller.utils.hooks import collect_data_files
 from PyInstaller.utils.hooks import collect_submodules
 from PyInstaller.utils.hooks import collect_dynamic_libs
 
@@ -9,7 +9,7 @@ from PyInstaller.utils.hooks import collect_dynamic_libs
 entry_point = 'app.py'
 
 # Collect necessary data files and binaries
-datas = collect_data_files('sklearn')
+# datas = collect_data_files('sklearn')
 hiddenimports = collect_submodules('sklearn')
 binaries = collect_dynamic_libs('sklearn')
 
@@ -18,7 +18,7 @@ a = Analysis(
     [entry_point],
     pathex=[],
     binaries=binaries,
-    datas=datas,
+    datas=[],
     hiddenimports=hiddenimports,
     hookspath=[],
     hooksconfig={},
