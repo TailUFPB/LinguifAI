@@ -23,5 +23,5 @@ pipeline = make_pipeline(TfidfVectorizer(), MultinomialNB())
 pipeline.fit(X_train, y_train)
 
 # Salvando o pipeline em um arquivo .pkl
-with open("text_classification_pipeline.pkl", "wb") as model_file:
+with open("../models/text_classification_pipeline.pkl", "wb") as model_file:
     pickle.dump(pipeline, model_file)

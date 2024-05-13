@@ -2,13 +2,19 @@
 from NbNewsModel import news_prediction
 from NbEmotionsModel import make_prediction
 from available_classifiers import get_available_classifiers
+from sklearn.pipeline import make_pipeline
+
+# bag of words
+from sklearn.feature_extraction.text import TfidfVectorizer
+
+from sklearn.model_selection import train_test_split
+from sklearn.naive_bayes import MultinomialNB
 
 import Neural_Network2
 import pickle
 import re
 import joblib
 import numpy as np
-import string
 import os
 import pandas as pd
 import torch
@@ -30,7 +36,8 @@ class DataProcesser():
         classifier_switcher = get_available_classifiers() # id: nome_arquivo
         model_name = classifier_switcher[classifier]
         if model_name.endswith('.pkl'):
-            return self.pretrained_predict(df, model_name)
+            pipeline = self.get_pipeline(model_name)
+            return self.pretrained_predict(df, pipeline)
         else:
             return self.trained_predict(df, model_name)
         #classifier_switcher = {
@@ -40,6 +47,20 @@ class DataProcesser():
         #}
 
         #return classifier_switcher.get(classifier, lambda: "Invalid Classifier")(df)
+
+    def get_pipeline(self, model_name):
+        if model_name=="emotion_pipeline.pkl":
+            df = pd.read_csv('api/training_df/tweet_emotions.csv')
+            train_data, test_data, train_target, test_target = train_test_split(df['content'], df['sentiment'], test_size=0.2, shuffle=True)
+        elif model_name=="hate_speech.pkl":
+            df = pd.read_csv('api/training_df/nb_hatespeech.csv', sep=';')
+            train_data, test_data, train_target, test_target = train_test_split(df['comment'], df['isHate'], test_size=0.2, shuffle=True)
+        elif model_name=="text_classification_pipeline.pkl":
+            df = pd.read_csv('api/training_df/nb_news.csv')
+            train_data, test_data, train_target, test_target = train_test_split(df['short_description'], df['category'], test_size=0.2, shuffle=True)
+        else:
+            return None
+        return make_pipeline(TfidfVectorizer(), MultinomialNB()).fit(train_data, train_target)
 
     def generate_statistics(self, df):
         unique_labels = df['output_column'].unique()
@@ -67,19 +88,15 @@ class DataProcesser():
         df['output_column'] = df['input_column'].apply(make_prediction)
         return df
 
-    def lin_regression_model(self, df):
-        df['output_column'] = df['input_column'].apply(make_prediction_nblin)
-        return df
+    # def lin_regression_model(self, df):
+    #     df['output_column'] = df['input_column'].apply(make_prediction_nblin)
+    #     return df
 
     def nb_news_application(self, df):
         df['output_column'] = df['input_column'].apply(news_prediction)
         return df
 
-    def pretrained_predict(self, df, model_name):
-        model_file = f'api/models/{model_name}'
-        with open(model_file, 'rb') as model:
-            pipeline = pickle.load(model)
-
+    def pretrained_predict(self, df, pipeline):
         texts_to_predict = df['input_column']
         texts_to_predict = [str(text) for text in texts_to_predict]
         predictions = pipeline.predict(texts_to_predict)

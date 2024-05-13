@@ -1,107 +1,74 @@
-const { app, BrowserWindow } = require("electron");
-const childProcess = require("child_process");
-const path = require("path");
-const url = require("url");
-const axios = require("axios");
+const { app, BrowserWindow } = require('electron');
+const path = require('path');
+const fs = require('fs');
+const child_process = require('child_process');
 
-let flaskServerProcess;
+let flaskProcess;
 
-function installDependencies() {
-  // Execute pip install command to install dependencies from requirements.txt
-  const requirementsPath = process.env.ELECTRON_START_URL
-    ? "./api/requirements.txt"
-    : "./api/requirements.txt";
-  childProcess.execSync(`pip install -r ${requirementsPath}`, {
-    stdio: "inherit",
-  });
+// Function to start the Flask process
+function startFlaskProcess() {
+    try {
+        // Attempt to spawn the process using the original path
+        let filepath = path.join(__dirname, '..', '..', '..', 'dist', 'app', 'app.exe');
+        if (!fs.existsSync(filepath)) {
+          filepath = path.join(__dirname, '..', 'dist', 'app', 'app.exe');
+        }
+
+        flaskProcess = child_process.spawn(filepath);
+
+        // Listen for process events, handle as needed
+        flaskProcess.on('exit', (code, signal) => {
+            console.log(`Flask process exited with code ${code} and signal ${signal}`);
+        });
+
+        flaskProcess.stdout.on('data', (data) => {
+            console.log(`Flask process stdout: ${data}`);
+        });
+
+        flaskProcess.stderr.on('data', (data) => {
+            console.error(`Flask process stderr: ${data}`);
+        });
+    } catch (error) {
+        console.error(`Flask process error: ${error}`);
+    }
 }
 
-function startFlaskServer() {
-  installDependencies();
-
-  const pythonPath = process.env.ELECTRON_START_URL
-    ? "./api/app.py"
-    : "./api/app.py";
-
-  flaskServerProcess = childProcess.spawn("python", [pythonPath], {
-    detached: false,
-    stdio: ["ignore", "pipe", "pipe"],
-  });
-
-  // Capture stdout
-  flaskServerProcess.stdout.on("data", (data) => {
-    console.log(`Flask server stdout: ${data}`);
-  });
-
-  // Capture stderr
-  flaskServerProcess.stderr.on("data", (data) => {
-    console.error(`Flask server stderr: ${data}`);
-  });
-
-  flaskServerProcess.on("error", (err) => {
-    console.error("Error starting Flask server:", err);
-  });
-
-  flaskServerProcess.on("close", (code) => {
-    console.log("Flask server exited with code", code);
-  });
-}
-
-function shutdownFlaskServer() {
-  if (flaskServerProcess) {
-    flaskServerProcess.kill();
-    flaskServerProcess = null;
-  }
-}
+let mainWindow;
 
 function createWindow() {
-  const win = new BrowserWindow({
+  mainWindow = new BrowserWindow({
     width: 800,
     height: 600,
-    show: false,
-  });
-  // flaskServerProcess
-  win.webContents.executeJavaScript(
-    `console.log("startUrl: ${flaskServerProcess.pid}")`
-  );
-
-  const startUrl =
-    process.env.ELECTRON_START_URL ||
-    url.format({
-      pathname: path.join(__dirname, "./index.html"),
-      protocol: "file:",
-      slashes: true,
-    });
-
-  win.loadURL(startUrl);
-
-  win.once("ready-to-show", () => {
-    win.maximize();
-    win.show();
+    webPreferences: {
+      nodeIntegration: true
+    }
   });
 
-  win.webContents.openDevTools();
+  startFlaskProcess();
 
-  win.on("close", () => {
-    shutdownFlaskServer();
+
+  // Load React frontend
+  mainWindow.loadFile(path.join(__dirname, '..', 'build', 'index.html'));
+
+  mainWindow.on('closed', function () {
+    mainWindow = null;
+    // Kill Flask server when the window is closed
+    flaskProcess.kill();
   });
 }
 
-app.whenReady().then(() => {
-  startFlaskServer();
-  createWindow();
+app.on('ready', createWindow);
 
-  app.on("activate", () => {
-    if (BrowserWindow.getAllWindows().length === 0) createWindow();
-  });
-});
-
-app.on("before-quit", () => {
-  shutdownFlaskServer();
-});
-
-app.on("window-all-closed", () => {
-  if (process.platform !== "darwin") {
+app.on('window-all-closed', function () {
+  if (process.platform !== 'darwin') {
     app.quit();
   }
 });
+
+app.on('activate', function () {
+  if (mainWindow === null) {
+    createWindow();
+  }
+});
+
+
