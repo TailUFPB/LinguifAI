@@ -22,19 +22,47 @@ jobs:
         with:
           activate-environment: default
           environment-file: api/environment.yml
+          
+      - name: Set up Wine
+        uses: actions/setup-node@v2
+        with:
+          node-version: "14"
 
-      - name: 🏗️ Build
+      - name: Install Wine64
+        run: sudo apt update && sudo apt install wine64
+
+      - name: Install Wine32
+        run: |
+          sudo dpkg --add-architecture i386
+          sudo apt-get update
+          sudo apt-get install wine32
+
+      - name: ⬇️ Checkout repo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - name: ⎔ Setup Node
+        uses: actions/setup-node@v3
+        with:
+          cache: "npm"
+
+      - name: 🟨 Setup Python
+        uses: actions/setup-python@v3
+
+      - name: 📦 Install dependencies
+        run: npm install
+        
+      - name: 🏗️ Create python exe
         run: |
           pip install pyinstaller
           pyinstaller api/app.py
-          npm install
           
-
       - name: 📦 Electron Builder
         run: npm run electron:package:win
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
+          
       - name: Get latest release number
         id: get_latest_release
         uses: actions/github-script@v4
