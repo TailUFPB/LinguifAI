@@ -2,8 +2,8 @@
 
 a = Analysis(
     ['api\\app.py'],
-    pathex=['C:\\Users\\camer\\anaconda3\\envs\\LinguifAI\\Lib\\site-packages', 'C:\\Users\\camer\\AppData\\Roaming\\Python\\Python310\\site-packages\\sklearn'],
-    binaries=[],
+    pathex=[],
+    binaries=[], #  pathex=['C:\\Users\\camer\\anaconda3\\envs\\LinguifAI\\Lib\\site-packages', 'C:\\Users\\camer\\AppData\\Roaming\\Python\\Python310\\site-packages\\sklearn'],
     datas=[],
     hiddenimports=['sklearn'],
     hookspath=[],

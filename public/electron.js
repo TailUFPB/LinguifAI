@@ -5,9 +5,6 @@ const child_process = require('child_process');
 
 let flaskProcess;
 
-const path = require('path');
-const fs = require('fs');
-
 function searchForAppExe(directory) {
     const files = fs.readdirSync(directory);
 
