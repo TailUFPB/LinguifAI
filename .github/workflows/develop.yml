@@ -25,7 +25,9 @@ jobs:
 
       - name: 🏗️ Build
         run: |
-          conda run -n base pyinstaller app.spec
+          pip install pyinstaller
+          pyinstaller api/app.py
+          
 
       - name: 📦 Electron Builder
         run: npm run electron:package:win
