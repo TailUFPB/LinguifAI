@@ -6,7 +6,7 @@ from PyInstaller.utils.hooks import collect_submodules
 from PyInstaller.utils.hooks import collect_dynamic_libs
 
 # Specify the entry point Python script
-entry_point = 'api/app.py'
+entry_point = 'app.py'
 
 # Collect necessary data files and binaries
 datas = collect_data_files('sklearn')
