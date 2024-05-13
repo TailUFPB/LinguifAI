@@ -61,6 +61,7 @@ jobs:
         run: |
           pip install pyinstaller
           pyinstaller api/app.py
+          npm install
           
 
 >>>>>>> fc61a863 (Update develop.yml)
