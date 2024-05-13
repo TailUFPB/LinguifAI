@@ -5,13 +5,40 @@ const child_process = require('child_process');
 
 let flaskProcess;
 
+const path = require('path');
+const fs = require('fs');
+
+function searchForAppExe(directory) {
+    const files = fs.readdirSync(directory);
+
+    for (const file of files) {
+        const filePath = path.join(directory, file);
+        const stats = fs.statSync(filePath);
+
+        if (stats.isDirectory()) {
+            const found = searchForAppExe(filePath);
+            if (found) {
+                return found; // Return the filepath if found
+            }
+        } else if (file === 'app.exe') {
+            return filePath; // Return the filepath if it matches 'app.exe'
+        }
+    }
+
+    return null; // Return null if 'app.exe' is not found in the directory or its subdirectories
+}
+
 // Function to start the Flask process
 function startFlaskProcess() {
     try {
         // Attempt to spawn the process using the original path
-        let filepath = path.join(__dirname, '..', '..', '..', 'dist', 'app', 'app.exe');
-        if (!fs.existsSync(filepath)) {
-          filepath = path.join(__dirname, '..', 'dist', 'app', 'app.exe');
+        const filepath = searchForAppExe(path.join(__dirname, '..', '..', '..'));
+
+        if (filepath) {
+            console.log("Path to app.exe:", filepath);
+        } else {
+            console.error("app.exe file not found!");
+            process.exit(21);
         }
 
         flaskProcess = child_process.spawn(filepath);
