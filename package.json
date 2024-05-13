@@ -91,8 +91,8 @@
     },
     "extraFiles": [
       {
-        "from": "dist/app",
-        "to": "dist/app",
+        "from": "dist/windows/app",
+        "to": "dist/windows/app",
         "filter": [
           "**/*"
         ]
