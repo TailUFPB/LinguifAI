@@ -21,18 +21,21 @@ export default function Home() {
 
   useEffect(() => {
     const fetchClassifiers = async () => {
-      try {
-        const response = await axios.get(
-          "http://localhost:5000/get-classifiers"
-        );
-        setClassifiers(response.data);
-      } catch (error) {
-        console.error("Erro ao buscar classificadores:", error);
-      }
+      setTimeout(async () => {
+        try {
+          const response = await axios.get(
+            "http://localhost:5000/get-classifiers"
+          );
+          setClassifiers(response.data);
+        } catch (error) {
+          console.error("Error fetching classifiers:", error);
+        }
+      }, 15000);
     };
-
+  
     fetchClassifiers();
   }, []);
+  
 
   const handleChangeSelectedColumn = (event: any) => {
     setSelectedColumn(event.target.value);
