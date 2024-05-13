@@ -66,6 +66,9 @@ jobs:
         run: npm run electron:package:win
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Print directory tree
+        run: tree
           
       - name: Get latest release number
         id: get_latest_release
