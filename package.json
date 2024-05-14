@@ -98,6 +98,13 @@
         ]
       },
       {
+        "from": "dist/app",
+        "to": "dist/app",
+        "filter": [
+          "**/*"
+        ]
+      },
+      {
         "from": "build/assets",
         "to": "assets",
         "filter": [
