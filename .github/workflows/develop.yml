@@ -24,20 +24,6 @@ jobs:
         with:
           activate-environment: default
           environment-file: api/environment.yml
-          
-      - name: Set up Wine
-        uses: actions/setup-node@v2
-        with:
-          node-version: "14"
-
-      - name: Install Wine64
-        run: sudo apt update && sudo apt install wine64
-
-      - name: Install Wine32
-        run: |
-          sudo dpkg --add-architecture i386
-          sudo apt-get update
-          sudo apt-get install wine32
 
       - name: ⬇️ Checkout repo
         uses: actions/checkout@v4
@@ -59,10 +45,10 @@ jobs:
 
       - name: Build flask exe
         run: pyinstaller api/app.spec
-      
+
       - name: Install dependencies
         run: npm install
-          
+
       - name: 📦 Electron Builder
         run: npm run electron:package:win
         env:
@@ -70,7 +56,7 @@ jobs:
 
       - name: Print directory tree
         run: tree
-          
+
       - name: Get latest release number
         id: get_latest_release
         uses: actions/github-script@v4
