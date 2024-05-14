@@ -77,6 +77,19 @@ jobs:
 
       - name: Rename file
         run: ren "dist\LinguifAI Setup 0.1.0.exe" "LinguifAI Setup ${{ steps.get_latest_release.outputs.new_version }}.exe"
+
+      - name: Get latest commit message
+        id: get_latest_commit_message
+        uses: actions/github-script@v4
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const response = await github.repos.listCommits({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              per_page: 1
+            });
+            console.log(`::set-output name=commit_message::${response.data[0].commit.message}`);
       
       - name: Create Release
         id: create_release
@@ -87,5 +100,4 @@ jobs:
           tag_name: v${{ steps.get_latest_release.outputs.new_version }}
           name: v${{ steps.get_latest_release.outputs.new_version }}
           prerelease: true
-          body: |
-            Descrição do release aqui
+          body: ${{ steps.get_latest_commit_message.outputs.commit_message }}
