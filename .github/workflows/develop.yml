@@ -8,24 +8,11 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  flask:
-    name: Flask
+  build:
+    name: 🏗️ Build
     runs-on: windows-latest
     strategy:
       fail-fast: false
-      
-    steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-python@v2
-        with:
-          python-version: 3.12.3
-
-      - run: pip install -r api/requirements.txt pyinstaller
-      - run: pyinstaller api/app.spec
-      
-  build:
-    name: 🏗️ Build
-    runs-on: ubuntu-latest
     steps:
       - name: ⬇️ Checkout repo
         uses: actions/checkout@v4
@@ -64,22 +51,15 @@ jobs:
 
       - name: 🟨 Setup Python
         uses: actions/setup-python@v3
-
-      - name: 📦 Install dependencies
-        run: npm install
-        
-      - name: 🏗️ Install pyinstaller
-        run: |
-          pip install pyinstaller==6.6.0
-    
-      - name: Package Flask Application
-        uses: sayyid5416/pyinstaller@v1
         with:
-          python_ver: '3.12.3'
-          spec: 'api/app.spec'
-          requirements: 'api/requirements.txt'
-          upload_exe_with_name: 'AppTest'
+          python-version: 3.12.3
 
+      - name: Install pip dependencies
+        run: pip install -r api/requirements.txt pyinstaller==6.6.0
+
+      - name: Build flask exe
+        run: pyinstaller api/app.spec
+      
       - name: Install dependencies
         run: npm install
           
