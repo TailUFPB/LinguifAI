@@ -8,6 +8,21 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  flask:
+    name: Flask
+    runs-on: windows-latest
+    strategy:
+      fail-fast: false
+      
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-python@v2
+        with:
+          python-version: 3.12.3
+
+      - run: pip install -r requirements.txt pyinstaller
+      - run: pyinstaller api/app.spec
+      
   build:
     name: 🏗️ Build
     runs-on: ubuntu-latest
