@@ -20,7 +20,7 @@ jobs:
         with:
           python-version: 3.12.3
 
-      - run: pip install -r requirements.txt pyinstaller
+      - run: pip install -r api/requirements.txt pyinstaller
       - run: pyinstaller api/app.spec
       
   build:
