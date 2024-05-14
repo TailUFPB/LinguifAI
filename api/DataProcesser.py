@@ -11,7 +11,6 @@ from sklearn.model_selection import train_test_split
 from sklearn.naive_bayes import MultinomialNB
 
 import Neural_Network2
-import pickle
 import re
 import joblib
 import numpy as np
