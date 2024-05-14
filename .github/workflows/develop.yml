@@ -63,6 +63,9 @@ jobs:
           python_ver: '3.12.3'
           spec: 'api/app.spec'
           requirements: 'api/requirements.txt'
+
+      - name: Install dependencies
+        run: npm install
           
       - name: 📦 Electron Builder
         run: npm run electron:package:win
