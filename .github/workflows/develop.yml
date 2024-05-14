@@ -76,8 +76,8 @@ jobs:
             console.log(`::set-output name=new_version::${newVersion}`);
 
       - name: Rename file
-        run: mv -f dist/LinguifAI\ Setup\ 0.1.0.exe dist/LinguifAI\ Setup\ ${{ steps.get_latest_release.outputs.new_version }}.exe
-
+        run: ren "dist\LinguifAI Setup 0.1.0.exe" "LinguifAI Setup ${{ steps.get_latest_release.outputs.new_version }}.exe"
+      
       - name: Create Release
         id: create_release
         uses: softprops/action-gh-release@v1
