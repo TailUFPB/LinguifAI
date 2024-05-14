@@ -55,7 +55,7 @@ jobs:
         
       - name: 🏗️ Install pyinstaller
         run: |
-          pip install pyinstaller
+          pip install pyinstaller==6.6.0
     
       - name: Package Flask Application
         uses: JackMcKew/pyinstaller-action-windows@main
