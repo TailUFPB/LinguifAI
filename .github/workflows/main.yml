@@ -151,10 +151,10 @@ jobs:
               per_page: 10
             });
 
-            const latestPreRelease = response.data[0]; 
+            const latestPreRelease = response.data[0];
             const preReleaseTag = latestPreRelease.name;
             const versionParts = preReleaseTag.replace(/^v/, '').split('.');
-            const newVersion = `${parseInt(versionParts[0])}.${parseInt(versionParts[1])}.${parseInt(versionParts[2]) + 1}`;
+            const newVersion = `${parseInt(versionParts[0])}.${parseInt(versionParts[1])+1}.0`;
             console.log(`::set-output name=new_version::${newVersion}`);
 
       - name: Rename file
