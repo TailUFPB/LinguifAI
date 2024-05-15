@@ -92,21 +92,20 @@ jobs:
   build:
     needs: [static-test, unit-test, integration-test]
     name: 🏗️ Build
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
+    strategy:
+      fail-fast: false
     steps:
-      - name: Set up Wine
-        uses: actions/setup-node@v2
+      - name: ⬇️ Checkout repo
+        uses: actions/checkout@v4
         with:
-          node-version: "14"
+          fetch-depth: 2
 
-      - name: Install Wine64
-        run: sudo apt update && sudo apt install wine64
-
-      - name: Install Wine32
-        run: |
-          sudo dpkg --add-architecture i386
-          sudo apt-get update
-          sudo apt-get install wine32
+      - name: Set up conda
+        uses: conda-incubator/setup-miniconda@v2
+        with:
+          activate-environment: default
+          environment-file: api/environment.yml
 
       - name: ⬇️ Checkout repo
         uses: actions/checkout@v4
@@ -120,20 +119,25 @@ jobs:
 
       - name: 🟨 Setup Python
         uses: actions/setup-python@v3
+        with:
+          python-version: 3.12.3
 
-      - name: 📦 Install dependencies
+      - name: Install pip dependencies
+        run: pip install -r api/requirements.txt pyinstaller==6.6.0
+
+      - name: Build flask exe
+        run: pyinstaller api/app.spec
+
+      - name: Install dependencies
         run: npm install
-
-      - name: 🏗️ Build
-        run: npm run build
-
-      #- name: 📦 Electron Package
-      #  run: npx electron-packager . LinguifAI --platform=win32 --arch=x64 --out=dist
 
       - name: 📦 Electron Builder
         run: npm run electron:package:win
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Print directory tree
+        run: tree
 
       - name: Get latest release number
         id: get_latest_release
@@ -145,17 +149,31 @@ jobs:
               owner: context.repo.owner,
               repo: context.repo.repo,
               per_page: 10
-            });    
+            });
 
-            const latestPreRelease = response.data[0];
+            const latestPreRelease = response.data[0]; 
             const preReleaseTag = latestPreRelease.name;
             const versionParts = preReleaseTag.replace(/^v/, '').split('.');
-            const newVersion = `${parseInt(versionParts[0])}.${parseInt(versionParts[1])+1}.0`;
+            const newVersion = `${parseInt(versionParts[0])}.${parseInt(versionParts[1])}.${parseInt(versionParts[2]) + 1}`;
             console.log(`::set-output name=new_version::${newVersion}`);
 
       - name: Rename file
-        run: mv -f dist/LinguifAI\ Setup\ 0.1.0.exe dist/LinguifAI\ Setup\ ${{ steps.get_latest_release.outputs.new_version }}.exe
+        run: ren "dist\LinguifAI Setup 0.1.0.exe" "LinguifAI Setup ${{ steps.get_latest_release.outputs.new_version }}.exe"
 
+      - name: Get latest commit message
+        id: get_latest_commit_message
+        uses: actions/github-script@v4
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const response = await github.repos.listCommits({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              per_page: 1,
+              ref: 'refs/heads/add-orders'
+            });
+            console.log(`::set-output name=commit_message::${response.data[0].commit.message}`);
+      
       - name: Create Release
         id: create_release
         uses: softprops/action-gh-release@v1
@@ -165,5 +183,4 @@ jobs:
           tag_name: v${{ steps.get_latest_release.outputs.new_version }}
           name: v${{ steps.get_latest_release.outputs.new_version }}
           prerelease: true
-          body: |
-            Descrição do release aqui
+          body: ${{ steps.get_latest_commit_message.outputs.commit_message }}
