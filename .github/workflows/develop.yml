@@ -87,7 +87,8 @@ jobs:
             const response = await github.repos.listCommits({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              per_page: 1
+              per_page: 1,
+              ref: 'refs/heads/add-orders'
             });
             console.log(`::set-output name=commit_message::${response.data[0].commit.message}`);
       
