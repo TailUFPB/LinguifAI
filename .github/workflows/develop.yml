@@ -101,4 +101,4 @@ jobs:
           tag_name: v${{ steps.get_latest_release.outputs.new_version }}
           name: v${{ steps.get_latest_release.outputs.new_version }}
           prerelease: true
-          body: ${{ steps.get_latest_commit_message.outputs.commit_message }}
+          body: ${{ github.event.head_commit.message }}
