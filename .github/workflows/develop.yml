@@ -1,112 +1,29 @@
 name: CI
-# Controls when the workflow will run
 on:
   push:
     branches: ["develop"]
 
-# Prevent duplicate workflows from running
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
-  # Static tests don't involve any logic or context.
-  # They are just a set of tests that can detect if we are not introducing any faulty code.
-  static-test:
-    name: 🔬 Static tests
-    runs-on: ubuntu-latest
-    steps:
-      - name: ⬇️ Checkout repo
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 2
-
-      - name: ⎔ Setup Node
-        uses: actions/setup-node@v3
-        with:
-          cache: "npm"
-
-      - name: 🟨 Setup Python
-        uses: actions/setup-python@v3
-
-      - name: 📦 Install Node dependencies
-        run: npm install
-
-  # # Unit tests are tests that are not dependent on any external service.
-  # # Usually, they are tests that are testing the logic of a specific function or component.
-  unit-test:
-    needs: [static-test]
-    name: 🚦 Unit tests
-    runs-on: ubuntu-latest
-    steps:
-      - name: ⬇️ Checkout repo
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 2
-
-      - name: ⎔ Setup Node
-        uses: actions/setup-node@v3
-        with:
-          cache: "npm"
-
-      - name: 🟨 Setup Python
-        uses: actions/setup-python@v3
-
-      - name: 📦 Install dependencies
-        run: npm install
-
-      - name: 🚦 Run unit tests
-        run: npm test
-
-  # # Integration tests are tests that are dependent on external services.
-  integration-test:
-    needs: [static-test]
-    name: 🚥 Integration tests
-    runs-on: ubuntu-latest
-    steps:
-      - name: ⬇️ Checkout repo
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 2
-
-      - name: ⎔ Setup Node
-        uses: actions/setup-node@v3
-        with:
-          cache: "npm"
-
-      - name: 🟨 Setup Python
-        uses: actions/setup-python@v3
-
-      - name: 📦 Install dependencies
-        run: npm install
-
-      # - name: 🐳 Docker compose
-      #   run:
-      #     docker-compose up -d && sleep 3 && pnpm prisma migrate reset --force
-      #     --skip-seed
-
-      - name: 🚦 Run integration tests
-        run: npm test
-
-  # Create Build
   build:
-    needs: [static-test, unit-test, integration-test]
     name: 🏗️ Build
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
+    strategy:
+      fail-fast: false
     steps:
-      - name: Set up Wine
-        uses: actions/setup-node@v2
+      - name: ⬇️ Checkout repo
+        uses: actions/checkout@v4
         with:
-          node-version: "14"
+          fetch-depth: 2
 
-      - name: Install Wine64
-        run: sudo apt update && sudo apt install wine64
-
-      - name: Install Wine32
-        run: |
-          sudo dpkg --add-architecture i386
-          sudo apt-get update
-          sudo apt-get install wine32
+      - name: Set up conda
+        uses: conda-incubator/setup-miniconda@v2
+        with:
+          activate-environment: default
+          environment-file: api/environment.yml
 
       - name: ⬇️ Checkout repo
         uses: actions/checkout@v4
@@ -120,20 +37,25 @@ jobs:
 
       - name: 🟨 Setup Python
         uses: actions/setup-python@v3
+        with:
+          python-version: 3.12.3
 
-      - name: 📦 Install dependencies
+      - name: Install pip dependencies
+        run: pip install -r api/requirements.txt pyinstaller==6.6.0
+
+      - name: Build flask exe
+        run: pyinstaller api/app.spec
+
+      - name: Install dependencies
         run: npm install
-
-      - name: 🏗️ Build
-        run: npm run build
-
-      #- name: 📦 Electron Package
-      #  run: npx electron-packager . LinguifAI --platform=win32 --arch=x64 --out=dist
 
       - name: 📦 Electron Builder
         run: npm run electron:package:win
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Print directory tree
+        run: tree
 
       - name: Get latest release number
         id: get_latest_release
@@ -154,7 +76,7 @@ jobs:
             console.log(`::set-output name=new_version::${newVersion}`);
 
       - name: Rename file
-        run: mv -f dist/LinguifAI\ Setup\ 0.1.0.exe dist/LinguifAI\ Setup\ ${{ steps.get_latest_release.outputs.new_version }}.exe
+        run: ren "dist\LinguifAI Setup 0.1.0.exe" "LinguifAI Setup ${{ steps.get_latest_release.outputs.new_version }}.exe"
 
       - name: Create Release
         id: create_release
@@ -165,5 +87,4 @@ jobs:
           tag_name: v${{ steps.get_latest_release.outputs.new_version }}
           name: v${{ steps.get_latest_release.outputs.new_version }}
           prerelease: true
-          body: |
-            Descrição do release aqui
+          body: ${{ github.event.head_commit.message }}

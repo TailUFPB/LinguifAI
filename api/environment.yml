@@ -1,0 +1,16 @@
+name: LinguifAI
+channels:
+  - defaults
+  - pytorch
+dependencies:
+  - flask
+  - flask-cors
+  - pandas
+  - nltk
+  - scikit-learn
+  - numpy
+  - matplotlib
+  - seaborn
+  - tensorflow
+  - keras
+  - torchtext

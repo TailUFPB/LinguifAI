@@ -21,6 +21,7 @@
     "@types/node": "^16.18.48",
     "@types/react": "^18.2.21",
     "@types/react-dom": "^18.2.7",
+    "asar": "^3.2.0",
     "axios": "^1.6.0",
     "electron-process": "^0.2.0",
     "react": "^18.2.0",
@@ -28,7 +29,7 @@
     "react-icons": "^4.12.0",
     "react-papaparse": "^4.1.0",
     "react-router-dom": "^6.15.0",
-    "react-scripts": "5.0.1",
+    "react-scripts": "5.0.0",
     "react-transition-group": "^4.4.5",
     "serve": "^14.2.1",
     "typescript": "^4.9.5"
@@ -68,7 +69,7 @@
   },
   "devDependencies": {
     "concurrently": "^8.2.2",
-    "electron": "^26.1.0",
+    "electron": "^26.6.10",
     "electron-builder": "^24.13.3",
     "electron-packager": "^17.1.2",
     "tailwindcss": "^3.3.3"
@@ -90,8 +91,8 @@
     },
     "extraFiles": [
       {
-        "from": "api",
-        "to": "api",
+        "from": "dist/app",
+        "to": "dist/app",
         "filter": [
           "**/*"
         ]
