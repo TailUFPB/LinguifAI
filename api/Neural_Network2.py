@@ -315,13 +315,6 @@ def validate_epoch(model, valid_loader, criterion):
 
     return total_loss / total
 
-import os
-import json
-import torch
-from tqdm import tqdm
-from torch.utils.data import DataLoader
-from sklearn.preprocessing import LabelEncoder
-import joblib
 
 def create_and_train_model(df, name, epochs=10, batch_size=32, learning_rate=0.001):
     # Configurações iniciais e preparações do modelo
