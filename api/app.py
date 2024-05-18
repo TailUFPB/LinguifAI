@@ -122,9 +122,11 @@ def get_training_status():
             training_status = data.get('training_in_progress', False)
             progress = data.get('training_progress', 0)
             cancel_request = data.get('cancel_requested', False)
-            return jsonify({'training_in_progress': training_status, 'training_progress': progress, 'cancel_requested': cancel_request})
+            train_losses = data.get('train_losses', [])
+            valid_losses = data.get('valid_losses', [])
+            return jsonify({'training_in_progress': training_status, 'training_progress': progress, 'cancel_requested': cancel_request, 'train_losses': train_losses,'valid_losses': valid_losses,})
     except FileNotFoundError:
-        return jsonify({'training_in_progress': False, 'training_progress': 0, 'cancel_requested': False})
+        return jsonify({'training_in_progress': False, 'training_progress': 0, 'cancel_requested': False, 'train_losses': [],'valid_losses': []})
     
 @app.route('/cancel-training', methods=['POST'])
 def cancel_training():

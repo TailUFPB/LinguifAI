@@ -275,19 +275,22 @@ def train_epoch(model, optimizer, scheduler, train_loader, criterion, curr_epoch
         # Record metrics
         total_loss += loss.item()
         total += len(target)
+
+        returnLoss = total_loss / max(total, 1)
+
         num_iters += 1
         if num_iters % 20 == 0:
             with open('training_progress.json', 'r+') as f:
                 progress = 100 * (curr_epoch + num_iters / len(train_loader)) / num_total_epochs
                 data.update({
                     'training_progress': progress,
-                    'training_in_progress': True
+                    'training_in_progress': True,
                 })
                 f.seek(0)
                 json.dump(data, f)
                 f.truncate()
 
-    return total_loss / max(total, 1), False
+    return returnLoss, False
 
 def validate_epoch(model, valid_loader, criterion):
     model.eval()
@@ -373,6 +376,18 @@ def create_and_train_model(df, name, epochs=10, batch_size=32, learning_rate=0.0
         train_losses.append(train_loss)
         valid_losses.append(valid_loss)
 
+        # Atualizar a train_losses e valid_losses no arquivo de progresso
+        with open('training_progress.json', 'r+') as f:
+            data = json.load(f)
+            data.update({
+                'train_losses': train_losses,
+                'valid_losses': valid_losses,
+                
+            })
+            f.seek(0)
+            json.dump(data, f)
+            f.truncate()
+
     # Finalizar e salvar o modelo se não foi cancelado
     if not canceled:
         model_path = os.path.join('api', 'models', name)
@@ -383,7 +398,9 @@ def create_and_train_model(df, name, epochs=10, batch_size=32, learning_rate=0.0
         training_progress = {
             'training_progress': 100,
             'training_in_progress': False,
-            'cancel_requested': False
+            'cancel_requested': False,
+            'train_losses': train_losses,
+            'valid_losses': valid_losses,
         }
         with open('training_progress.json', 'w') as file:
             json.dump(training_progress, file)
