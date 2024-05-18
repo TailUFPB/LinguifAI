@@ -3,6 +3,8 @@ import SelectFileCard from "../components/selectFileCard/selectFileCard";
 import axios from "axios";
 import ResultTable from "../components/resultTable/resultTable";
 import { Menu } from "../components/menu/menu";
+import ReactApexChart from "react-apexcharts";
+import { ReactApexChartsDefaultOptions } from "../Shared/apexChartsOptions";
 
 export default function Train() {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -35,10 +37,12 @@ export default function Train() {
     }
     setIsCancelling(false); // Desativa o estado de cancelamento
   };
-  
+
   const handleSubmit = async () => {
     setIsLoading(true);
     setLoadingProgress(0);
+    setTrainLosses([]);
+    setValidLosses([]);
 
     let selectedData = data.map((row) => ({
       value: row[selectedColumn],
@@ -76,9 +80,9 @@ export default function Train() {
                   .catch((error) => {
                     throw new Error(error);
                   })
-                })
               })
-            });
+          })
+      });
 
     setIsLoading(false);
   };
@@ -123,15 +127,20 @@ export default function Train() {
   // carregamento
 
   const [loadingProgress, setLoadingProgress] = useState(0);
+  const [train_losses, setTrainLosses] = useState<number[]>([]);
+  const [valid_losses, setValidLosses] = useState<number[]>([]);
   const prevLoadingProgressRef = useRef<number>(0); // Explicitly type prevLoadingProgressRef
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         const response = await axios.get("http://localhost:5000/training-status");
-        const { training_progress, training_in_progress } = response.data;
+        const { training_progress, training_in_progress, train_losses, valid_losses } = response.data;
         const newProgress: number = training_in_progress || training_progress === 100 ? training_progress : 0; // Explicitly type newProgress
         updateLoadingProgress(newProgress);
+
+        setTrainLosses(train_losses);
+        setValidLosses(valid_losses);
       } catch (error) {
         console.error("Error fetching progress:", error);
       }
@@ -141,7 +150,7 @@ export default function Train() {
       const duration = 1000; // Duration in milliseconds for the transition
       const startTime = Date.now();
       const startProgress = prevLoadingProgressRef.current;
-      
+
       const updateProgress = () => {
         const elapsedTime = Date.now() - startTime;
         const progress = Math.min(1, elapsedTime / duration); // Ensure progress doesn't exceed 1
@@ -336,14 +345,33 @@ export default function Train() {
                 )}
 
                 <button
-                  className={`w-full bg-main-dark text-white py-2 px-4 hover:bg-main-darker focus:outline-none border-2 border-main-lighter rounded-3xl h-14 ${
-                    (isLoading) ? "opacity-0 pointer-events-none" : ""
-                  }`}
+                  className={`w-full bg-main-dark text-white py-2 px-4 hover:bg-main-darker focus:outline-none border-2 border-main-lighter rounded-3xl h-14 ${(isLoading) ? "opacity-0 pointer-events-none" : ""
+                    }`}
                   onClick={handleSubmit}
                   disabled={isLoading}
                 >
                   {isLoading ? "Carregando..." : "Treinar"}
                 </button>
+
+
+                {
+                  isLoading && train_losses.length > 0 && (// set background to red
+                    <div className="bg-main-darker rounded-lg pt-10 mt-4">
+                      <ReactApexChart options={ReactApexChartsDefaultOptions} series={
+                        [
+                          {
+                            name: "Treino",
+                            data: train_losses
+                          },
+                          {
+                            name: "Validação",
+                            data: valid_losses
+                          }
+                        ]
+                      } type="line" height={350} />
+                    </div>
+                  )
+                }
 
                 {isLoading && (
                   <button
