@@ -19,6 +19,7 @@ export const ReactApexChartsDefaultOptions = {
     },
     yaxis: {
         labels: {
+            formatter: (value: number) => value.toFixed(4),
             style: {
                 colors: "#ffffff",
             },
@@ -35,5 +36,17 @@ export const ReactApexChartsDefaultOptions = {
     },
     grid: {
         borderColor: "#ffffff",
+    },
+    title: {
+        text: "Loss vs Epochs",
+        align: 'center' as 'center',
+        style: {
+            color: "#ffffff",
+        },
+    },
+    legend: {
+        labels: {
+            colors: "#ffffff", // Muda a cor das legendas
+        },
     },
 };

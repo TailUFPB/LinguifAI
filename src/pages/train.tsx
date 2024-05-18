@@ -356,7 +356,7 @@ export default function Train() {
 
                 {
                   isLoading && train_losses.length > 0 && (// set background to red
-                    <div className="bg-main-darker rounded-lg pt-10 mt-4">
+                    <div className="bg-main-dark rounded-lg pt-2 my-4">
                       <ReactApexChart options={ReactApexChartsDefaultOptions} series={
                         [
                           {
