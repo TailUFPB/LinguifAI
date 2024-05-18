@@ -14,6 +14,7 @@ export default function Train() {
   const [selectedLabel, setSelectedLabel] = useState<number>(0);
 
   const [isLoading, setIsLoading] = useState(false);
+  const [isCancelling, setIsCancelling] = useState(false);
 
   const handleChangeSelectedColumn = (event: any) => {
     setSelectedColumn(event.target.value);
@@ -23,6 +24,18 @@ export default function Train() {
     setSelectedLabel(event.target.value);
   };
 
+  const handleCancelTraining = async () => {
+    setIsCancelling(true); // Ativa o estado de cancelamento
+    try {
+      await axios.post('http://localhost:5000/cancel-training');
+      alert('Treinamento cancelado com sucesso!');
+    } catch (error) {
+      console.error('Erro ao cancelar o treinamento:', error);
+      alert('Falha ao cancelar o treinamento.');
+    }
+    setIsCancelling(false); // Desativa o estado de cancelamento
+  };
+  
   const handleSubmit = async () => {
     setIsLoading(true);
     setLoadingProgress(0);
@@ -331,6 +344,16 @@ export default function Train() {
                 >
                   {isLoading ? "Carregando..." : "Treinar"}
                 </button>
+
+                {isLoading && (
+                  <button
+                    className="mt-3 bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-lg"
+                    onClick={handleCancelTraining}
+                    disabled={isCancelling}
+                  >
+                    {isCancelling ? 'Cancelando...' : 'Cancelar Treinamento'}
+                  </button>
+                )}
               </div>
             </div>
           </>
