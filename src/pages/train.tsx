@@ -16,6 +16,7 @@ export default function Train() {
   const [selectedLabel, setSelectedLabel] = useState<number>(0);
 
   const [isLoading, setIsLoading] = useState(false);
+  const [hasTrained, setHasTrained] = useState(false);
   const [isCancelling, setIsCancelling] = useState(false);
 
   const handleChangeSelectedColumn = (event: any) => {
@@ -40,6 +41,7 @@ export default function Train() {
 
   const handleSubmit = async () => {
     setIsLoading(true);
+    setHasTrained(true);
     setLoadingProgress(0);
     setTrainLosses([]);
     setValidLosses([]);
@@ -355,7 +357,7 @@ export default function Train() {
 
 
                 {
-                  isLoading && train_losses.length > 0 && (// set background to red
+                  hasTrained && train_losses.length > 0 && (// set background to red
                     <div className="bg-main-dark rounded-lg pt-2 my-4">
                       <ReactApexChart options={ReactApexChartsDefaultOptions} series={
                         [
