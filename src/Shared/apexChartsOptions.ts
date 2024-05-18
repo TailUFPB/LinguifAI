@@ -3,6 +3,9 @@ export const ReactApexChartsDefaultOptions = {
         toolbar: {
             show: false,
         },
+        zoom: {
+            enabled: false,
+        },
     },
     xaxis: {
         labels: {
