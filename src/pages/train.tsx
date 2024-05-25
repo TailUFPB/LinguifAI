@@ -3,6 +3,7 @@ import SelectFileCard from "../components/selectFileCard/selectFileCard";
 import axios from "axios";
 import ResultTable from "../components/resultTable/resultTable";
 import { Menu } from "../components/menu/menu";
+import { ReactApexChartsDefaultOptions } from "../Shared/apexChartsOptions";
 
 export default function Train() {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -14,6 +15,8 @@ export default function Train() {
   const [selectedLabel, setSelectedLabel] = useState<number>(0);
 
   const [isLoading, setIsLoading] = useState(false);
+  const [hasTrained, setHasTrained] = useState(false);
+  const [isCancelling, setIsCancelling] = useState(false);
 
   const handleChangeSelectedColumn = (event: any) => {
     setSelectedColumn(event.target.value);
@@ -25,7 +28,10 @@ export default function Train() {
 
   const handleRnnSubmit = async () => {
     setIsLoading(true);
+    setHasTrained(true);
     setLoadingProgress(0);
+    setTrainLosses([]);
+    setValidLosses([]);
 
     let selectedData = data.map((row) => ({
       value: row[selectedColumn],
@@ -139,6 +145,8 @@ export default function Train() {
   // carregamento
 
   const [loadingProgress, setLoadingProgress] = useState(0);
+  const [train_losses, setTrainLosses] = useState<number[]>([]);
+  const [valid_losses, setValidLosses] = useState<number[]>([]);
   const prevLoadingProgressRef = useRef<number>(0); // Explicitly type prevLoadingProgressRef
 
   useEffect(() => {
@@ -153,6 +161,9 @@ export default function Train() {
             ? training_progress
             : 0; // Explicitly type newProgress
         updateLoadingProgress(newProgress);
+
+        setTrainLosses(train_losses);
+        setValidLosses(valid_losses);
       } catch (error) {
         console.error("Error fetching progress:", error);
       }
