@@ -118,7 +118,7 @@ export default function About() {
                 alt={member.name}
                 className="rounded-full w-32 h-32 mx-auto mb-2"
               />
-              <p className="text-lg font-medium mb-1">{member.name}</p>
+              <p className="font-medium mb-1">{member.name}</p>
               <div className="flex justify-center space-x-4">
                 <a
                   href={member.linkedin}

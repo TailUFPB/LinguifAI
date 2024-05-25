@@ -10,13 +10,13 @@ export const ReactApexChartsDefaultOptions = {
     xaxis: {
         labels: {
             style: {
-                colors: "#ffffff",
+                colors: "#000",
             },
         },
         title: {
             text: "Epoch",
             style: {
-                color: "#ffffff",
+                color: "#000",
             },
         },
     },
@@ -24,13 +24,13 @@ export const ReactApexChartsDefaultOptions = {
         labels: {
             formatter: (value: number) => value.toFixed(4),
             style: {
-                colors: "#ffffff",
+                colors: "#000",
             },
         },
         title: {
             text: "Loss",
             style: {
-                color: "#ffffff",
+                color: "#000",
             },
         },
     },
@@ -38,18 +38,18 @@ export const ReactApexChartsDefaultOptions = {
         theme: "dark",
     },
     grid: {
-        borderColor: "#ffffff",
+        borderColor: "#000",
     },
     title: {
         text: "Loss vs Epochs",
         align: 'center' as 'center',
         style: {
-            color: "#ffffff",
+            color: "#000",
         },
     },
     legend: {
         labels: {
-            colors: "#ffffff", // Muda a cor das legendas
+            colors: "#000", // Muda a cor das legendas
         },
     },
 };

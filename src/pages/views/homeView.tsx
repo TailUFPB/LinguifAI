@@ -93,7 +93,7 @@ export default function HomeView() {
     };
 
     return (
-        <div className="p-8 text-center text-lg text-black">
+        <div className="p-8 text-center  text-black">
             <SelectFileCard
                 selectedFile={selectedFile}
                 setSelectedFile={setSelectedFile}

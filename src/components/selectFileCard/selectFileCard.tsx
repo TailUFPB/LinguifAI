@@ -77,7 +77,7 @@ export default function SelectFileCard({
   return !selectedFile ? (
     <div
       className={`${data.length > 0 ? `w-4/5` : `w-2/5`
-        } min-h-[170px] relative mx-auto mt-24 bg-gray-100 border-dashed border-2 border-gray-700 text-gray-600 px-4 placeholder-gray-300 rounded-md flex flex-col items-center justify-center gap-4 text-lg ${isDragging ? "blur-sm" : ""
+        } min-h-[170px] relative mx-auto mt-24 bg-gray-100 border-dashed border-2 border-gray-700 text-gray-600 px-4 placeholder-gray-300 rounded-md flex flex-col items-center justify-center gap-4 ${isDragging ? "blur-sm" : ""
         }`}
       onDrop={handleDrop}
       onDragOver={handleDragOver}
