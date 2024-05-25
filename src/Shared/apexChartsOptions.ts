@@ -38,7 +38,8 @@ export const ReactApexChartsDefaultOptions = {
         theme: "dark",
     },
     grid: {
-        borderColor: "#000",
+        borderColor: "#777",
+        strokeDashArray: 1,
     },
     title: {
         text: "Loss vs Epochs",
