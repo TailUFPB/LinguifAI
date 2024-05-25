@@ -178,7 +178,7 @@ export default function Train() {
     <div className="bg-main-darker text-white min-h-screen flex flex-col">
       <Menu />
 
-      <div className="p-8 text-center font-roboto">
+      <div className="p-8 text-center">
         <h1 className="text-3xl font-bold mb-6 mt-6">
           Linguif<span className="text-main-light">AI</span>
         </h1>

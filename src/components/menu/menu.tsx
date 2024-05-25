@@ -12,9 +12,9 @@ export function Menu() {
   };
 
   return (
-    <>
+    <div className="flex">
       <button
-        className="text-white fixed top-0 left-0 p-4 focus:outline-none focus:text-white hover:text-blue-300 transition"
+        className="text-black fixed top-0 left-0 p-4 focus:outline-none focus:text-white hover:text-blue-300 transition"
         onClick={toggleMenu}
       >
         {isExpanded ? (
@@ -29,11 +29,11 @@ export function Menu() {
         classNames="menu"
         unmountOnExit
       >
-        <nav className="text-white fixed top-0 left-0 bottom-0 z-50 overflow-y-auto w-64 bg-gray-800">
+        <nav className="text-black fixed top-0 left-0 bottom-0 z-50 overflow-y-auto w-64 bg-gray-50">
           <div className="p-4 flex justify-between items-center">
             <div className="text-2xl font-bold">Menu</div>
             <button
-              className="text-white focus:outline-none p-2 hover:text-blue-300 transition"
+              className="text-black focus:outline-none p-2 hover:text-blue-300 transition"
               onClick={toggleMenu}
             >
               <HiOutlineX className="h-6 w-6" />
@@ -57,6 +57,6 @@ export function Menu() {
           </ul>
         </nav>
       </CSSTransition>
-    </>
+    </div>
   );
 }
