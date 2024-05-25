@@ -312,12 +312,7 @@ def validate_epoch(model, valid_loader, criterion):
 
     return total_loss / total
 
-<<<<<<< HEAD
 def create_and_train_rnn_model(df, name, epochs = 10, batch_size = 32, learning_rate = 0.001):
-=======
->>>>>>> dee0a494328004861698578544010c16b2a995da
-
-def create_and_train_model(df, name, epochs=10, batch_size=32, learning_rate=0.001):
     # Configurações iniciais e preparações do modelo
     dropout_probability = 0.2
     n_rnn_layers = 1
