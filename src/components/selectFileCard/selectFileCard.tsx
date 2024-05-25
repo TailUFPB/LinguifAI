@@ -2,6 +2,7 @@ import { Icon } from "@iconify/react";
 import { ChangeEvent, useState } from "react";
 import Papa from "papaparse";
 import CsvTable from "../csvTable/csvTable";
+import { Link } from "@mui/material";
 
 interface props {
   selectedFile: File | null;
@@ -52,7 +53,6 @@ export default function SelectFileCard({
     }
   };
 
-  // Arrastar e soltar
   const handleDrop = (event: React.DragEvent<HTMLDivElement>) => {
     setIsDragging(false);
     event.preventDefault();
@@ -76,40 +76,25 @@ export default function SelectFileCard({
 
   return (
     <div
-      className={`${
-        data.length > 0 ? `w-4/5` : `w-2/5`
-      } relative mx-auto mt-24 bg-main-dark border-2 border-main-lighter text-white pt-4 px-4 placeholder-gray-300 rounded-3xl min-h-min flex flex-col items-center justify-between ${
-        isDragging ? "blur-sm" : ""
-      }`}
+      className={`${data.length > 0 ? `w-4/5` : `w-2/5`
+        } min-h-[150px] relative mx-auto mt-24 bg-gray-200 border-dashed border-2 border-gray-700 text-gray-600 px-4 placeholder-gray-300 rounded-md flex flex-col items-center justify-center gap-2 ${isDragging ? "blur-sm" : ""
+        }`}
       onDrop={handleDrop}
       onDragOver={handleDragOver}
       onDragLeave={handleDragLeave}
     >
-      {isDragging ? (
-        <h2 className="mb-0">Arrastar e soltar</h2>
+      <Icon
+        icon="ic:outline-upload-file"
+        className="text-gray"
+        width="50"
+      />
+
+      {selectedFile ? ( // se tiver arquivo selecionado, seu nome é exibido
+        <p className="blur-none">{selectedFile.name}</p>
       ) : (
         <>
-          <Icon
-            icon="ic:outline-upload-file"
-            className=" text-white"
-            width="50"
-          />
-
-          {selectedFile ? ( // se tiver arquivo selecionado, seu nome é exibido
-            <p className="blur-none">{selectedFile.name}</p>
-          ) : (
-            <>
-              <h2 className="mb-0">Arrastar e soltar</h2>
-              <h2 className="mt-0">Ou</h2>
-            </>
-          )}
-
-          {data.length > 0 && (
-            <CsvTable data={data.slice(0, 4)} head={header} />
-          )}
-
-          <button
-            className="border-2 border-main-lighter border-b-0 bottom-0 rounded-3xl rounded-b-none mt-5 py-2 w-3/5 bg-main-medium hover:bg-main-darker"
+          <h2 className="mb-0">Arrastar e soltar ou <a
+            className="underline cursor-pointer"
             onClick={() => {
               const fileInput = document.getElementById("fileInput");
               if (fileInput) {
@@ -117,17 +102,21 @@ export default function SelectFileCard({
               }
             }}
           >
-            Selecionar do Computador
-          </button>
-          <input
-            type="file"
-            id="fileInput"
-            data-testid="fileInput"
-            style={{ display: "none" }}
-            accept=".csv"
-            onChange={handleFileChange}
-          />
+            selecionar do Computador
+          </a>
+            <input
+              type="file"
+              id="fileInput"
+              data-testid="fileInput"
+              style={{ display: "none" }}
+              accept=".csv"
+              onChange={handleFileChange}
+            /></h2>
         </>
+      )}
+
+      {data.length > 0 && (
+        <CsvTable data={data.slice(0, 4)} head={header} />
       )}
     </div>
   );
