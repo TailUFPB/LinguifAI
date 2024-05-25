@@ -23,7 +23,7 @@ export default function Train() {
     setSelectedLabel(event.target.value);
   };
 
-  const handleSubmit = async () => {
+  const handleRnnSubmit = async () => {
     setIsLoading(true);
     setLoadingProgress(0);
 
@@ -46,26 +46,55 @@ export default function Train() {
 
     console.log(sendData);
 
+    const url = "http://localhost:5000/neural-network-rnn";
 
-    const url = "http://localhost:5000/neural-network";
+    await axios.post(url, sendData).catch(async (error) => {
+      await axios.post(url, sendData).catch(async (error) => {
+        await axios.post(url, sendData).catch(async (error) => {
+          await axios.post(url, sendData).catch((error) => {
+            throw new Error(error);
+          });
+        });
+      });
+    });
 
-    await axios
-      .post(url, sendData)
-      .catch(async (error) => {
-        await axios
-          .post(url, sendData)
-          .catch(async (error) => {
-            await axios
-              .post(url, sendData)
-              .catch(async (error) => {
-                await axios
-                  .post(url, sendData)
-                  .catch((error) => {
-                    throw new Error(error);
-                  })
-                })
-              })
-            });
+    setIsLoading(false);
+  };
+
+  const handleNbSubmit = async () => {
+    setIsLoading(true);
+    setLoadingProgress(0);
+
+    let selectedData = data.map((row) => ({
+      value: row[selectedColumn],
+      label: row[selectedLabel],
+    }));
+
+    let selectedLabels = data.map((row) => row[selectedLabel]);
+    let selectedValues = data.map((row) => row[selectedColumn]);
+
+    const sendData = {
+      data: selectedValues,
+      label: selectedLabels,
+      batch_size: batchSize || 16,
+      epochs: epochs || 50,
+      learning_rate: learningRate || 0.001,
+      name: modelName || "trained-model",
+    };
+
+    console.log(sendData);
+
+    const url = "http://localhost:5000/neural-network-nb";
+
+    await axios.post(url, sendData).catch(async (error) => {
+      await axios.post(url, sendData).catch(async (error) => {
+        await axios.post(url, sendData).catch(async (error) => {
+          await axios.post(url, sendData).catch((error) => {
+            throw new Error(error);
+          });
+        });
+      });
+    });
 
     setIsLoading(false);
   };
@@ -115,24 +144,31 @@ export default function Train() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get("http://localhost:5000/training-status");
+        const response = await axios.get(
+          "http://localhost:5000/training-status"
+        );
         const { training_progress, training_in_progress } = response.data;
-        const newProgress: number = training_in_progress || training_progress === 100 ? training_progress : 0; // Explicitly type newProgress
+        const newProgress: number =
+          training_in_progress || training_progress === 100
+            ? training_progress
+            : 0; // Explicitly type newProgress
         updateLoadingProgress(newProgress);
       } catch (error) {
         console.error("Error fetching progress:", error);
       }
     };
 
-    const updateLoadingProgress = (newProgress: number) => { // Explicitly type newProgress parameter
+    const updateLoadingProgress = (newProgress: number) => {
+      // Explicitly type newProgress parameter
       const duration = 1000; // Duration in milliseconds for the transition
       const startTime = Date.now();
       const startProgress = prevLoadingProgressRef.current;
-      
+
       const updateProgress = () => {
         const elapsedTime = Date.now() - startTime;
         const progress = Math.min(1, elapsedTime / duration); // Ensure progress doesn't exceed 1
-        const interpolatedProgress = startProgress + (newProgress - startProgress) * progress;
+        const interpolatedProgress =
+          startProgress + (newProgress - startProgress) * progress;
         setLoadingProgress(interpolatedProgress);
 
         if (progress < 1) {
@@ -310,8 +346,7 @@ export default function Train() {
               <div className="relative w-full">
                 {isLoading && (
                   <div className="relative w-full">
-                    <div className="bg-main-bold flex rounded-lg h-10 absolute top-0 left-0 w-full text-white">
-                    </div>
+                    <div className="bg-main-bold flex rounded-lg h-10 absolute top-0 left-0 w-full text-white"></div>
                     <div
                       className="bg-blue-500 h-10 rounded-lg absolute top-0 left-0 w-full transition-width duration-500"
                       style={{ width: `${loadingProgress.toFixed(2)}%` }}
@@ -324,12 +359,21 @@ export default function Train() {
 
                 <button
                   className={`w-full bg-main-dark text-white py-2 px-4 hover:bg-main-darker focus:outline-none border-2 border-main-lighter rounded-3xl h-14 ${
-                    (isLoading) ? "opacity-0 pointer-events-none" : ""
+                    isLoading ? "opacity-0 pointer-events-none" : ""
                   }`}
-                  onClick={handleSubmit}
+                  onClick={handleRnnSubmit}
                   disabled={isLoading}
                 >
-                  {isLoading ? "Carregando..." : "Treinar"}
+                  {isLoading ? "Carregando..." : "Treinar RNN"}
+                </button>
+                <button
+                  className={`w-full bg-main-dark text-white py-2 px-4 hover:bg-main-darker focus:outline-none border-2 border-main-lighter rounded-3xl h-14 ${
+                    isLoading ? "opacity-0 pointer-events-none" : ""
+                  }`}
+                  onClick={handleNbSubmit}
+                  disabled={isLoading}
+                >
+                  {isLoading ? "Carregando..." : "Treinar NB"}
                 </button>
               </div>
             </div>

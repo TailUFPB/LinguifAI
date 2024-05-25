@@ -1,7 +1,8 @@
 from flask import Flask, jsonify, request
 from flask_cors import CORS
 from DataProcesser import DataProcesser
-from Neural_Network2 import create_and_train_model
+from Neural_Network2 import create_and_train_rnn_model
+from Neural_Network import create_and_train_nb_model
 from available_classifiers import get_available_classifiers
 
 import time
@@ -63,8 +64,8 @@ def shutdown():
     shutdown_server()
     return 'Server shutting down...'
 
-@app.route('/neural-network', methods=["POST"])
-def train_model():
+@app.route('/neural-network-rnn', methods=["POST"])
+def train_rnn_model():
     received_data = request.json
 
     if received_data:
@@ -97,7 +98,45 @@ def train_model():
 
     df = pd.DataFrame({'input_text': selected_data, 'labels': selected_label})
 
-    create_and_train_model(df, name, epochs, batch_size, learning_rate)
+    create_and_train_rnn_model(df, name, epochs, batch_size, learning_rate)
+        
+    return jsonify({"message": "Model train started successfully."}), 200 
+
+@app.route('/neural-network-nb', methods=["POST"])
+def train_nb_model():
+    received_data = request.json
+
+    if received_data:
+        selected_data = received_data.get('data')
+        selected_label = received_data.get('label')
+        epochs = received_data.get('epochs')
+        batch_size = received_data.get('batch_size')
+        learning_rate = received_data.get('learning_rate')
+        name = received_data.get('name')
+
+        #
+        print("\n")
+        print("Received data: " + str(len(selected_data))) 
+        print("Received label: " + str(len(selected_label)))
+        print("Name: " + str(name))
+        print("Epochs: " + str(epochs))
+        print("Batch Size: " + str(batch_size))
+        print("Learning Rate: " + str(learning_rate))
+        print("\n")
+    else:
+        return jsonify({"message": "No data received."}), 400
+
+    # reseta status
+    training_progress = {
+        'training_progress': 0,
+        'training_in_progress': True
+    }
+    with open('training_progress.json', 'w') as file:
+        json.dump(training_progress, file)
+
+    df = pd.DataFrame({'input_text': selected_data, 'labels': selected_label})
+
+    create_and_train_nb_model(df, name, epochs, batch_size, learning_rate)
         
     return jsonify({"message": "Model train started successfully."}), 200 
 
