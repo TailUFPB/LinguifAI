@@ -54,7 +54,7 @@ export function Menu() {
         classNames="menu"
         unmountOnExit
       >
-        <nav className="text-black fixed top-0 left-0 bottom-0 z-50 overflow-y-auto w-80 bg-gray-50">
+        <nav className="text-black fixed top-0 left-0 bottom-0 z-50 overflow-y-auto w-80 bg-gray-50 border-2">
           <div className="p-4 flex justify-between items-center">
             <div className="text-2xl font-bold">Menu</div>
             <button

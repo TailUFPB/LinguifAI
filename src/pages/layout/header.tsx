@@ -8,7 +8,7 @@ interface HeaderProps {
 
 const Header: React.FC<HeaderProps> = ({ title }) => {
   return (
-    <header className="flex items-center justify-center">
+    <header className="flex items-center justify-center  border-2">
       <Menu />
       <header className="text-center flex items-center justify-center">
         <img src={logo} alt="Logo da LinguifAI" className="h-12 mr-2 pb-3" />
