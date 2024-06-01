@@ -1,6 +1,6 @@
 <div style = "text-align: center;">
     <span style="vertical-align: middle; font-size:3em">Linguif<span style="color: #3F72AF; font-weight: bold;">AI</span>
-    <img src="build\assets\logo_TAIL.png" alt="Logo do Projeto" width="65" height="65" style="vertical-align: 
+    <img src="public\assets\logo_TAIL.png" alt="Logo da TAIL" width="65" height="65" style="vertical-align: 
     middle; position: relative; top: -5px;"/>
 </div>
 
