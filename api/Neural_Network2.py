@@ -17,7 +17,7 @@ from torch import optim
 from torch.optim.lr_scheduler import CosineAnnealingLR
 from torch.utils.data import Dataset, DataLoader
 from torch.utils.data.dataset import random_split
-from torch.nn.utils.rnn import pack_padded_sequence, pad_packed_sequence
+from torch.nn.utils.rnn import pack_padded_sequence, pad_packed_sequence, pad_sequence
 from torchtext.vocab import build_vocab_from_iterator
 
 tqdm.pandas()
@@ -74,6 +74,11 @@ class CustomDataset(Dataset):
         # Add a padding idx
         self.token2idx['<PAD>'] = max(self.token2idx.values()) + 1
 
+        vocab_filename = f"Vocab-{name}"
+        vocab_file = os.path.join("api", "encoders", f"{vocab_filename}.joblib")
+        os.makedirs(os.path.dirname(vocab_file), exist_ok=True)
+        joblib.dump(self.token2idx, vocab_file)
+
         self.idx2token = {idx: token for token, idx in self.token2idx.items()}
 
         df['indexed_tokens'] = df.tokens.apply(
@@ -92,7 +97,7 @@ class CustomDataset(Dataset):
         self.targets = df.encoded_labels.tolist()
 
     def __getitem__(self, i):
-        return self.sequences[i], self.targets[i],  self.text[i]
+        return torch.tensor(self.sequences[i]), torch.tensor(self.targets[i]),  self.text[i]
 
     def __len__(self):
         return len(self.sequences)
@@ -109,10 +114,11 @@ def split_train_valid_test(corpus, valid_ratio=0.1, test_ratio=0.1):
 
 
 def collate(batch):
-    inputs = [item[0] for item in batch]
-    target = torch.LongTensor([item[1] for item in batch])
-    text = [item[2] for item in batch]
-    return inputs, target, text
+    inputs, target, text = zip(*batch)
+
+    padded_inputs = pad_sequence(inputs, batch_first=True, padding_value=0)
+
+    return padded_inputs, torch.tensor(target), text
 
 def pad_sequences(sequences, padding_val=0, pad_left=False):
     """Pad a list of sequences to the same length with a padding_val."""
@@ -140,6 +146,7 @@ class RNNClassifier(nn.Module):
         self.dropout_probability = dropout_probability
         self.device = device
         self.padding_idx = padding_idx
+        self.vocab_size = vocab_size
 
         # We need to multiply some layers by two if the model is bidirectional
         self.input_size_factor = 2 if bidirectional else 1
@@ -210,8 +217,8 @@ class RNNClassifier(nn.Module):
         lengths, permutation_indices = lengths.sort(0, descending=True)
 
         # Pad sequences so that they are all the same length
-        padded_inputs = pad_sequences(inputs, padding_val=self.padding_idx)
-        inputs = torch.LongTensor(padded_inputs)
+        #padded_inputs = pad_sequences(inputs, padding_val=self.padding_idx)
+        inputs = torch.LongTensor(inputs)
 
         # Sort inputs
         inputs = inputs[permutation_indices].to(self.device)
@@ -248,6 +255,9 @@ def train_epoch(model, optimizer, scheduler, train_loader, criterion, curr_epoch
     progress_bar = tqdm(train_loader, desc='Training', leave=False)
     num_iters = 0
     for inputs, target, text in progress_bar:
+        # print(inputs)
+        # print(target)
+        # print(text)
         target = target.to(device)
 
         # Verifica se o cancelamento foi solicitado a cada batch
@@ -257,14 +267,14 @@ def train_epoch(model, optimizer, scheduler, train_loader, criterion, curr_epoch
                 print("Training canceled during epoch:", curr_epoch)
                 return total_loss / max(total, 1), True  # Retorna a perda média e o status de cancelamento
 
-        # Clean old gradients
-        optimizer.zero_grad()
-
         # Forwards pass
         output = model(inputs)
 
         # Calculate how wrong the model is
         loss = criterion(output, target)
+
+        # Clean old gradients
+        optimizer.zero_grad()
 
         # Perform gradient descent, backwards pass
         loss.backward()
@@ -311,7 +321,7 @@ def validate_epoch(model, valid_loader, criterion):
             total_loss += loss.item()
             total += len(target)
 
-    return total_loss / total
+    return total_loss / total if total != 0 else 0
 
 def create_and_train_rnn_model(df, name, epochs = 10, batch_size = 32, learning_rate = 0.001):
     # Configurações iniciais e preparações do modelo
@@ -340,7 +350,7 @@ def create_and_train_rnn_model(df, name, epochs = 10, batch_size = 32, learning_
         output_size=len(df['labels'].unique()),
         hidden_size=hidden_size,
         embedding_dimension=embedding_dimension,
-        vocab_size=len(dataset.token2idx),
+        vocab_size=len(dataset.token2idx)+1,
         padding_idx=dataset.token2idx['<PAD>'],
         dropout_probability=dropout_probability,
         bidirectional=is_bidirectional,

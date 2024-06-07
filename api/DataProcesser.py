@@ -104,11 +104,15 @@ class DataProcesser():
         if model_name: 
             label_map_filename = f"api/encoders/LabelMapping-{model_name.split('_')[0]}.joblib"
             label_encoder = joblib.load(label_map_filename)
+
         texts_to_predict = df['input_column']
         texts_to_predict = [str(text) for text in texts_to_predict]
+
         predictions = pipeline.predict(texts_to_predict)
         label_predictions = label_encoder.inverse_transform(predictions)
+
         df['output_column'] = label_predictions
+
         return df
 
     def load_weights_and_model(self, name):
@@ -122,6 +126,9 @@ class DataProcesser():
     def trained_predict(self, df, model_name):
         label_map_filename = f"api/encoders/LabelMapping-{model_name}.joblib"
         label_encoder = joblib.load(label_map_filename)
+
+        vocab_file = f"api/encoders/Vocab-{model_name}.joblib"
+        token2id = joblib.load(vocab_file)
 
         model = self.load_weights_and_model(model_name)
         model.eval()
@@ -147,17 +154,12 @@ class DataProcesser():
             lambda tokens: any(token != '<UNK>' for token in tokens),
         )]
 
-        vocab = sorted({
-            sublst for lst in df.tokens.tolist() for sublst in lst
-        })
-        self.token2idx = {token: idx for idx, token in enumerate(vocab)}
-
-        self.token2idx['<PAD>'] = max(self.token2idx.values()) + 1
-
-        self.idx2token = {idx: token for token, idx in self.token2idx.items()}
+        #token2id['<PAD>'] = max(token2id.values()) + 1
+        if '<UNK>' not in token2id:
+            token2id['<UNK>'] = max(token2id.values()) + 1
 
         df['indexed_tokens'] = df.tokens.apply(
-            lambda tokens: [self.token2idx[token] for token in tokens],
+            lambda tokens: [token2id.get(token, 0) for token in tokens],
         )
 
         predictions = []
