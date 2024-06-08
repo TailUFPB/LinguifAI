@@ -37,7 +37,7 @@ export default function TrainView() {
         setIsCancelling(false);
     };
 
-    const handleSubmit = async () => {
+    const handleRnnSubmit = async () => {
         setIsLoading(true);
         setHasTrained(true);
         setLoadingProgress(0);
@@ -63,25 +63,55 @@ export default function TrainView() {
 
         console.log(sendData);
 
-        const url = "http://localhost:5000/neural-network";
+        const url = "http://localhost:5000/neural-network-rnn";
 
-        await axios
-            .post(url, sendData)
-            .catch(async (error) => {
-                await axios
-                    .post(url, sendData)
-                    .catch(async (error) => {
-                        await axios
-                            .post(url, sendData)
-                            .catch(async (error) => {
-                                await axios
-                                    .post(url, sendData)
-                                    .catch((error) => {
-                                        throw new Error(error);
-                                    })
-                            })
-                    })
+        await axios.post(url, sendData).catch(async (error) => {
+            await axios.post(url, sendData).catch(async (error) => {
+                await axios.post(url, sendData).catch(async (error) => {
+                    await axios.post(url, sendData).catch((error) => {
+                        throw new Error(error);
+                    });
+                });
             });
+        });
+
+        setIsLoading(false);
+    };
+
+    const handleNbSubmit = async () => {
+        setIsLoading(true);
+        setLoadingProgress(0);
+
+        let selectedData = data.map((row) => ({
+            value: row[selectedColumn],
+            label: row[selectedLabel],
+        }));
+
+        let selectedLabels = data.map((row) => row[selectedLabel]);
+        let selectedValues = data.map((row) => row[selectedColumn]);
+
+        const sendData = {
+            data: selectedValues,
+            label: selectedLabels,
+            batch_size: batchSize || 16,
+            epochs: epochs || 50,
+            learning_rate: learningRate || 0.001,
+            name: modelName || "trained-model",
+        };
+
+        console.log(sendData);
+
+        const url = "http://localhost:5000/neural-network-nb";
+
+        await axios.post(url, sendData).catch(async (error) => {
+            await axios.post(url, sendData).catch(async (error) => {
+                await axios.post(url, sendData).catch(async (error) => {
+                    await axios.post(url, sendData).catch((error) => {
+                        throw new Error(error);
+                    });
+                });
+            });
+        });
 
         setIsLoading(false);
     };
@@ -131,9 +161,14 @@ export default function TrainView() {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const response = await axios.get("http://localhost:5000/training-status");
+                const response = await axios.get(
+                    "http://localhost:5000/training-status"
+                );
                 const { training_progress, training_in_progress, train_losses, valid_losses } = response.data;
-                const newProgress: number = training_in_progress || training_progress === 100 ? training_progress : 0;
+                const newProgress: number =
+                    training_in_progress || training_progress === 100
+                        ? training_progress
+                        : 0; // Explicitly type newProgress
                 updateLoadingProgress(newProgress);
 
                 setTrainLosses(train_losses);
@@ -144,6 +179,7 @@ export default function TrainView() {
         };
 
         const updateLoadingProgress = (newProgress: number) => {
+            // Explicitly type newProgress parameter
             const duration = 1000;
             const startTime = Date.now();
             const startProgress = prevLoadingProgressRef.current;
@@ -151,7 +187,8 @@ export default function TrainView() {
             const updateProgress = () => {
                 const elapsedTime = Date.now() - startTime;
                 const progress = Math.min(1, elapsedTime / duration);
-                const interpolatedProgress = startProgress + (newProgress - startProgress) * progress;
+                const interpolatedProgress =
+                    startProgress + (newProgress - startProgress) * progress;
                 setLoadingProgress(interpolatedProgress);
 
                 if (progress < 1) {
@@ -295,7 +332,7 @@ export default function TrainView() {
 
                             {!isLoading && <button
                                 className={`w-2/4 bg-blue-400 text-white py-2 px-4 hover:bg-blue-500 focus:outline-none border-2 border-blue-500 rounded-xl h-14`}
-                                onClick={handleSubmit}
+                                onClick={handleNbSubmit}
                                 disabled={isLoading}
                             >
                                 {isLoading ? "Carregando..." : "Treinar"}
