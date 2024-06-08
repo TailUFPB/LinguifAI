@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 
 interface Message {
     text: string;
@@ -20,25 +21,27 @@ const ChatBot: React.FC = () => {
         setIsOpen(!isOpen);
     };
 
-    const fetchChatData = async () => {
-        // buscar histórico de mensagens do backend
-        // talvez reiniciar o chat 
-        // verificar status do carregamento
-    };
-
     const sendMessage = async () => {
         if (message.trim() === "") return;
 
-        setChatHistory([...chatHistory, { text: message, origin: 'user' }]);
+        const newMessage: Message = { text: message, origin: 'user' };
+        setChatHistory(prevHistory => [...prevHistory, newMessage]);
 
-        setChatHistory(prevHistory => [
-            ...prevHistory,
-            { text: "Essa é uma resposta automática.", origin: 'bot' }
-        ]);
+        try {
+            const response = await axios.post('http://localhost:5000/api/chat', {
+                message,
+                history: [...chatHistory, newMessage]  // Enviar o histórico completo
+            });
+
+            const botResponse: Message = { text: response.data.reply, origin: 'bot' };
+            setChatHistory(prevHistory => [...prevHistory, botResponse]);
+        } catch (error) {
+            console.error("Error sending message:", error);
+            const errorMessage: Message = { text: "Desculpe, ocorreu um erro. Tente novamente.", origin: 'bot' };
+            setChatHistory(prevHistory => [...prevHistory, errorMessage]);
+        }
 
         setMessage("");
-
-        // enviar mensagem para o backend
     };
 
     const sendInitialMessage = () => {
@@ -59,8 +62,7 @@ const ChatBot: React.FC = () => {
 
             {/* Chat Dialog */}
             {isOpen && (
-                <div className="fixed bottom-20 right-4 bg-white border border-gray-300 shadow-lg rounded-lg w-80 flex flex-col max-h-[600px]
-                ">
+                <div className="fixed bottom-20 right-4 bg-white border border-gray-300 shadow-lg rounded-lg w-80 flex flex-col max-h-[600px]">
                     <div className="bg-blue-500 text-white p-4 flex justify-between items-center">
                         <h2 className="text-lg">LinguiTalk ou LinguaBot</h2>
                         <button
@@ -75,8 +77,7 @@ const ChatBot: React.FC = () => {
                             {chatHistory.map((msg, index) => (
                                 <div
                                     key={index}
-                                    className={`mb-2 p-2 rounded-lg ${msg.origin === 'user' ? 'bg-blue-100 text-right' : 'bg-gray-200 text-left'
-                                        }`}
+                                    className={`mb-2 p-2 rounded-lg ${msg.origin === 'user' ? 'bg-blue-100 text-right' : 'bg-gray-200 text-left'}`}
                                 >
                                     <p className={`text-sm ${msg.origin === 'user' ? 'text-blue-700' : 'text-red-700'}`}>
                                         {msg.origin === 'user' ? 'Você' : 'LinguiBot'}

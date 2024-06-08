@@ -9,16 +9,20 @@ import time
 import os
 import pandas as pd
 import nltk
+import os
+from dotenv import load_dotenv
 import json
+import openai
 import asyncio
 import logging
 nltk.download('wordnet')
 
 
+load_dotenv()
 app = Flask(__name__)
 server_thread = None
 CORS(app)  # Permite todas as origens por padrão (não recomendado para produção)
-
+openai.api_key = os.getenv('OPEN_AI_KEY')
 log = logging.getLogger('werkzeug')
 log.disabled = True
 
@@ -179,6 +183,32 @@ def cancel_training():
         return jsonify({'message': 'Cancellation requested.'}), 200
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+
+@app.route('/api/chat', methods=['POST'])
+def chat():
+    data = request.get_json()
+    user_message = data.get('message')
+    chat_history = data.get('history', [])
+
+    messages = [{"role": "system", "content": "You are a helpful assistant."}]
+    for msg in chat_history:
+        messages.append({"role": "user" if msg['origin'] == 'user' else "assistant", "content": msg['text']})
+    messages.append({"role": "user", "content": user_message})
+
+    try:
+        client = openai.OpenAI(api_key = openai.api_key)
+        response = client.chat.completions.create(
+            model="gpt-3.5-turbo", # ou a gente poderia ver com gpt 4 mas por enquanto coloquei 3.5
+            messages=messages,
+            max_tokens=200
+        )
+        bot_reply = response.choices[0].message.content.strip()
+    
+        print(bot_reply)
+        return jsonify(reply=bot_reply)
+    except Exception as e:
+        print(f"Error: {e}")
+        return jsonify(reply="Desculpe, ocorreu um erro ao processar sua mensagem."), 500
 
 
 if __name__ == '__main__':
