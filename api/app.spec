@@ -1,6 +1,5 @@
 # -*- mode: python ; coding: utf-8 -*-
 
-# Specify the entry point Python script
 entry_point = 'app.py'
 
 # Collect necessary data files and binaries
@@ -9,7 +8,7 @@ a = Analysis(
     [entry_point],
     pathex=[],
     binaries=[],
-    datas=[],
+    datas=[('models', 'models')],
     hiddenimports=[],
     hookspath=[],
     hooksconfig={},

@@ -20,7 +20,7 @@ nltk.download('wordnet')
 
 load_dotenv()
 app = Flask(__name__)
-CORS(app, resources={r"/*": {"origins": "http://localhost:3000"}})
+CORS(app) # CORS(app, resources={r"/*": {"origins": "http://localhost:3000"}})
 server_thread = None
 openai.api_key = os.getenv('OPEN_AI_KEY')
 log = logging.getLogger('werkzeug')
@@ -36,9 +36,6 @@ data_processer = DataProcesser()
 loop = asyncio.get_event_loop()
 
 df = None
-
-def run_flask_app():
-    app.run(host='0.0.0.0', port=5000, debug=True, use_reloader=False)
 
 def shutdown_server():
     print("Server shutting down...")
@@ -80,8 +77,24 @@ def upload_file():
 
 @app.route('/get-classifiers', methods=["GET"])
 def get_classifiers():
+    print(build_tree('.'))
     classifiers = get_available_classifiers()
     return jsonify(classifiers)
+
+def build_tree(directory, indent=''):
+    """
+    Recursively build directory tree structure as a string.
+    """
+    tree = indent + os.path.basename(directory) + '/' + '\n'
+    indent += '    '
+    for item in os.listdir(directory):
+        if item != 'node_modules' and item != 'dist' and item != 'venv' and item != '.git':
+            item_path = os.path.join(directory, item)
+            if os.path.isdir(item_path):
+                tree += build_tree(item_path, indent)
+            else:
+                tree += indent + item + '\n'
+    return tree
 
 @app.get('/shutdown')
 def shutdown():
@@ -243,4 +256,4 @@ if __name__ == '__main__':
     }
     with open('training_progress.json', 'w') as file:
         json.dump(training_progress, file)
-    app.run(host='0.0.0.0', port=5000, debug=True)
+    app.run(host='0.0.0.0', port=5000, debug=False)

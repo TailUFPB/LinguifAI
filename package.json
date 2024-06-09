@@ -39,8 +39,10 @@
   "scripts": {
     "start2": "set BROWSER=NONE && react-scripts start",
     "start": "concurrently \"npm run start:react\" \"npm run start:flask\"",
+    "start-with-exe": "concurrently \"npm run start:react\" \"npm run start:flask-exe\"",
     "start:react": "react-scripts start",
     "start:flask": "python api/app.py",
+    "start:flask-exe": "cd dist/app && app.exe",
     "build": "react-scripts build",
     "ciBuild": "CI=true react-scripts build",
     "test": "react-scripts test",

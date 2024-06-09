@@ -1,11 +1,9 @@
 import os
 
 def get_available_classifiers():
-    model_folder = 'api/models'
-
+    model_folder = next((folder for folder in ['models', 'api/models', '_internal/models'] if os.path.exists(folder)), None)
+    
     # Verifica se o diretório 'models' existe
-
-    ## retorna o path atual
     if not os.path.exists(model_folder):
         return []
 
