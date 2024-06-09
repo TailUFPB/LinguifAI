@@ -12,15 +12,15 @@ export default function HomeView() {
     const [classifiers, setClassifiers] = useState<{ [key: string]: string }>({});
     const [result, setResult] = useState<{ [key: string]: any }>({});
     const [isLoading, setIsLoading] = useState(false);
+    const [isBackendAvailable, setIsBackendAvailable] = useState(false);
 
     useEffect(() => {
         const fetchClassifiers = async () => {
             while (true) {
                 try {
-                    const response = await axios.get(
-                        "http://localhost:5000/get-classifiers"
-                    );
+                    const response = await axios.get("http://localhost:5000/get-classifiers");
                     setClassifiers(response.data);
+                    setIsBackendAvailable(true);
                     break;
                 } catch (error) {
                     console.error("Error fetching classifiers, retrying...", error);
@@ -32,6 +32,27 @@ export default function HomeView() {
         fetchClassifiers();
     }, []);
 
+    useEffect(() => {
+        const sendSelectedFileToBackend = async () => {
+            if (selectedFile) {
+                const formData = new FormData();
+                formData.append("file", selectedFile);
+
+                try {
+                    await axios.post("http://localhost:5000/receive", formData, {
+                        headers: {
+                            "Content-Type": "multipart/form-data",
+                        },
+                    });
+                } catch (error) {
+                    console.error("Error uploading file", error);
+                }
+            }
+        };
+
+        sendSelectedFileToBackend();
+    }, [selectedFile]);
+    
     const handleChangeSelectedColumn = (event: React.ChangeEvent<HTMLSelectElement>) => {
         setSelectedColumn(Number(event.target.value));
     };
@@ -43,14 +64,12 @@ export default function HomeView() {
     const handleSubmit = async () => {
         setIsLoading(true);
         let selectedData = data.map((row) => row[selectedColumn]);
-        const response = await axios
-            .post("http://localhost:5000/classify", {
-                data: selectedData,
-                classifier: selectedClassifier,
-            })
-            .catch((error) => {
-                console.error(error.response.data);
-            });
+        const response = await axios.post("http://localhost:5000/classify", {
+            data: selectedData,
+            classifier: selectedClassifier,
+        }).catch((error) => {
+            console.error(error.response.data);
+        });
 
         if (response && response.data) {
             const parsedData = JSON.parse(response.data.result);
@@ -66,7 +85,7 @@ export default function HomeView() {
                 console.log(result);
                 setResult(result);
             } else {
-                console.error("Os arrays 'input' e 'output' tem tamanhos diferentes.");
+                console.error("Os arrays 'input' e 'output' têm tamanhos diferentes.");
             }
         }
 
@@ -75,14 +94,9 @@ export default function HomeView() {
 
     const handleDownloadOutputCSV = async () => {
         const finalHeader = header.concat(`${selectedClassifier}_output`);
-        const finalData = data.map((row) =>
-            row.concat(result[row[selectedColumn]])
-        );
+        const finalData = data.map((row) => row.concat(result[row[selectedColumn]]));
 
-        const csv = finalHeader
-            .join(",")
-            .concat("\n")
-            .concat(finalData.map((row) => row.join(",")).join("\n"));
+        const csv = finalHeader.join(",").concat("\n").concat(finalData.map((row) => row.join(",")).join("\n"));
 
         const csvFile = new Blob([csv], { type: "text/csv" });
         const csvURL = window.URL.createObjectURL(csvFile);
@@ -92,8 +106,12 @@ export default function HomeView() {
         tempLink.click();
     };
 
+    if (!isBackendAvailable) {
+        return <div className="p-8 text-center text-black text-2xl font-bold">Carregando backend...</div>;
+    }
+
     return (
-        <div className="p-8 text-center  text-black">
+        <div className="p-8 text-center text-black">
             <SelectFileCard
                 selectedFile={selectedFile}
                 setSelectedFile={setSelectedFile}
@@ -114,12 +132,7 @@ export default function HomeView() {
                             className="w-full border-2 border-gray-500 rounded-xl py-2 px-4 hover:bg-gray-100 focus:outline-none h-14"
                             onChange={handleChangeSelectedColumn}
                         >
-                            <option
-                                value=""
-                                disabled
-                                selected
-                                className="placeholder-gray-300"
-                            >
+                            <option value="" disabled selected className="placeholder-gray-300">
                                 Selecione a coluna de entrada
                             </option>
                             {header.length > 0 &&
@@ -137,12 +150,7 @@ export default function HomeView() {
                             className="w-full border-2 border-gray-500 rounded-xl py-2 px-4 hover:bg-gray-100 focus:outline-none h-14"
                             onChange={handleChangeSelectedClassifier}
                         >
-                            <option
-                                value=""
-                                disabled
-                                selected
-                                className="placeholder-gray-300"
-                            >
+                            <option value="" disabled selected className="placeholder-gray-300">
                                 Selecione um classificador
                             </option>
                             {Object.entries(classifiers).map(([value, label]) => (

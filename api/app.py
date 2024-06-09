@@ -20,18 +20,22 @@ nltk.download('wordnet')
 
 load_dotenv()
 app = Flask(__name__)
+CORS(app, resources={r"/*": {"origins": "http://localhost:3000"}})
 server_thread = None
-CORS(app)  # Permite todas as origens por padrão (não recomendado para produção)
 openai.api_key = os.getenv('OPEN_AI_KEY')
 log = logging.getLogger('werkzeug')
 log.disabled = True
 
+selectedFile = None
 
 app.config['JSONIFY_PRETTYPRINT_REGULAR'] = True
 
 data_processer = DataProcesser()
 
+
 loop = asyncio.get_event_loop()
+
+df = None
 
 def run_flask_app():
     app.run(host='0.0.0.0', port=5000, debug=True, use_reloader=False)
@@ -43,6 +47,22 @@ def shutdown_server():
 @app.route('/', methods=['GET'])
 def hello_world():
     return jsonify("Hello, world!")
+
+
+@app.route('/receive', methods=['POST'])
+def receive_file():
+    global df
+
+    if 'file' not in request.files:
+        return jsonify({'error': 'No file part'}), 400
+    file = request.files['file']
+    if file.filename == '':
+        return jsonify({'error': 'No selected file'}), 400
+    if file:
+        df = pd.read_csv(file)
+        return jsonify({'message': 'File uploaded successfully'}), 200
+
+
 
 @app.route('/classify', methods=["POST"])
 def upload_file():
@@ -184,8 +204,13 @@ def cancel_training():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
-@app.route('/api/chat', methods=['POST'])
+@app.route('/chat', methods=['POST'])
 def chat():
+    global df
+    if df is not None:
+        # run rag
+        print(df.head(1))
+    else:
     data = request.get_json()
     user_message = data.get('message')
     chat_history = data.get('history', [])
@@ -203,8 +228,7 @@ def chat():
             max_tokens=200
         )
         bot_reply = response.choices[0].message.content.strip()
-    
-        print(bot_reply)
+
         return jsonify(reply=bot_reply)
     except Exception as e:
         print(f"Error: {e}")
@@ -218,4 +242,4 @@ if __name__ == '__main__':
     }
     with open('training_progress.json', 'w') as file:
         json.dump(training_progress, file)
-    app.run(host='0.0.0.0', port=5000, debug=False)
+    app.run(host='0.0.0.0', port=5000, debug=True)

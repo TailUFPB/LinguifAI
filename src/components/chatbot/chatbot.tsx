@@ -28,9 +28,9 @@ const ChatBot: React.FC = () => {
         setChatHistory(prevHistory => [...prevHistory, newMessage]);
 
         try {
-            const response = await axios.post('http://localhost:5000/api/chat', {
+            const response = await axios.post('http://localhost:5000/chat', {
                 message,
-                history: [...chatHistory, newMessage]  // Enviar o histórico completo
+                history: [...chatHistory, newMessage]
             });
 
             const botResponse: Message = { text: response.data.reply, origin: 'bot' };
