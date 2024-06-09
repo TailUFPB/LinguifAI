@@ -211,6 +211,7 @@ def chat():
         # run rag
         print(df.head(1))
     else:
+        print("No df")
     data = request.get_json()
     user_message = data.get('message')
     chat_history = data.get('history', [])
