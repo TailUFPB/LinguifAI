@@ -96,6 +96,9 @@ jobs:
             const newV = `${parseInt(versionParts[0])}.${parseInt(versionParts[1])}.${parseInt(versionParts[2]) + 1}`;
             console.log(`::set-output name=new_version::${newV}`);
 
+      - name: run tree
+        run: tree
+
       - name: Create Release
         id: create_release
         uses: softprops/action-gh-release@v1
