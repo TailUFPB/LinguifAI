@@ -48,8 +48,7 @@ jobs:
         id: bump_version
         run: |
           # Bump version using npm
-          CURRENT_VERSION=$(jq -r '.version' package.json)
-          NEW_VERSION=$(npm version patch -m "chore(release): $CURRENT_VERSION -> %s [skip ci]")
+          NEW_VERSION=$(npm version patch -m "chore(release): %s [skip ci]")
           NEW_VERSION=$(echo $NEW_VERSION | tr -d 'v') # Remove the 'v' prefix
           echo "NEW_VERSION=${NEW_VERSION}" >> $GITHUB_ENV
 
@@ -63,9 +62,9 @@ jobs:
 
       - name: Rename file
         run: |
-          OLD_NAME=$(ls dist | grep 'LinguifAI Setup')
-          NEW_NAME="LinguifAI Setup ${{ env.NEW_VERSION }}.exe"
-          mv "dist/$OLD_NAME" "dist/$NEW_NAME"
+          $old_name = Get-ChildItem -Path dist -Filter 'LinguifAI Setup*.exe' | Select-Object -ExpandProperty Name
+          $new_name = "LinguifAI Setup ${{ env.NEW_VERSION }}.exe"
+          Rename-Item -Path "dist\$old_name" -NewName $new_name
 
       - name: Create Release
         id: create_release
