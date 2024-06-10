@@ -8,9 +8,34 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  version-bump:
+    name: 🔢 Version Bump
+    runs-on: ubuntu-latest
+    steps:
+      - name: ⬇️ Checkout repo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Get version of the project
+        id: project-version
+        uses: euberdeveloper/ga-project-version@main
+      
+      - name: Automated Version Bump
+        uses: phips28/gh-action-bump-version@master
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          commit-message: 'CI: bumps version to {{version}} [skip ci]'
+
+      - name: Get version of the project after bump
+        id: project-version-after
+        uses: euberdeveloper/ga-project-version@main
+
   build:
     name: 🏗️ Build
     runs-on: windows-latest
+    needs: version-bump
     strategy:
       fail-fast: false
     steps:
@@ -18,7 +43,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          
+
       - name: ⎔ Setup Node
         uses: actions/setup-node@v3
         with:
@@ -26,18 +51,7 @@ jobs:
 
       - name: Get version of the project
         id: project-version
-        uses: 'euberdeveloper/ga-project-version@main'
-      
-      - name:  'Automated Version Bump'
-        uses:  'phips28/gh-action-bump-version@master'
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          commit-message: 'CI: bumps version to {{version}} [skip ci]'
-
-      - name: Get version of the project
-        id: project-version-after
-        uses: 'euberdeveloper/ga-project-version@main'
+        uses: euberdeveloper/ga-project-version@main
 
       - name: Set up conda
         uses: conda-incubator/setup-miniconda@v2
