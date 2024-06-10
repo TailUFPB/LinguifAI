@@ -17,18 +17,28 @@ jobs:
       - name: ⬇️ Checkout repo
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0 # Ensure full history is fetched for tagging
+          fetch-depth: 0
+          
+      - name: ⎔ Setup Node
+        uses: actions/setup-node@v3
+        with:
+          cache: "npm"
+
+      - name: Get version of the project
+        id: project-version
+        uses: 'euberdeveloper/ga-project-version@main'
+
+      - name: 'change version'
+        uses: reedyuk/npm-version@1.1.1
+        with:
+          version: ${{ steps.project-version.outputs.version }}
+          git-tag-version: 'true'
 
       - name: Set up conda
         uses: conda-incubator/setup-miniconda@v2
         with:
           activate-environment: default
           environment-file: api/environment.yml
-
-      - name: ⎔ Setup Node
-        uses: actions/setup-node@v3
-        with:
-          cache: "npm"
 
       - name: 🟨 Setup Python
         uses: actions/setup-python@v3
@@ -43,17 +53,6 @@ jobs:
 
       - name: Install dependencies
         run: npm install
-
-      - name: Get version of the project
-        id: project-version
-        uses: 'euberdeveloper/ga-project-version@main'
-
-      - name: 'change version'
-        uses: reedyuk/npm-version@1.1.1
-        with:
-          version: ${{ steps.project-version.outputs.version }}
-          package: 'subproject-directory/'
-          git-tag-version: 'true'
 
       - name: 📦 Electron Builder
         run: npm run electron:package:win
