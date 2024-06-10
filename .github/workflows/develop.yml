@@ -28,6 +28,10 @@ jobs:
         id: project-version
         uses: 'euberdeveloper/ga-project-version@main'
 
+      - name: Increase patch version by 1
+        run: echo "::set-output name=patch_version::$(echo ${{ steps.project-version.outputs.version }} | awk -F. '{$NF = $NF + 1;} 1' | sed 's/ /./g')"
+        id: increase-patch-version
+
       - name: 'change version'
         uses: reedyuk/npm-version@1.1.1
         with:
