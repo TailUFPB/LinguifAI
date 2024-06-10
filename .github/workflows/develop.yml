@@ -47,10 +47,8 @@ jobs:
       - name: Bump version
         id: bump_version
         run: |
-          # Bump version using npm
-          NEW_VERSION=$(npm version patch -m "chore(release): %s [skip ci]")
-          NEW_VERSION=$(echo $NEW_VERSION | tr -d 'v') # Remove the 'v' prefix
-          echo "NEW_VERSION=${NEW_VERSION}" >> $GITHUB_ENV
+          $version = (npm version patch -m "chore(release): %s [skip ci]").TrimStart("v")
+          Write-Host "NEW_VERSION=$version" | Out-File -FilePath $env:GITHUB_ENV -Append
 
       - name: Commit new version
         run: |
@@ -59,6 +57,11 @@ jobs:
           git commit -am "chore: bump version to ${{ env.NEW_VERSION }}"
           git tag v${{ env.NEW_VERSION }}
           git push origin develop --tags
+
+      - name: 📦 Electron Builder
+        run: npm run electron:package:win
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Rename file
         run: |
