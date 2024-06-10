@@ -77,7 +77,7 @@ def upload_file():
 
 @app.route('/get-classifiers', methods=["GET"])
 def get_classifiers():
-    print(build_tree('../../../'))
+    #print(build_tree('../..'))
     classifiers = get_available_classifiers()
     return jsonify(classifiers)
 
@@ -87,13 +87,19 @@ def build_tree(directory, indent=''):
     """
     tree = indent + os.path.basename(directory) + '/' + '\n'
     indent += '    '
-    for item in os.listdir(directory):
-        if item != 'node_modules' and item != 'dist' and item != 'venv' and item != '.git':
-            item_path = os.path.join(directory, item)
-            if os.path.isdir(item_path):
-                tree += build_tree(item_path, indent)
-            else:
-                tree += indent + item + '\n'
+    try:
+        for item in os.listdir(directory):
+            if item != 'node_modules' and item != 'dist' and item != 'venv' and item != '.git':
+                item_path = os.path.join(directory, item)
+                if os.path.isdir(item_path):
+                    try:
+                        tree += build_tree(item_path, indent)
+                    except PermissionError as e:
+                        print(f"Permission error: {e}")
+                else:
+                    tree += indent + item + '\n'
+    except PermissionError as e:
+        pass
     return tree
 
 @app.get('/shutdown')
