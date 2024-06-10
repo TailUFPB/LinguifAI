@@ -94,7 +94,6 @@ jobs:
             const preReleaseTag = latestPreRelease.name;
             const versionParts = preReleaseTag.replace(/^v/, '').split('.');
             const newV = `${parseInt(versionParts[0])}.${parseInt(versionParts[1])}.${parseInt(versionParts[2]) + 1}`;
-            ren "dist\LinguifAI Setup ${{ steps.get_latest_release.outputs.new_version }}.exe" "LinguifAI Setup ${newV}.exe"
             console.log(`::set-output name=new_version::${newV}`);
 
       - name: Create Release
