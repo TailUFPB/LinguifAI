@@ -19,6 +19,7 @@ export default function HomeView() {
             while (true) {
                 try {
                     const response = await axios.get("http://localhost:5000/get-classifiers");
+                    console.log(response);
                     setClassifiers(response.data);
                     setIsBackendAvailable(true);
                     break;
