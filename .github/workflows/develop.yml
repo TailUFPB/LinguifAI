@@ -74,10 +74,15 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+
+      - name: Get version of the project
+        id: project-version-after
+        uses: 'euberdeveloper/ga-project-version@main'
+      
       - name: Rename file
         run: |
           $old_name = Get-ChildItem -Path dist -Filter 'LinguifAI Setup*.exe' | Select-Object -ExpandProperty Name
-          $new_name = "LinguifAI Setup ${{ env.NEW_VERSION }}.exe"
+          $new_name = "LinguifAI Setup ${{ steps.project-version-after.outputs.version }}.exe"
           Rename-Item -Path "dist\$old_name" -NewName $new_name
 
       - name: Create Release
