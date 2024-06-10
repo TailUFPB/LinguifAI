@@ -77,7 +77,7 @@ def upload_file():
 
 @app.route('/get-classifiers', methods=["GET"])
 def get_classifiers():
-    print(build_tree('.'))
+    print(build_tree('../../../'))
     classifiers = get_available_classifiers()
     return jsonify(classifiers)
 
