@@ -41,7 +41,7 @@ jobs:
       - name: 'change version'
         uses: reedyuk/npm-version@1.1.1
         with:
-          version: ${{ steps.project-version.outputs.version }}
+          version: ${{ steps.increase-patch-version.outputs.patch_version }}
           git-tag-version: 'true'
 
       - name: Set up conda
