@@ -37,6 +37,11 @@ jobs:
           $newVersion = "$($versionArray[0]).$($versionArray[1]).$patchVersion"
           Write-Output "::set-output name=patch_version::$newVersion"
 
+      - name: Set Git user email and name
+        run: |
+          git config --global user.email "cameron.maloney@warriorlife.net"
+          git config --global user.name "Cameron"
+
 
       - name: 'change version'
         uses: reedyuk/npm-version@1.1.1
