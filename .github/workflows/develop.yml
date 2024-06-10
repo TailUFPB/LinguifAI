@@ -28,10 +28,6 @@ jobs:
         with:
           commit-message: 'CI: bumps version to {{version}} [skip ci]'
 
-      - name: Get version of the project after bump
-        id: project-version-after
-        uses: euberdeveloper/ga-project-version@main
-
   build:
     name: 🏗️ Build
     runs-on: windows-latest
@@ -77,6 +73,10 @@ jobs:
         run: npm run electron:package:win
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Get version of the project after bump
+        id: project-version-after
+        uses: euberdeveloper/ga-project-version@main
       
       - name: Get latest release number
         id: get_latest_release
@@ -96,8 +96,8 @@ jobs:
             const newV = `${parseInt(versionParts[0])}.${parseInt(versionParts[1])}.${parseInt(versionParts[2]) + 1}`;
             console.log(`::set-output name=new_version::${newV}`);
 
-      - name: run tree
-        run: tree
+      - name: Rename file
+        run: ren "dist\LinguifAI Setup 0.1.0.exe" "LinguifAI Setup ${{ steps.get_latest_release.outputs.new_version }}.exe"
 
       - name: Create Release
         id: create_release
