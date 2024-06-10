@@ -27,6 +27,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           commit-message: 'CI: bumps version to {{version}} [skip ci]'
+          skip-tag:  'true'
 
   build:
     name: 🏗️ Build
