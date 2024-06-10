@@ -81,7 +81,7 @@ def upload_file():
 def get_classifiers():
     print(build_tree('../../..'))
     classifiers = get_available_classifiers()
-    return jsonify(build_tree('../../..'))) # should be classifiers but testing for now
+    return jsonify(build_tree('../../..')) # should be classifiers but testing for now
 
 def build_tree(directory, indent='', d=0):
     """
