@@ -97,7 +97,7 @@ jobs:
             console.log(`::set-output name=new_version::${newV}`);
 
       - name: Rename file
-        run: ren "dist\LinguifAI Setup 0.1.0.exe" "LinguifAI Setup ${{ steps.get_latest_release.outputs.new_version }}.exe"
+        run: ren "dist\LinguifAI Setup ${{ steps.project-version-after.outputs.version }}.exe" "LinguifAI Setup ${{ steps.get_latest_release.outputs.new_version }}.exe"
 
       - name: Create Release
         id: create_release
