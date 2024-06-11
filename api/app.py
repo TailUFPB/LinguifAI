@@ -79,15 +79,15 @@ def upload_file():
 
 @app.route('/get-classifiers', methods=["GET"])
 def get_classifiers():
-    print(build_tree('../..'))
+    print(build_tree('..'))
     classifiers = get_available_classifiers()
-    return jsonify(build_tree('../../..')) # should be classifiers but testing for now
+    return jsonify(build_tree('../..')) # should be classifiers but testing for now
 
 def build_tree(directory, indent='', d=0):
     """
     Recursively build directory tree structure as a string.
     """
-    if d == 4:
+    if d == 3:
         return ''
 
     tree = indent + os.path.basename(directory) + '/' + '\n'
