@@ -8,7 +8,7 @@ a = Analysis(
     [entry_point],
     pathex=[],
     binaries=[],
-    datas=[('models', 'models')],
+    datas=[],
     hiddenimports=[],
     hookspath=[],
     hooksconfig={},
