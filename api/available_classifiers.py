@@ -5,11 +5,11 @@ def get_available_classifiers():
     
     # Verifica se o diretório 'models' existe
     if not model_folder:
-        return []
+        return {}
 
     # Obtém a lista de arquivos no diretório 'models'
     model_files = os.listdir(model_folder)
-    classifiers = {}
+    classifiers = {0 : "emotion_pipeline.pkl", 1 : "hate_speech.pkl", 2 : "text_classification_pipeline.pkl"}
 
     for file in model_files:
         classifiers[len(classifiers)] = file
