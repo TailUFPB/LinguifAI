@@ -163,7 +163,7 @@ export default function HomeView() {
                     </div>
                     <div className="w-1/4 relative mx-auto mt-10 text-white">
                         <button
-                            className="w-full bg-blue-400 py-2 px-4 hover:bg-main-darker focus:outline-none border-2 border-main-lighter rounded-xl h-14"
+                            className="w-full bg-blue-400 py-2 px-4 hover:bg-blue-600 focus:outline-none border-2 border-main-lighter rounded-xl h-14"
                             onClick={handleSubmit}
                         >
                             {isLoading ? "Carregando..." : "Classificar"}
@@ -179,7 +179,7 @@ export default function HomeView() {
                             />
                             <div className="w-1/4 relative mx-auto mt-10">
                                 <button
-                                    className="w-full text-white bg-blue-400 py-2 px-4 hover:bg-main-darker focus:outline-none border-2 border-main-lighter rounded-xl h-14"
+                                    className="w-full text-white bg-blue-400 py-2 px-4 hover:bg-blue-600 focus:outline-none border-2 border-main-lighter rounded-xl h-14"
                                     onClick={handleDownloadOutputCSV}
                                 >
                                     Baixar CSV
