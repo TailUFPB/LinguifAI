@@ -44,5 +44,6 @@ function printAsarDirectoryTree(asarPath, currentPath = '') {
     }
 }
 
+
 // Print out the directory tree of the app.asar file
 printAsarDirectoryTree(asarFilePath);

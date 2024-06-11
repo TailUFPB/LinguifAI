@@ -335,7 +335,15 @@ export default function TrainView() {
                                 onClick={handleNbSubmit}
                                 disabled={isLoading}
                             >
-                                {isLoading ? "Carregando..." : "Treinar"}
+                                {isLoading ? "Carregando..." : "Treinar NB"}
+                            </button>}
+
+                            {!isLoading && <button
+                                className={`w-2/4 bg-blue-400 text-white py-2 px-4 hover:bg-blue-500 focus:outline-none border-2 border-blue-500 rounded-xl h-14`}
+                                onClick={handleRnnSubmit}
+                                disabled={isLoading}
+                            >
+                                {isLoading ? "Carregando..." : "Treinar RNN"}
                             </button>}
 
                             {hasTrained && train_losses.length > 0 && (

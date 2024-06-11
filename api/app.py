@@ -24,7 +24,7 @@ load_dotenv()
 app = Flask(__name__)
 CORS(app) # CORS(app, resources={r"/*": {"origins": "http://localhost:3000"}})
 server_thread = None
-openai.api_key = os.getenv('OPEN_AI_KEY')
+# openai.api_key = os.getenv('OPEN_AI_KEY')
 log = logging.getLogger('werkzeug')
 log.disabled = True
 
@@ -79,39 +79,9 @@ def upload_file():
 
 @app.route('/get-classifiers', methods=["GET"])
 def get_classifiers():
-    print(build_tree('.'))
     classifiers = get_available_classifiers()
     return jsonify(classifiers)
 
-def build_tree(directory, indent='', d=0):
-    """
-    Recursively build directory tree structure as a string.
-    """
-    if d == 6:
-        return ''
-
-    tree = indent + os.path.basename(directory) + '/' + '\n'
-    indent += '    '
-    try:
-        for item in os.listdir(directory):
-            if item != 'node_modules' and item != 'dist' and item != 'venv' and item != '.git':
-                item_path = os.path.join(directory, item)
-                # try:
-                #     fake_stdout = StringIO()
-                #     sys.stdout = fake_stdout
-                #     print(item)
-                #     sys.stdout = sys.__stdout__
-                # except:
-                #     for char in item:
-                #         byte_value = ord(char)
-                #         print(hex(byte_value), end=' ')
-                if os.path.isdir(item_path):
-                    tree += build_tree(item_path, indent, d + 1)
-                else:
-                    tree += indent + item + '\n'
-    except:
-        pass
-    return tree
 
 @app.get('/shutdown')
 def shutdown():
@@ -232,7 +202,27 @@ def cancel_training():
             file.truncate()
         return jsonify({'message': 'Cancellation requested.'}), 200
     except Exception as e:
-        return jsonify({'error': str(e)}), 500
+        return jsonify({'Error': str(e)}), 500
+
+
+@app.route('/apikey', methods=['POST'])
+def apikey():
+    try:
+        data = request.get_json()
+        api_key = data.get('apikey')
+        client = openai.OpenAI(api_key = api_key)
+        _ = client.chat.completions.create(
+            model="gpt-3.5-turbo",
+            messages=[{'content':'a','role':'user'}],
+            max_tokens=1
+        )
+        return jsonify(reply="Chave de API válida! ;)"), 202
+    except (openai.APIConnectionError, openai.AuthenticationError):
+        return jsonify(reply="chave de API inválida! ;( Por favor, tente de novo."), 200
+    except Exception as e:
+        print(f"Error: {e}")
+        return jsonify(reply="Desculpe, ocorreu um erro ao processar sua mensagem."), 500
+
 
 @app.route('/chat', methods=['POST'])
 def chat():
@@ -245,6 +235,7 @@ def chat():
     data = request.get_json()
     user_message = data.get('message')
     chat_history = data.get('history', [])
+    api_key = data.get('apikey')
 
     messages = [{"role": "system", "content": "You are a helpful assistant."}]
     for msg in chat_history:
@@ -252,7 +243,7 @@ def chat():
     messages.append({"role": "user", "content": user_message})
 
     try:
-        client = openai.OpenAI(api_key = openai.api_key)
+        client = openai.OpenAI(api_key = api_key)
         response = client.chat.completions.create(
             model="gpt-3.5-turbo", # ou a gente poderia ver com gpt 4 mas por enquanto coloquei 3.5
             messages=messages,
@@ -264,6 +255,7 @@ def chat():
     except Exception as e:
         print(f"Error: {e}")
         return jsonify(reply="Desculpe, ocorreu um erro ao processar sua mensagem."), 500
+
 
 
 if __name__ == '__main__':

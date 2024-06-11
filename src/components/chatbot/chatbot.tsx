@@ -7,22 +7,31 @@ interface Message {
 }
 
 const ChatBot: React.FC = () => {
+    const [apikey, setApiKey] = useState("");
+    const [firstTime, setFirstTime] = useState(true);
+    const [apiKeyInput, setApiKeyInput] = useState("");
     const [isOpen, setIsOpen] = useState(false);
     const [message, setMessage] = useState("");
     const [chatHistory, setChatHistory] = useState<Message[]>([]);
 
     useEffect(() => {
-        if (isOpen && chatHistory.length === 0) {
+        if (isOpen && !apikey && firstTime) {
+            sendAPIKeyMessage();
+        }
+    }, [isOpen, apikey]);
+
+    useEffect(() => {
+        if (isOpen && chatHistory.length === 0 && apikey) {
             sendInitialMessage();
         }
-    }, [isOpen, chatHistory]);
+    }, [isOpen, chatHistory, apikey]);
 
     const toggleChat = () => {
         setIsOpen(!isOpen);
     };
 
     const sendMessage = async () => {
-        if (message.trim() === "") return;
+        if (message.trim() === "" || !apikey) return;
 
         const newMessage: Message = { text: message, origin: 'user' };
         setChatHistory(prevHistory => [...prevHistory, newMessage]);
@@ -30,7 +39,8 @@ const ChatBot: React.FC = () => {
         try {
             const response = await axios.post('http://localhost:5000/chat', {
                 message,
-                history: [...chatHistory, newMessage]
+                history: [...chatHistory, newMessage],
+                apikey
             });
 
             const botResponse: Message = { text: response.data.reply, origin: 'bot' };
@@ -44,11 +54,35 @@ const ChatBot: React.FC = () => {
         setMessage("");
     };
 
+    const sendAPIKeyMessage = () => {
+        setChatHistory(prevHistory => [
+            ...prevHistory,
+            { text: "Olá! Eu sou o (LinguiTalk ou LinguaBot). Coloca a sua chave:", origin: 'bot' }
+        ]);
+    };
+
     const sendInitialMessage = () => {
         setChatHistory(prevHistory => [
             ...prevHistory,
             { text: "Olá! Eu sou o (LinguiTalk ou LinguaBot). Como posso ajudar?", origin: 'bot' }
         ]);
+    };
+
+    const handleApiKeySubmit = async () => {
+        setApiKey(apiKeyInput);
+        const response = await axios.post('http://localhost:5000/apikey', {
+            apikey: apiKeyInput
+        });
+        const botResponse: Message = { text: response.data.reply, origin: 'bot' };
+        setChatHistory(prevHistory => [...prevHistory, botResponse]);
+        setApiKeyInput("");
+        if (response.status == 202) {
+            sendInitialMessage()
+        }
+        else {
+            setApiKey("")
+            setFirstTime(false)
+        }
     };
 
     return (
@@ -87,24 +121,45 @@ const ChatBot: React.FC = () => {
                             ))}
                         </div>
                     </div>
-                    <div className="p-4 border-t border-gray-300">
-                        <input
-                            type="text"
-                            className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none"
-                            placeholder="Digite sua mensagem..."
-                            value={message}
-                            onChange={(e) => setMessage(e.target.value)}
-                            onKeyPress={(e) => {
-                                if (e.key === 'Enter') sendMessage();
-                            }}
-                        />
-                        <button
-                            className="w-full mt-2 bg-blue-500 text-white p-2 rounded-lg hover:bg-blue-600 focus:outline-none"
-                            onClick={sendMessage}
-                        >
-                            Enviar
-                        </button>
-                    </div>
+                    {apikey ? (
+                        <div className="p-4 border-t border-gray-300">
+                            <input
+                                type="text"
+                                className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none"
+                                placeholder="Digite sua mensagem..."
+                                value={message}
+                                onChange={(e) => setMessage(e.target.value)}
+                                onKeyPress={(e) => {
+                                    if (e.key === 'Enter') sendMessage();
+                                }}
+                            />
+                            <button
+                                className="w-full mt-2 bg-blue-500 text-white p-2 rounded-lg hover:bg-blue-600 focus:outline-none"
+                                onClick={sendMessage}
+                            >
+                                Enviar
+                            </button>
+                        </div>
+                    ) : (
+                        <div className="p-4 border-t border-gray-300">
+                            <input
+                                type="text"
+                                className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none"
+                                placeholder="Digite sua chave API..."
+                                value={apiKeyInput}
+                                onChange={(e) => setApiKeyInput(e.target.value)}
+                                onKeyPress={(e) => {
+                                    if (e.key === 'Enter') handleApiKeySubmit();
+                                }}
+                            />
+                            <button
+                                className="w-full mt-2 bg-blue-500 text-white p-2 rounded-lg hover:bg-blue-600 focus:outline-none"
+                                onClick={handleApiKeySubmit}
+                            >
+                                Enviar Chave API
+                            </button>
+                        </div>
+                    )}
                 </div>
             )}
         </div>
