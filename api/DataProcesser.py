@@ -52,14 +52,18 @@ class DataProcesser():
         #return classifier_switcher.get(classifier, lambda: "Invalid Classifier")(df)
 
     def get_pipeline(self, model_name):
+        if os.path.exists('assets/tweet_emotions.csv'):
+            prefix = ''
+        else:
+            prefix = 'public/'
         if model_name=="emotion_pipeline.pkl":
-            df = pd.read_csv('assets/tweet_emotions.csv')
+            df = pd.read_csv(prefix + 'assets/tweet_emotions.csv')
             train_data, test_data, train_target, test_target = train_test_split(df['content'], df['sentiment'], test_size=0.2, shuffle=True)
         elif model_name=="hate_speech.pkl":
-            df = pd.read_csv('assets/nb_hatespeech.csv', sep=';')
+            df = pd.read_csv(prefix + 'assets/nb_hatespeech.csv', sep=';')
             train_data, test_data, train_target, test_target = train_test_split(df['comment'], df['isHate'], test_size=0.2, shuffle=True)
         elif model_name=="text_classification_pipeline.pkl":
-            df = pd.read_csv('assets/nb_news.csv')
+            df = pd.read_csv(prefix + 'assets/nb_news.csv')
             train_data, test_data, train_target, test_target = train_test_split(df['short_description'], df['category'], test_size=0.2, shuffle=True)
         else:
             with open(f'api/models/{model_name}', 'rb') as file:
@@ -109,9 +113,12 @@ class DataProcesser():
         texts_to_predict = [str(text) for text in texts_to_predict]
 
         predictions = pipeline.predict(texts_to_predict)
-        label_predictions = label_encoder.inverse_transform(predictions)
 
-        df['output_column'] = label_predictions
+        if model_name:
+            label_predictions = label_encoder.inverse_transform(predictions)
+            df['output_column'] = label_predictions
+        else:
+            df['output_column'] = predictions
 
         return df
 
