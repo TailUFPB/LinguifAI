@@ -13,5 +13,8 @@ def get_available_classifiers():
 
     for file in model_files:
         classifiers[len(classifiers)] = file
+    classifiers[len(classifiers)] = "emotion_pipeline.pkl"
+    classifiers[len(classifiers)] = "hate_speech.pkl"
+    classifiers[len(classifiers)] = "text_classification_pipeline.pkl"
 
     return classifiers
