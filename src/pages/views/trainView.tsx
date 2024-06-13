@@ -168,7 +168,7 @@ export default function TrainView() {
                 const newProgress: number =
                     training_in_progress || training_progress === 100
                         ? training_progress
-                        : 0; // Explicitly type newProgress
+                        : 0; 
                 updateLoadingProgress(newProgress);
 
                 setTrainLosses(train_losses);
@@ -179,7 +179,6 @@ export default function TrainView() {
         };
 
         const updateLoadingProgress = (newProgress: number) => {
-            // Explicitly type newProgress parameter
             const duration = 1000;
             const startTime = Date.now();
             const startProgress = prevLoadingProgressRef.current;

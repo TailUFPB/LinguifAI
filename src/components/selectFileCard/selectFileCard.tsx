@@ -4,7 +4,7 @@ import Papa from "papaparse";
 import CsvTable from "../csvTable/csvTable";
 import { Link } from "@mui/material";
 
-interface props {
+interface Props {
   selectedFile: File | null;
   setSelectedFile: (file: File | null) => void;
   setData: (data: any[][]) => void;
@@ -20,39 +20,38 @@ export default function SelectFileCard({
   data,
   header,
   setHeader,
-}: props) {
+}: Props) {
   const [isDragging, setIsDragging] = useState<boolean>(false);
 
-  // Selecionar arquivo
+  // Handle file selection from file input
   const handleFileChange = async (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file && file.name.endsWith(".csv")) {
       setSelectedFile(file);
-
-      Papa.parse(file, {
-        header: true,
-        dynamicTyping: true,
-        skipEmptyLines: true,
-        complete(results, file) {
-          let chaves = Object.keys(results.data[0] || []);
-
-          let data: any[][] = results.data.map((row: any) => {
-            let newRow: any[] = [];
-            chaves.forEach((chave) => {
-              newRow.push(row[chave]);
-            });
-            return newRow;
-          });
-
-          setData(data);
-          setHeader(chaves);
-        },
-      });
+      parseCSV(file);
     } else {
       setSelectedFile(null);
     }
   };
 
+  // Parse CSV file
+  const parseCSV = (file: File) => {
+    Papa.parse(file, {
+      header: true,
+      dynamicTyping: true,
+      skipEmptyLines: true,
+      complete(results) {
+        const keys = Object.keys(results.data[0] || []);
+        const data: any[][] = results.data.map((row: any) => {
+          return keys.map((key) => row[key]);
+        });
+        setData(data);
+        setHeader(keys);
+      },
+    });
+  };
+
+  // Handle file drop
   const handleDrop = (event: React.DragEvent<HTMLDivElement>) => {
     setIsDragging(false);
     event.preventDefault();
@@ -60,6 +59,7 @@ export default function SelectFileCard({
     const file = event.dataTransfer.files[0];
     if (file && file.name.endsWith(".csv")) {
       setSelectedFile(file);
+      parseCSV(file);
     } else {
       setSelectedFile(null);
     }
@@ -83,25 +83,24 @@ export default function SelectFileCard({
       onDragOver={handleDragOver}
       onDragLeave={handleDragLeave}
     >
-
       <Icon
         icon="ic:outline-upload-file"
         className="text-gray"
         width="50"
       />
-
-
-      <h2 className="mb-0">Arraste e solte ou <a
-        className="underline cursor-pointer"
-        onClick={() => {
-          const fileInput = document.getElementById("fileInput");
-          if (fileInput) {
-            fileInput.click();
-          }
-        }}
-      >
-        selecione do Computador
-      </a>
+      <h2 className="mb-0">
+        Arraste e solte ou{" "}
+        <a
+          className="underline cursor-pointer"
+          onClick={() => {
+            const fileInput = document.getElementById("fileInput");
+            if (fileInput) {
+              fileInput.click();
+            }
+          }}
+        >
+          selecione do Computador
+        </a>
         <input
           type="file"
           id="fileInput"
@@ -109,10 +108,10 @@ export default function SelectFileCard({
           style={{ display: "none" }}
           accept=".csv"
           onChange={handleFileChange}
-        /></h2>
+        />
+      </h2>
     </div>
   ) : (
-
     <div
       className={`${data.length > 0 ? `w-4/5` : `w-2/5`
         } min-h-[170px] relative mx-auto flex flex-col items-center justify-center ${isDragging ? "blur-sm" : ""
@@ -121,11 +120,7 @@ export default function SelectFileCard({
       onDragOver={handleDragOver}
       onDragLeave={handleDragLeave}
     >
-
-
-      {data.length > 0 && (
-        <CsvTable data={data.slice(0, 4)} head={header} />
-      )}
+      {data.length > 0 && <CsvTable data={data.slice(0, 4)} head={header} />}
     </div>
-  )
+  );
 }
