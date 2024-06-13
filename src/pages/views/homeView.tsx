@@ -161,7 +161,7 @@ export default function HomeView() {
                             ))}
                         </select>
                     </div>
-                    <div className="w-1/4 relative mx-auto mt-10 text-white">
+                    <div className="w-1/3 relative mx-auto mt-10 text-white">
                         <button
                             className="w-full bg-blue-400 py-2 px-4 hover:bg-blue-600 focus:outline-none border-2 border-main-lighter rounded-xl h-14"
                             onClick={handleSubmit}
