@@ -3,6 +3,8 @@ import axios from "axios";
 import ReactApexChart from "react-apexcharts";
 import SelectFileCard from "../../components/selectFileCard/selectFileCard";
 import { ReactApexChartsDefaultOptions } from "../../Shared/apexChartsOptions";
+import { ToastContainer, toast } from "react-toastify";
+import 'react-toastify/dist/ReactToastify.css';
 
 export default function TrainView() {
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -16,6 +18,7 @@ export default function TrainView() {
     const [isLoading, setIsLoading] = useState(false);
     const [hasTrained, setHasTrained] = useState(false);
     const [isCancelling, setIsCancelling] = useState(false);
+    const [trainingCompleted, setTrainingCompleted] = useState(false);
 
     const handleChangeSelectedColumn = (event: React.ChangeEvent<HTMLSelectElement>) => {
         setSelectedColumn(Number(event.target.value));
@@ -40,6 +43,7 @@ export default function TrainView() {
     const handleRnnSubmit = async () => {
         setIsLoading(true);
         setHasTrained(true);
+        setTrainingCompleted(false);
         setLoadingProgress(0);
         setTrainLosses([]);
         setValidLosses([]);
@@ -76,10 +80,12 @@ export default function TrainView() {
         });
 
         setIsLoading(false);
+        setTrainingCompleted(true);
     };
 
     const handleNbSubmit = async () => {
         setIsLoading(true);
+        setTrainingCompleted(false);
         setLoadingProgress(0);
 
         let selectedData = data.map((row) => ({
@@ -114,6 +120,7 @@ export default function TrainView() {
         });
 
         setIsLoading(false);
+        setTrainingCompleted(true);
     };
 
     const [batchSize, setBatchSize] = useState<number>(16);
@@ -205,6 +212,31 @@ export default function TrainView() {
 
         return () => clearInterval(interval);
     }, []);
+
+    useEffect(() => {
+        if (trainingCompleted) {
+            toast("Seu modelo está disponível para uso na aba de Classificação", {
+                position: "bottom-right",
+                autoClose: 5000,
+                hideProgressBar: true,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+                style: {
+                    background: "rgba(60, 170, 97, 0.85)",
+                    color: "#ffffff",
+                    border: "2px solid #3ca261",
+                    borderRadius: "8px",
+                    boxShadow: "0px 0px 10px rgba(0, 0, 0, 0.2)",
+                    width: "300px",
+                    minHeight: "60px",
+                    padding: "16px",
+                    fontSize: "14px",
+                },
+            });
+        }
+    }, [trainingCompleted]);
 
     return (
         <div className="p-8 text-center">
@@ -376,6 +408,7 @@ export default function TrainView() {
                     </div>
                 </>
             )}
+        <ToastContainer/>
         </div>
     );
 }
