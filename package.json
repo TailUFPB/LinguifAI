@@ -32,6 +32,7 @@
     "react-papaparse": "^4.1.0",
     "react-router-dom": "^6.15.0",
     "react-scripts": "5.0.0",
+    "react-spinners": "^0.13.8",
     "react-toastify": "^10.0.5",
     "react-transition-group": "^4.4.5",
     "serve": "^14.2.1",

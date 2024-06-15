@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import SelectFileCard from "../../components/selectFileCard/selectFileCard";
 import ResultTable from "../../components/resultTable/resultTable";
+import { ClipLoader } from "react-spinners";
 
 export default function HomeView() {
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -108,7 +109,11 @@ export default function HomeView() {
     };
 
     if (!isBackendAvailable) {
-        return <div className="p-8 text-center text-black text-2xl font-bold">Carregando backend...</div>;
+        return (
+            <div className="flex justify-center items-center min-h-screen -mt-40">
+                <ClipLoader size={70} color={"#123abc"} loading={true} speedMultiplier={0.8} />
+            </div>
+        );
     }
 
     return (
