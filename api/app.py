@@ -17,8 +17,13 @@ import json
 import openai
 import asyncio
 import logging
-nltk.download('wordnet')
+from langchain.schema.document import Document
+from langchain.chains.question_answering.chain import load_qa_chain
+from langchain_community.vectorstores import FAISS
+from langchain_openai import OpenAIEmbeddings
+from langchain_community.llms import OpenAI
 
+nltk.download('wordnet')
 
 load_dotenv()
 app = Flask(__name__)
@@ -38,6 +43,61 @@ data_processer = DataProcesser()
 loop = asyncio.get_event_loop()
 
 df = None
+
+def split_dataframe_into_documents(df):
+    documents = []
+    for index, row in df.iterrows():
+        content = row.to_json()
+        documents.append(Document(page_content=content))
+    return documents
+
+
+@app.route('/chat', methods=['POST'])
+def chat():
+    global df
+    data = request.get_json()
+    user_message = data.get('message')
+    chat_history = data.get('history', [])
+    api_key = data.get('apikey')
+
+    if df is not None:
+        documents = split_dataframe_into_documents(df)
+        
+        embeddings = OpenAIEmbeddings(api_key=api_key)
+        vectorstore = FAISS.from_documents(documents, embeddings)
+        
+        relevant_docs = vectorstore.similarity_search(user_message, k=5)
+        
+        llm = OpenAI(api_key=api_key, model="gpt-3.5-turbo-instruct")
+        qa_chain = load_qa_chain(llm, chain_type="stuff")
+        
+        response = qa_chain.run(input_documents=relevant_docs, question=user_message)
+        bot_reply = response
+
+        return jsonify(reply=bot_reply)
+    else:
+        print("No df")
+        return jsonify(reply="No data available."), 400
+
+    # messages = [{"role": "system", "content": "You are a helpful assistant."}]
+    # for msg in chat_history:
+    #     messages.append({"role": "user" if msg['origin'] == 'user' else "assistant", "content": msg['text']})
+    # messages.append({"role": "user", "content": user_message})
+
+    # try:
+    #     client = openai.OpenAI(api_key = api_key)
+    #     response = client.chat.completions.create(
+    #         model="gpt-3.5-turbo",
+    #         messages=messages,
+    #         max_tokens=200
+    #     )
+    #     bot_reply = response.choices[0].message.content.strip()
+
+    #     return jsonify(reply=bot_reply)
+    # except Exception as e:
+    #     print(f"Error: {e}")
+    #     return jsonify(reply="Desculpe, ocorreu um erro ao processar sua mensagem."), 500
+
 
 def shutdown_server():
     print("Server shutting down...")
@@ -224,37 +284,37 @@ def apikey():
         return jsonify(reply="Desculpe, ocorreu um erro ao processar sua mensagem."), 500
 
 
-@app.route('/chat', methods=['POST'])
-def chat():
-    global df
-    if df is not None:
-        # run rag
-        print(df.head(1))
-    else:
-        print("No df")
-    data = request.get_json()
-    user_message = data.get('message')
-    chat_history = data.get('history', [])
-    api_key = data.get('apikey')
+# @app.route('/chat', methods=['POST'])
+# def chat():
+#     global df
+#     if df is not None:
+#         # run rag
+#         print(df.head(1))
+#     else:
+#         print("No df")
+#     data = request.get_json()
+#     user_message = data.get('message')
+#     chat_history = data.get('history', [])
+#     api_key = data.get('apikey')
 
-    messages = [{"role": "system", "content": "You are a helpful assistant."}]
-    for msg in chat_history:
-        messages.append({"role": "user" if msg['origin'] == 'user' else "assistant", "content": msg['text']})
-    messages.append({"role": "user", "content": user_message})
+#     messages = [{"role": "system", "content": "You are a helpful assistant."}]
+#     for msg in chat_history:
+#         messages.append({"role": "user" if msg['origin'] == 'user' else "assistant", "content": msg['text']})
+#     messages.append({"role": "user", "content": user_message})
 
-    try:
-        client = openai.OpenAI(api_key = api_key)
-        response = client.chat.completions.create(
-            model="gpt-3.5-turbo", # ou a gente poderia ver com gpt 4 mas por enquanto coloquei 3.5
-            messages=messages,
-            max_tokens=200
-        )
-        bot_reply = response.choices[0].message.content.strip()
+#     try:
+#         client = openai.OpenAI(api_key = api_key)
+#         response = client.chat.completions.create(
+#             model="gpt-3.5-turbo", # ou a gente poderia ver com gpt 4 mas por enquanto coloquei 3.5
+#             messages=messages,
+#             max_tokens=200
+#         )
+#         bot_reply = response.choices[0].message.content.strip()
 
-        return jsonify(reply=bot_reply)
-    except Exception as e:
-        print(f"Error: {e}")
-        return jsonify(reply="Desculpe, ocorreu um erro ao processar sua mensagem."), 500
+#         return jsonify(reply=bot_reply)
+#     except Exception as e:
+#         print(f"Error: {e}")
+#         return jsonify(reply="Desculpe, ocorreu um erro ao processar sua mensagem."), 500
 
 
 
