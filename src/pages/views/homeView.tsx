@@ -171,7 +171,7 @@ export default function HomeView() {
                             className="w-full bg-blue-400 py-2 px-4 hover:bg-blue-600 focus:outline-none border-2 border-main-lighter rounded-xl h-14"
                             onClick={handleSubmit}
                         >
-                            {isLoading ? "Carregando..." : "Classificar"}
+                            {isLoading ? <ClipLoader size={30} color={"#123abc"} loading={true} speedMultiplier={0.8} /> : "Classificar"}
                         </button>
                     </div>
                     {Object.keys(result).length > 0 && (
