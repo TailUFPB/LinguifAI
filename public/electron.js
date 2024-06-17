@@ -52,6 +52,7 @@ function startFlaskProcess() {
         flaskProcess.stderr.on('data', (data) => {
             console.error(`Flask process stderr: ${data}`);
         });
+
     } catch (error) {
         console.error(`Flask process error: ${error}`);
     }
@@ -77,7 +78,7 @@ function createWindow() {
   mainWindow.on('closed', function () {
     mainWindow = null;
     // Kill Flask server when the window is closed
-    flaskProcess.kill();
+    flaskProcess.kill('SIGKILL');
   });
 }
 

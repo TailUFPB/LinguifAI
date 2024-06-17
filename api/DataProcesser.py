@@ -19,6 +19,7 @@ import pandas as pd
 import torch
 from collections import Counter
 from functools import partial
+import pickle
 
 import nltk
 from nltk.tokenize import wordpunct_tokenize
@@ -35,8 +36,11 @@ class DataProcesser():
         classifier_switcher = get_available_classifiers() # id: nome_arquivo
         model_name = classifier_switcher[classifier]
         if model_name.endswith('.pkl'):
-            pipeline = self.get_pipeline(model_name)
-            return self.pretrained_predict(df, pipeline)
+            pipeline, custom = self.get_pipeline(model_name)
+            if custom:
+                return self.pretrained_predict(df, pipeline, model_name)
+            else:
+                return self.pretrained_predict(df, pipeline)
         else:
             return self.trained_predict(df, model_name)
         #classifier_switcher = {
@@ -48,18 +52,23 @@ class DataProcesser():
         #return classifier_switcher.get(classifier, lambda: "Invalid Classifier")(df)
 
     def get_pipeline(self, model_name):
+        if os.path.exists('assets/tweet_emotions.csv'):
+            prefix = ''
+        else:
+            prefix = 'public/'
         if model_name=="emotion_pipeline.pkl":
-            df = pd.read_csv('api/training_df/tweet_emotions.csv')
+            df = pd.read_csv(prefix + 'assets/tweet_emotions.csv')
             train_data, test_data, train_target, test_target = train_test_split(df['content'], df['sentiment'], test_size=0.2, shuffle=True)
         elif model_name=="hate_speech.pkl":
-            df = pd.read_csv('api/training_df/nb_hatespeech.csv', sep=';')
+            df = pd.read_csv(prefix + 'assets/nb_hatespeech.csv', sep=';')
             train_data, test_data, train_target, test_target = train_test_split(df['comment'], df['isHate'], test_size=0.2, shuffle=True)
         elif model_name=="text_classification_pipeline.pkl":
-            df = pd.read_csv('api/training_df/nb_news.csv')
+            df = pd.read_csv(prefix + 'assets/nb_news.csv')
             train_data, test_data, train_target, test_target = train_test_split(df['short_description'], df['category'], test_size=0.2, shuffle=True)
         else:
-            return None
-        return make_pipeline(TfidfVectorizer(), MultinomialNB()).fit(train_data, train_target)
+            with open(f'api/models/{model_name}', 'rb') as file:
+                return pickle.load(file), True
+        return make_pipeline(TfidfVectorizer(), MultinomialNB()).fit(train_data, train_target), False
 
     def generate_statistics(self, df):
         unique_labels = df['output_column'].unique()
@@ -95,11 +104,22 @@ class DataProcesser():
         df['output_column'] = df['input_column'].apply(news_prediction)
         return df
 
-    def pretrained_predict(self, df, pipeline):
+    def pretrained_predict(self, df, pipeline, model_name = None):
+        if model_name: 
+            label_map_filename = f"api/encoders/LabelMapping-{model_name.split('_')[0]}.joblib"
+            label_encoder = joblib.load(label_map_filename)
+
         texts_to_predict = df['input_column']
         texts_to_predict = [str(text) for text in texts_to_predict]
+
         predictions = pipeline.predict(texts_to_predict)
-        df['output_column'] = predictions
+
+        if model_name:
+            label_predictions = label_encoder.inverse_transform(predictions)
+            df['output_column'] = label_predictions
+        else:
+            df['output_column'] = predictions
+
         return df
 
     def load_weights_and_model(self, name):
@@ -113,6 +133,9 @@ class DataProcesser():
     def trained_predict(self, df, model_name):
         label_map_filename = f"api/encoders/LabelMapping-{model_name}.joblib"
         label_encoder = joblib.load(label_map_filename)
+
+        vocab_file = f"api/encoders/Vocab-{model_name}.joblib"
+        token2id = joblib.load(vocab_file)
 
         model = self.load_weights_and_model(model_name)
         model.eval()
@@ -138,17 +161,12 @@ class DataProcesser():
             lambda tokens: any(token != '<UNK>' for token in tokens),
         )]
 
-        vocab = sorted({
-            sublst for lst in df.tokens.tolist() for sublst in lst
-        })
-        self.token2idx = {token: idx for idx, token in enumerate(vocab)}
-
-        self.token2idx['<PAD>'] = max(self.token2idx.values()) + 1
-
-        self.idx2token = {idx: token for token, idx in self.token2idx.items()}
+        #token2id['<PAD>'] = max(token2id.values()) + 1
+        if '<UNK>' not in token2id:
+            token2id['<UNK>'] = max(token2id.values()) + 1
 
         df['indexed_tokens'] = df.tokens.apply(
-            lambda tokens: [self.token2idx[token] for token in tokens],
+            lambda tokens: [token2id.get(token, 0) for token in tokens],
         )
 
         predictions = []

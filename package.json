@@ -2,10 +2,10 @@
   "name": "LinguifAI",
   "description": "",
   "author": {
-    "name": "TailLinguifAI",
-    "email": ""
+    "name": "Cameron",
+    "email": "cameron.maloney@warriorlife.net"
   },
-  "version": "0.1.0",
+  "version": "0.2.3",
   "main": "./public/electron.js",
   "homepage": "./",
   "private": true,
@@ -21,10 +21,12 @@
     "@types/node": "^16.18.48",
     "@types/react": "^18.2.21",
     "@types/react-dom": "^18.2.7",
+    "apexcharts": "^3.49.1",
     "asar": "^3.2.0",
     "axios": "^1.6.0",
     "electron-process": "^0.2.0",
     "react": "^18.2.0",
+    "react-apexcharts": "^1.4.1",
     "react-dom": "^18.2.0",
     "react-icons": "^4.12.0",
     "react-papaparse": "^4.1.0",
@@ -37,8 +39,10 @@
   "scripts": {
     "start2": "set BROWSER=NONE && react-scripts start",
     "start": "concurrently \"npm run start:react\" \"npm run start:flask\"",
+    "start-with-exe": "concurrently \"npm run start:react\" \"npm run start:flask-exe\"",
     "start:react": "react-scripts start",
     "start:flask": "python api/app.py",
+    "start:flask-exe": "cd dist/app && app.exe",
     "build": "react-scripts build",
     "ciBuild": "CI=true react-scripts build",
     "test": "react-scripts test",
@@ -47,7 +51,8 @@
     "start-electron": "set ELECTRON_START_URL=http://localhost:3000/ && electron .",
     "pack": "electron-builder --dir",
     "dist": "electron-builder",
-    "electron:package:win": "npm run build && electron-builder -w -c.extraMetadata.main=build/electron.js"
+    "electron:package:win": "npm run build && electron-builder -w -c.extraMetadata.main=build/electron.js",
+    "electron:package:linux": "npm run build && electron-builder -l -c.extraMetadata.main=build/electron.js"
   },
   "eslintConfig": {
     "extends": [
@@ -68,6 +73,8 @@
     ]
   },
   "devDependencies": {
+    "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
+    "@babel/plugin-transform-private-property-in-object": "^7.24.7",
     "concurrently": "^8.2.2",
     "electron": "^26.6.10",
     "electron-builder": "^24.13.3",
@@ -79,6 +86,12 @@
     "win": {
       "target": [
         "nsis"
+      ]
+    },
+    "linux": {
+      "target": [
+        "AppImage",
+        "deb"
       ]
     },
     "files": [

@@ -17,7 +17,8 @@ from torch import optim
 from torch.optim.lr_scheduler import CosineAnnealingLR
 from torch.utils.data import Dataset, DataLoader
 from torch.utils.data.dataset import random_split
-from torch.nn.utils.rnn import pack_padded_sequence, pad_packed_sequence
+from torch.nn.utils.rnn import pack_padded_sequence, pad_packed_sequence, pad_sequence
+from torchtext.vocab import build_vocab_from_iterator
 
 tqdm.pandas()
 
@@ -73,6 +74,11 @@ class CustomDataset(Dataset):
         # Add a padding idx
         self.token2idx['<PAD>'] = max(self.token2idx.values()) + 1
 
+        vocab_filename = f"Vocab-{name}"
+        vocab_file = os.path.join("api", "encoders", f"{vocab_filename}.joblib")
+        os.makedirs(os.path.dirname(vocab_file), exist_ok=True)
+        joblib.dump(self.token2idx, vocab_file)
+
         self.idx2token = {idx: token for token, idx in self.token2idx.items()}
 
         df['indexed_tokens'] = df.tokens.apply(
@@ -91,7 +97,7 @@ class CustomDataset(Dataset):
         self.targets = df.encoded_labels.tolist()
 
     def __getitem__(self, i):
-        return self.sequences[i], self.targets[i],  self.text[i]
+        return torch.tensor(self.sequences[i]), torch.tensor(self.targets[i]),  self.text[i]
 
     def __len__(self):
         return len(self.sequences)
@@ -108,10 +114,11 @@ def split_train_valid_test(corpus, valid_ratio=0.1, test_ratio=0.1):
 
 
 def collate(batch):
-    inputs = [item[0] for item in batch]
-    target = torch.LongTensor([item[1] for item in batch])
-    text = [item[2] for item in batch]
-    return inputs, target, text
+    inputs, target, text = zip(*batch)
+
+    padded_inputs = pad_sequence(inputs, batch_first=True, padding_value=0)
+
+    return padded_inputs, torch.tensor(target), text
 
 def pad_sequences(sequences, padding_val=0, pad_left=False):
     """Pad a list of sequences to the same length with a padding_val."""
@@ -139,6 +146,7 @@ class RNNClassifier(nn.Module):
         self.dropout_probability = dropout_probability
         self.device = device
         self.padding_idx = padding_idx
+        self.vocab_size = vocab_size
 
         # We need to multiply some layers by two if the model is bidirectional
         self.input_size_factor = 2 if bidirectional else 1
@@ -209,8 +217,8 @@ class RNNClassifier(nn.Module):
         lengths, permutation_indices = lengths.sort(0, descending=True)
 
         # Pad sequences so that they are all the same length
-        padded_inputs = pad_sequences(inputs, padding_val=self.padding_idx)
-        inputs = torch.LongTensor(padded_inputs)
+        #padded_inputs = pad_sequences(inputs, padding_val=self.padding_idx)
+        inputs = torch.LongTensor(inputs)
 
         # Sort inputs
         inputs = inputs[permutation_indices].to(self.device)
@@ -247,16 +255,26 @@ def train_epoch(model, optimizer, scheduler, train_loader, criterion, curr_epoch
     progress_bar = tqdm(train_loader, desc='Training', leave=False)
     num_iters = 0
     for inputs, target, text in progress_bar:
+        # print(inputs)
+        # print(target)
+        # print(text)
         target = target.to(device)
 
-        # Clean old gradients
-        optimizer.zero_grad()
+        # Verifica se o cancelamento foi solicitado a cada batch
+        with open('training_progress.json', 'r') as f:
+            data = json.load(f)
+            if data.get('cancel_requested', False):
+                print("Training canceled during epoch:", curr_epoch)
+                return total_loss / max(total, 1), True  # Retorna a perda média e o status de cancelamento
 
         # Forwards pass
         output = model(inputs)
 
         # Calculate how wrong the model is
         loss = criterion(output, target)
+
+        # Clean old gradients
+        optimizer.zero_grad()
 
         # Perform gradient descent, backwards pass
         loss.backward()
@@ -268,17 +286,22 @@ def train_epoch(model, optimizer, scheduler, train_loader, criterion, curr_epoch
         # Record metrics
         total_loss += loss.item()
         total += len(target)
+
+        returnLoss = total_loss / max(total, 1)
+
         num_iters += 1
         if num_iters % 20 == 0:
-            with open('training_progress.json', 'w') as f:
-                progress = 100 * (curr_epoch + num_iters/len(train_loader)) / num_total_epochs
-                training_progress = {
+            with open('training_progress.json', 'r+') as f:
+                progress = 100 * (curr_epoch + num_iters / len(train_loader)) / num_total_epochs
+                data.update({
                     'training_progress': progress,
-                    'training_in_progress': True
-                }
-                json.dump(training_progress, f)
+                    'training_in_progress': True,
+                })
+                f.seek(0)
+                json.dump(data, f)
+                f.truncate()
 
-    return total_loss / total
+    return returnLoss, False
 
 def validate_epoch(model, valid_loader, criterion):
     model.eval()
@@ -298,10 +321,10 @@ def validate_epoch(model, valid_loader, criterion):
             total_loss += loss.item()
             total += len(target)
 
-    return total_loss / total
+    return total_loss / total if total != 0 else 0
 
-def create_and_train_model(df, name, epochs = 10, batch_size = 32, learning_rate = 0.001):
-
+def create_and_train_rnn_model(df, name, epochs = 10, batch_size = 32, learning_rate = 0.001):
+    # Configurações iniciais e preparações do modelo
     dropout_probability = 0.2
     n_rnn_layers = 1
     embedding_dimension = 128
@@ -312,68 +335,85 @@ def create_and_train_model(df, name, epochs = 10, batch_size = 32, learning_rate
     valid_ratio = 0.05
     test_ratio = 0.05
 
+    # Preparação do dataset
     dataset = CustomDataset(df, max_vocab, max_len, name)
-
     train_dataset, valid_dataset, test_dataset = split_train_valid_test(
         dataset, valid_ratio=valid_ratio, test_ratio=test_ratio)
-    len(train_dataset), len(valid_dataset), len(test_dataset)
 
-
+    # Preparação dos DataLoader
     train_loader = DataLoader(train_dataset, batch_size=batch_size, collate_fn=collate)
     valid_loader = DataLoader(valid_dataset, batch_size=batch_size, collate_fn=collate)
-    test_loader = DataLoader(test_dataset, batch_size=batch_size, collate_fn=collate)
+    #test_loader = DataLoader(test_dataset, batch_size=batch_size, collate_fn=collate)
 
-
+    # Inicialização do modelo
     model = RNNClassifier(
-        output_size=len(df.labels),
+        output_size=len(df['labels'].unique()),
         hidden_size=hidden_size,
         embedding_dimension=embedding_dimension,
-        vocab_size=len(dataset.token2idx),
+        vocab_size=len(dataset.token2idx)+1,
         padding_idx=dataset.token2idx['<PAD>'],
         dropout_probability=dropout_probability,
         bidirectional=is_bidirectional,
         n_layers=n_rnn_layers,
         device=device,
-        batch_size=batch_size,
+        batch_size=batch_size
     )
-    model = model.to(device)
+    model.to(device)
 
-    criterion = nn.CrossEntropyLoss()
-    optimizer = optim.Adam(
-        filter(lambda p: p.requires_grad, model.parameters()),
-        lr=learning_rate,
-    )
-    scheduler = CosineAnnealingLR(optimizer, 1)
+    # Definição da função de perda e otimizador
+    criterion = torch.nn.CrossEntropyLoss()
+    optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
+    scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, 1)
 
-    n_epochs = 0
     train_losses, valid_losses = [], []
+    canceled = False
     for curr_epoch in range(epochs):
-        train_loss = train_epoch(model, optimizer, scheduler, train_loader, criterion, curr_epoch, epochs)
-        valid_loss = validate_epoch(model, valid_loader, criterion)
+        train_loss, canceled = train_epoch(model, optimizer, scheduler, train_loader, criterion, curr_epoch, epochs)
+        if canceled:
+            print(f"Training canceled during epoch {curr_epoch + 1}")
+            break
 
+        valid_loss = validate_epoch(model, valid_loader, criterion)
         tqdm.write(
-            f'epoch #{n_epochs + 1:3d}\ttrain_loss: {train_loss:.2e}'
-            f'\tvalid_loss: {valid_loss:.2e}\n',
+            f'Epoch #{curr_epoch + 1:3d}\ttrain_loss: {train_loss:.2e}'
+            f'\tvalid_loss: {valid_loss:.2e}'
         )
 
-        # Early stopping if the current valid_loss is greater than the last three valid losses
-        if len(valid_losses) > 2 and all(valid_loss >= loss
-                                        for loss in valid_losses[-3:]):
-            print('Stopping early')
+        if len(valid_losses) > 2 and all(valid_loss >= loss for loss in valid_losses[-3:]):
+            print('Stopping early due to lack of improvement in validation loss.')
             break
 
         train_losses.append(train_loss)
         valid_losses.append(valid_loss)
 
-        n_epochs += 1
-    
-    model_path = os.path.join('api', 'models', name)
-    os.makedirs(os.path.dirname(model_path), exist_ok=True)
-    torch.save(model, model_path)
+        # Atualizar a train_losses e valid_losses no arquivo de progresso
+        with open('training_progress.json', 'r+') as f:
+            data = json.load(f)
+            data.update({
+                'train_losses': train_losses,
+                'valid_losses': valid_losses,
+                
+            })
+            f.seek(0)
+            json.dump(data, f)
+            f.truncate()
 
-    training_progress = {
-        'training_progress': 0,
-        'training_in_progress': True
-    }
-    with open('training_progress.json', 'w') as file:
-        json.dump(training_progress, file)
+    # Finalizar e salvar o modelo se não foi cancelado
+    if not canceled:
+        model_path = os.path.join('api', 'models', name)
+        os.makedirs(os.path.dirname(model_path), exist_ok=True)
+        #torch.save(model.state_dict(), model_path)
+        torch.save(model, model_path)
+
+        # Atualizar e salvar o estado de treinamento final
+        training_progress = {
+            'training_progress': 100,
+            'training_in_progress': False,
+            'cancel_requested': False,
+            'train_losses': train_losses,
+            'valid_losses': valid_losses,
+        }
+        with open('training_progress.json', 'w') as file:
+            json.dump(training_progress, file)
+
+    print("Training complete.")
