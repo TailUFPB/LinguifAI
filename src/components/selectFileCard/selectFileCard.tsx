@@ -110,6 +110,7 @@ export default function SelectFileCard({
           onChange={handleFileChange}
         />
       </h2>
+      <p className="text-sm text-gray-600">Por favor, selecione um arquivo no formato .csv</p>
     </div>
   ) : (
     <div
