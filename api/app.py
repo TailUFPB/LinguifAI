@@ -12,7 +12,6 @@ import sys
 import pandas as pd
 import nltk
 import os
-from dotenv import load_dotenv
 import json
 import openai
 import asyncio
@@ -25,7 +24,6 @@ from langchain_community.llms import OpenAI
 
 nltk.download('wordnet')
 
-load_dotenv()
 app = Flask(__name__)
 CORS(app) # CORS(app, resources={r"/*": {"origins": "http://localhost:3000"}})
 server_thread = None
