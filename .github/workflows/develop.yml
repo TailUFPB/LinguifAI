@@ -46,6 +46,17 @@ jobs:
         with:
           cache: "npm"
 
+      - name: Install dependencies
+        run: npm install
+
+      - name: 📦 Electron Builder Linux
+        run: npm run electron:package:linux
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - run: tree
+      
+
       - name: Set up conda
         uses: conda-incubator/setup-miniconda@v2
         with:
@@ -72,7 +83,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - run: tree
-      
+
       - name: 📦 Electron Builder Windows
         run: npm run electron:package:win
         env:
