@@ -8,9 +8,28 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  version-bump:
+    name: 🔢 Version Bump
+    runs-on: ubuntu-latest
+    needs: publish-release
+    steps:
+      - name: ⬇️ Checkout repo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      
+      - name: Automated Version Bump
+        uses: phips28/gh-action-bump-version@master
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          commit-message: 'CI: bumps version to {{version}} [skip ci]'
+          skip-tag:  'true'
+
   build-linux:
     name: 🏗️ Build Linux
     runs-on: ubuntu-latest
+    needs: version-bump
     steps:
       - name: ⬇️ Checkout repo
         uses: actions/checkout@v4
@@ -35,6 +54,7 @@ jobs:
   build-windows:
     name: 🏗️ Build Windows
     runs-on: windows-latest
+    needs: version-bump
     strategy:
       fail-fast: false
     steps:
@@ -114,7 +134,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           tag_name: v${{ steps.project-version.outputs.version }}
-          release_name: Release ${{ steps.project-version.outputs.version }}
+          release_name: v${{ steps.project-version.outputs.version }}
           draft: false
           prerelease: true
 
@@ -139,21 +159,3 @@ jobs:
           asset_path: dist/LinguifAI Setup ${{ steps.project-version.outputs.version }}.exe
           asset_name: LinguifAI-Setup-${{ steps.project-version.outputs.version }}.exe
           asset_content_type: application/octet-stream
-
-  version-bump:
-    name: 🔢 Version Bump
-    runs-on: ubuntu-latest
-    needs: publish-release
-    steps:
-      - name: ⬇️ Checkout repo
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-      
-      - name: Automated Version Bump
-        uses: phips28/gh-action-bump-version@master
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          commit-message: 'CI: bumps version to {{version}} [skip ci]'
-          skip-tag:  'true'
