@@ -124,6 +124,8 @@ jobs:
           name: LinguifAI-Windows
           path: dist/
 
+      - run: tree
+
       - name: Create Release
         id: create_release
         uses: actions/create-release@v1
@@ -142,7 +144,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: dist/*.AppImage
+          asset_path: dist/*Linux*
           asset_name: LinguifAI-${{ steps.project-version.outputs.version }}.AppImage
           asset_content_type: application/octet-stream
 
@@ -153,6 +155,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: dist/*.exe
+          asset_path: dist/*Windows*
           asset_name: LinguifAI-Setup-${{ steps.project-version.outputs.version }}.exe
           asset_content_type: application/octet-stream
