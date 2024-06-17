@@ -6,10 +6,14 @@ import { Menu } from "../components/menu/menu";
 import { ReactApexChartsDefaultOptions } from "../Shared/apexChartsOptions";
 import Layout from "./layout/layout";
 import TrainView from "./views/trainView";
+import Breadcrumb from "../components/breadcumbs/breadcumbs";
 
 export default function Train() {
 
   return (
-    <Layout><TrainView /></Layout>
+    <Layout>
+      <Breadcrumb crumbs={[{ label: "Treinar" }]} />
+      <TrainView />
+    </Layout>
   );
 }
