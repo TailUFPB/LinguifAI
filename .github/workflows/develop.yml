@@ -96,9 +96,6 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Rename Windows installer
-        run: ren "dist\LinguifAI Setup ${{ steps.project-version.outputs.version }}.exe" "LinguifAI Setup ${{ steps.project-version.outputs.version }}.exe"
-
       - name: Upload Windows artifact
         uses: actions/upload-artifact@v2
         with:
