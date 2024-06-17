@@ -2,8 +2,8 @@
   "name": "LinguifAI",
   "description": "",
   "author": {
-    "name": "TailLinguifAI",
-    "email": ""
+    "name": "Cameron",
+    "email": "cameron.maloney@warriorlife.net"
   },
   "version": "0.2.5",
   "main": "./public/electron.js",
