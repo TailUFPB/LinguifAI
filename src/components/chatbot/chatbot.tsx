@@ -50,8 +50,9 @@ const ChatBot: React.FC = () => {
             const errorMessage: Message = { text: "Desculpe, ocorreu um erro. Tente novamente.", origin: 'bot' };
             setChatHistory(prevHistory => [...prevHistory, errorMessage]);
         }
-
+        console.log(message)
         setMessage("");
+        console.log(message)
     };
 
     const sendAPIKeyMessage = () => {
@@ -130,7 +131,7 @@ const ChatBot: React.FC = () => {
                                 value={message}
                                 onChange={(e) => setMessage(e.target.value)}
                                 onKeyPress={(e) => {
-                                    if (e.key === 'Enter') sendMessage();
+                                    if (e.key === 'Enter') sendMessage()
                                 }}
                             />
                             <button

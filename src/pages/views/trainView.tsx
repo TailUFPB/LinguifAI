@@ -19,6 +19,7 @@ export default function TrainView() {
     const [hasTrained, setHasTrained] = useState(false);
     const [isCancelling, setIsCancelling] = useState(false);
     const [trainingCompleted, setTrainingCompleted] = useState(false);
+    const [hasCancelled, setHasCancelled] = useState(false);
 
     const handleChangeSelectedColumn = (event: React.ChangeEvent<HTMLSelectElement>) => {
         setSelectedColumn(Number(event.target.value));
@@ -30,8 +31,9 @@ export default function TrainView() {
 
     const handleCancelTraining = async () => {
         setIsCancelling(true);
+        setHasCancelled(true);
         try {
-            await axios.post('http://localhost:5000/cancel-training');
+            await axios.post('http://localhost:5000/cancel-training');    
             alert('Treinamento cancelado com sucesso!');
         } catch (error) {
             console.error('Erro ao cancelar o treinamento:', error);
@@ -44,6 +46,7 @@ export default function TrainView() {
         setIsLoading(true);
         setHasTrained(true);
         setTrainingCompleted(false);
+        setHasCancelled(false);
         setLoadingProgress(0);
         setTrainLosses([]);
         setValidLosses([]);
@@ -85,6 +88,7 @@ export default function TrainView() {
 
     const handleNbSubmit = async () => {
         setIsLoading(true);
+        setHasCancelled(false);
         setTrainingCompleted(false);
         setLoadingProgress(0);
 
@@ -213,7 +217,7 @@ export default function TrainView() {
     }, []);
 
     useEffect(() => {
-        if (trainingCompleted) {
+        if (trainingCompleted && !hasCancelled) {
             toast("Seu modelo está disponível para uso na aba de Classificação", {
                 position: "bottom-right",
                 autoClose: 5000,
