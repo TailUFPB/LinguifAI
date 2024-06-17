@@ -144,7 +144,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: dist/*Linux*
+          asset_path: dist/LinguifAI-${{ steps.project-version.outputs.version }}.AppImage
           asset_name: LinguifAI-${{ steps.project-version.outputs.version }}.AppImage
           asset_content_type: application/octet-stream
 
@@ -155,6 +155,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: dist/*Windows*
+          asset_path: dist/LinguifAI Setup ${{ steps.project-version.outputs.version }}.exe
           asset_name: LinguifAI-Setup-${{ steps.project-version.outputs.version }}.exe
           asset_content_type: application/octet-stream
