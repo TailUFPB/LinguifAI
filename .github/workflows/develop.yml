@@ -29,8 +29,24 @@ jobs:
           commit-message: 'CI: bumps version to {{version}} [skip ci]'
           skip-tag:  'true'
 
-  build:
-    name: 🏗️ Build
+  build-linux:
+    name: 🏗️ Build Linux
+    runs-on: ubuntu-latest
+    needs: version-bump
+    steps:
+      - name: Install dependencies
+        run: npm install
+
+      - name: 📦 Electron Builder Linux
+        run: npm run electron:package:linux
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - run: tree
+
+
+  build-windows:
+    name: 🏗️ Build Windows
     runs-on: windows-latest
     needs: version-bump
     strategy:
@@ -45,17 +61,6 @@ jobs:
         uses: actions/setup-node@v3
         with:
           cache: "npm"
-
-      - name: Install dependencies
-        run: npm install
-
-      - name: 📦 Electron Builder Linux
-        run: npm run electron:package:linux
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - run: tree
-      
 
       - name: Set up conda
         uses: conda-incubator/setup-miniconda@v2
@@ -76,13 +81,6 @@ jobs:
 
       - name: Install dependencies
         run: npm install
-
-      - name: 📦 Electron Builder Linux
-        run: npm run electron:package:linux
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - run: tree
 
       - name: 📦 Electron Builder Windows
         run: npm run electron:package:win
