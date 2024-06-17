@@ -50,21 +50,22 @@ const ChatBot: React.FC = () => {
             const errorMessage: Message = { text: "Desculpe, ocorreu um erro. Tente novamente.", origin: 'bot' };
             setChatHistory(prevHistory => [...prevHistory, errorMessage]);
         }
-
+        console.log(message)
         setMessage("");
+        console.log(message)
     };
 
     const sendAPIKeyMessage = () => {
         setChatHistory(prevHistory => [
             ...prevHistory,
-            { text: "Olá! Eu sou o (LinguiTalk ou LinguaBot). Coloca a sua chave:", origin: 'bot' }
+            { text: "Olá! Eu sou o LinguiTalk, um chatbot para lhe auxiliar na exploração dos seus dados! Primeiro, insira uma chave API válida do ChatGPT:", origin: 'bot' }
         ]);
     };
 
     const sendInitialMessage = () => {
         setChatHistory(prevHistory => [
             ...prevHistory,
-            { text: "Olá! Eu sou o (LinguiTalk ou LinguaBot). Como posso ajudar?", origin: 'bot' }
+            { text: "Olá! Eu sou o LinguiTalk. Como posso ajudar?", origin: 'bot' }
         ]);
     };
 
@@ -98,7 +99,7 @@ const ChatBot: React.FC = () => {
             {isOpen && (
                 <div className="fixed bottom-20 right-4 bg-white border border-gray-300 shadow-lg rounded-lg w-80 flex flex-col max-h-[600px]">
                     <div className="bg-blue-500 text-white p-4 flex justify-between items-center">
-                        <h2 className="text-lg">LinguiTalk ou LinguaBot</h2>
+                        <h2 className="text-lg">LinguiTalk</h2>
                         <button
                             className="text-white hover:text-gray-200"
                             onClick={toggleChat}
@@ -130,7 +131,7 @@ const ChatBot: React.FC = () => {
                                 value={message}
                                 onChange={(e) => setMessage(e.target.value)}
                                 onKeyPress={(e) => {
-                                    if (e.key === 'Enter') sendMessage();
+                                    if (e.key === 'Enter') sendMessage()
                                 }}
                             />
                             <button
