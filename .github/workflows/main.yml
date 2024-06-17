@@ -82,7 +82,7 @@ jobs:
         run: pip install -r api/requirements.txt pyinstaller==6.6.0
 
       - name: Build flask exe
-        run: pyinstaller app.spec
+        run: pyinstaller api/app.spec
 
       - name: Install dependencies
         run: npm install
