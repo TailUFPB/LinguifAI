@@ -1,23 +1,35 @@
 # LinguifAI
+
 Projeto NLP 2 - 2023.2
 
 ## Tecnologias utilizadas:
+
 O projeto utiliza das seguintes tecnologias e ferramentas:
 
 ### Front-End
-* React
-* React-Router
-* Axios
-* ElectronJs
-* Tailwind
+
+- React
+- React-Router
+- Axios
+- ElectronJs
+- Tailwind
 
 ### Back-End
-* Python
-* Flask
+
+- Python
+- Flask
 
 ## Como rodar a aplicação:
 
-Primeiramente, instale as depencencias:
+Primeiramente, instale as dependências:
+
+Dependências do back-end:
+
+```bash
+pip install -r api/requirements.txt
+```
+
+Dependências do front-end:
 
 ```bash
 yarn
@@ -48,6 +60,6 @@ npm run electron
 - [x] Abrir CSV
 - [x] Exibir Preview de N linhas do CSV
 - [x] Escolher colunas de entrada
-- [X] Selecionar classificador e enviar dados
+- [x] Selecionar classificador e enviar dados
 - [x] Exibir resultado do classificador
 - [x] Exportar resultado em csv?

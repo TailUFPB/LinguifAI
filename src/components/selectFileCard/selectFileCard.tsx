@@ -2,7 +2,7 @@ import { Icon } from "@iconify/react";
 import { ChangeEvent, useState } from "react";
 import Papa from "papaparse";
 import CsvTable from "../csvTable/csvTable";
-import { Link } from "@mui/material";
+import { Button } from "@mui/material";
 
 interface Props {
   selectedFile: File | null;
@@ -13,6 +13,8 @@ interface Props {
   setHeader: (header: string[]) => void;
 }
 
+const ITEMS_PER_PAGE = 6;
+
 export default function SelectFileCard({
   selectedFile,
   setSelectedFile,
@@ -22,33 +24,36 @@ export default function SelectFileCard({
   setHeader,
 }: Props) {
   const [isDragging, setIsDragging] = useState<boolean>(false);
+  const [currentPage, setCurrentPage] = useState<number>(0);
 
-  // Handle file selection from file input
   const handleFileChange = async (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file && file.name.endsWith(".csv")) {
       setSelectedFile(file);
-      parseCSV(file);
+
+      Papa.parse(file, {
+        header: true,
+        dynamicTyping: true,
+        skipEmptyLines: true,
+        complete(results) {
+          let chaves = Object.keys(results.data[0] || []);
+
+          let data: any[][] = results.data.map((row: any) => {
+            let newRow: any[] = [];
+            chaves.forEach((chave) => {
+              newRow.push(row[chave]);
+            });
+            return newRow;
+          });
+
+          setData(data);
+          setHeader(chaves);
+          setCurrentPage(0); // Reset to first page
+        },
+      });
     } else {
       setSelectedFile(null);
     }
-  };
-
-  // Parse CSV file
-  const parseCSV = (file: File) => {
-    Papa.parse(file, {
-      header: true,
-      dynamicTyping: true,
-      skipEmptyLines: true,
-      complete(results) {
-        const keys = Object.keys(results.data[0] || []);
-        const data: any[][] = results.data.map((row: any) => {
-          return keys.map((key) => row[key]);
-        });
-        setData(data);
-        setHeader(keys);
-      },
-    });
   };
 
   // Handle file drop
@@ -72,6 +77,70 @@ export default function SelectFileCard({
 
   const handleDragLeave = () => {
     setIsDragging(false);
+  };
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+  };
+
+  const displayedData = data.slice(
+    currentPage * ITEMS_PER_PAGE,
+    (currentPage + 1) * ITEMS_PER_PAGE
+  );
+
+  const totalPages = Math.ceil(data.length / ITEMS_PER_PAGE);
+
+  const renderPageNumbers = (): JSX.Element[] => {
+    const pageNumbers: JSX.Element[] = [];
+
+    if (totalPages <= 1) return pageNumbers;
+
+    pageNumbers.push(
+      <button
+        key={0}
+        onClick={() => handlePageChange(0)}
+        className={`mx-1 px-2 py-1 border rounded ${currentPage === 0 ? 'bg-blue-500 text-white' : 'bg-gray-200 text-black'}`}
+      >
+        1
+      </button>
+    );
+
+    if (currentPage > 3) {
+      pageNumbers.push(<span key="start-ellipsis" className="mx-1">...</span>);
+    }
+
+    const startPage = Math.max(1, currentPage - 1);
+    const endPage = Math.min(totalPages - 2, currentPage + 1);
+
+    for (let i = startPage; i <= endPage; i++) {
+      pageNumbers.push(
+        <button
+          key={i}
+          onClick={() => handlePageChange(i)}
+          className={`mx-1 px-2 py-1 border rounded ${currentPage === i ? 'bg-blue-500 text-white' : 'bg-gray-200 text-black'}`}
+        >
+          {i + 1}
+        </button>
+      );
+    }
+
+    if (currentPage < totalPages - 4) {
+      pageNumbers.push(<span key="end-ellipsis" className="mx-1">...</span>);
+    }
+
+    if (totalPages > 1) {
+      pageNumbers.push(
+        <button
+          key={totalPages - 1}
+          onClick={() => handlePageChange(totalPages - 1)}
+          className={`mx-1 px-2 py-1 border rounded ${currentPage === totalPages - 1 ? 'bg-blue-500 text-white' : 'bg-gray-200 text-black'}`}
+        >
+          {totalPages}
+        </button>
+      );
+    }
+
+    return pageNumbers;
   };
 
   return !selectedFile ? (
@@ -121,7 +190,30 @@ export default function SelectFileCard({
       onDragOver={handleDragOver}
       onDragLeave={handleDragLeave}
     >
-      {data.length > 0 && <CsvTable data={data.slice(0, 4)} head={header} />}
+      {data.length > 0 && (
+        <>
+          <CsvTable data={displayedData} head={header} />
+          <div className="flex justify-between mt-4">
+            <Button
+              variant="contained"
+              onClick={() => handlePageChange(currentPage - 1)}
+              disabled={currentPage === 0}
+            >
+              Anterior
+            </Button>
+            <div className="flex items-center">
+              {renderPageNumbers()}
+            </div>
+            <Button
+              variant="contained"
+              onClick={() => handlePageChange(currentPage + 1)}
+              disabled={(currentPage + 1) * ITEMS_PER_PAGE >= data.length}
+            >
+              Próximo
+            </Button>
+          </div>
+        </>
+      )}
     </div>
   );
 }

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import SelectFileCard from "../../components/selectFileCard/selectFileCard";
 import ResultTable from "../../components/resultTable/resultTable";
+import { ClipLoader } from "react-spinners";
 
 export default function HomeView() {
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -108,7 +109,11 @@ export default function HomeView() {
     };
 
     if (!isBackendAvailable) {
-        return <div className="p-8 text-center text-black text-2xl font-bold">Carregando backend...</div>;
+        return (
+            <div className="flex justify-center items-center min-h-screen -mt-40">
+                <ClipLoader size={70} color={"#123abc"} loading={true} speedMultiplier={0.8} />
+            </div>
+        );
     }
 
     return (
@@ -161,12 +166,12 @@ export default function HomeView() {
                             ))}
                         </select>
                     </div>
-                    <div className="w-1/4 relative mx-auto mt-10 text-white">
+                    <div className="w-1/3 relative mx-auto mt-10 text-white">
                         <button
-                            className="w-full bg-blue-400 py-2 px-4 hover:bg-main-darker focus:outline-none border-2 border-main-lighter rounded-xl h-14"
+                            className="w-full bg-blue-400 py-2 px-4 hover:bg-blue-600 focus:outline-none border-2 border-main-lighter rounded-xl h-14"
                             onClick={handleSubmit}
                         >
-                            {isLoading ? "Carregando..." : "Classificar"}
+                            {isLoading ? <ClipLoader size={30} color={"#123abc"} loading={true} speedMultiplier={0.8} /> : "Classificar"}
                         </button>
                     </div>
                     {Object.keys(result).length > 0 && (
@@ -179,7 +184,7 @@ export default function HomeView() {
                             />
                             <div className="w-1/4 relative mx-auto mt-10">
                                 <button
-                                    className="w-full text-white bg-blue-400 py-2 px-4 hover:bg-main-darker focus:outline-none border-2 border-main-lighter rounded-xl h-14"
+                                    className="w-full text-white bg-blue-400 py-2 px-4 hover:bg-blue-600 focus:outline-none border-2 border-main-lighter rounded-xl h-14"
                                     onClick={handleDownloadOutputCSV}
                                 >
                                     Baixar CSV

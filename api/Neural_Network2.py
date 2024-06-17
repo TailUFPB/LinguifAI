@@ -381,7 +381,7 @@ def create_and_train_rnn_model(df, name, epochs = 10, batch_size = 32, learning_
 
         if len(valid_losses) > 2 and all(valid_loss >= loss for loss in valid_losses[-3:]):
             print('Stopping early due to lack of improvement in validation loss.')
-            break
+            # break
 
         train_losses.append(train_loss)
         valid_losses.append(valid_loss)
