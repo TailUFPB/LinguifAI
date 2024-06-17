@@ -92,9 +92,9 @@ export default function AboutView() {
 
                 <h2 className="text-3xl font-bold mb-6">Conheça nossa equipe:</h2>
 
-                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-8">
+                <div className="grid grid-cols-2 xl:grid-cols-3 gap-8">
                     {teamMembers.map((member, index) => (
-                        <div key={index} className="text-center bg-gray-200 p-4 rounded-lg shadow-lg transform transition-transform hover:scale-105">
+                        <div key={index} className="text-center bg-gray-200 w-50 p-4 rounded-lg shadow-lg transform transition-transform hover:scale-105">
                             <img
                                 src={member.photo}
                                 alt={member.name}
