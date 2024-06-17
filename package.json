@@ -51,7 +51,8 @@
     "start-electron": "set ELECTRON_START_URL=http://localhost:3000/ && electron .",
     "pack": "electron-builder --dir",
     "dist": "electron-builder",
-    "electron:package:win": "npm run build && electron-builder -w -c.extraMetadata.main=build/electron.js"
+    "electron:package:win": "npm run build && electron-builder -w -c.extraMetadata.main=build/electron.js",
+    "electron:package:linux": "npm run build && electron-builder -l -c.extraMetadata.main=build/electron.js"
   },
   "eslintConfig": {
     "extends": [
@@ -83,6 +84,12 @@
     "win": {
       "target": [
         "nsis"
+      ]
+    },
+    "linux": {
+      "target": [
+        "AppImage",
+        "deb"
       ]
     },
     "files": [
