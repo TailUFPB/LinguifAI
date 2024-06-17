@@ -1,50 +1,37 @@
 import React from "react";
-import './csvTable.css';
 
 interface Props {
-  head: any[];
+  head: string[];
   data: any[][];
 }
 
 export default function CsvTable({ data, head }: Props) {
   return (
-    <div className="csv-div border-grey">
-      <table className="csv-table min-w-full">
-        <thead>
-          <tr className="rounded-3xl bg-main-darker">
-            {head.map((headTitle, index) => {
-              return (
-                <th key={index} className={`border-grey ${index === 0 ? `` : `border-l-2`}`}>
-                  {headTitle}
-                </th>
-              );
-            })}
+    <div className="overflow-x-auto w-full">
+      <table className="w-full bg-gray-100 border-collapse">
+        <thead className="bg-gray-100 h-[120px]">
+          <tr>
+            {head.map((headTitle, index) => (
+              <th key={index} className="px-4 py-2 text-left border-2 bg-gray-100 border-gray-300 align-top">
+                {headTitle}
+              </th>
+            ))}
           </tr>
         </thead>
         <tbody>
-          {data.map((row, index) => {
-            return (
-              <tr
-                key={index}
-                className={`${
-                  index % 2 ? `bg-main-bold` : `bg-main-medium`
-                } border-t-2`}
-              >
-                {row.map((cell, cellIndex) => {
-                  return (
-                    <td
-                      key={cellIndex}
-                      className={`px-5 py-1 border-grey ${
-                        cellIndex === 0 ? `` : `border-l-2`
-                      }`}
-                    >
+          {data.map((row, rowIndex) => (
+            <tr key={rowIndex} className={"bg-gray-100"}>
+              {
+                row.map((cell, cellIndex) => (
+                  <td key={cellIndex} className="px-4 py-2 text-center border-2 border-gray-300">
+                    <div className="line-clamp-3">
                       {cell}
-                    </td>
-                  );
-                })}
-              </tr>
-            );
-          })}
+                    </div>
+                  </td>
+                ))
+              }
+            </tr>
+          ))}
         </tbody>
       </table>
     </div>

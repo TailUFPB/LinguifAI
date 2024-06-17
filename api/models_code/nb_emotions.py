@@ -1,3 +1,5 @@
+# move?
+
 import pandas as pd
 import pickle
 from sklearn.pipeline import make_pipeline
@@ -25,3 +27,7 @@ pipeline.fit(train_data, train_target)
 # Salvando o pipeline em um arquivo .pkl
 with open("../models/emotion_pipeline.pkl", "wb") as model_file:
     pickle.dump(pipeline, model_file)
+
+
+
+

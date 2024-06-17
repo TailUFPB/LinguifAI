@@ -23,5 +23,5 @@ pipeline = make_pipeline(TfidfVectorizer(), MultinomialNB())
 pipeline.fit(X_train, y_train)
 
 # Salvando o pipeline em um arquivo .pkl
-with open("hate_speech.pkl", "wb") as model_file:
+with open("../models/hate_speech.pkl", "wb") as model_file:
     pickle.dump(pipeline, model_file)

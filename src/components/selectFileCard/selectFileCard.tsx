@@ -2,6 +2,7 @@ import { Icon } from "@iconify/react";
 import { ChangeEvent, useState } from "react";
 import Papa from "papaparse";
 import CsvTable from "../csvTable/csvTable";
+import { Button } from "@mui/material";
 
 interface props {
   selectedFile: File | null;
@@ -12,6 +13,8 @@ interface props {
   setHeader: (header: string[]) => void;
 }
 
+const ITEMS_PER_PAGE = 6;
+
 export default function SelectFileCard({
   selectedFile,
   setSelectedFile,
@@ -21,8 +24,8 @@ export default function SelectFileCard({
   setHeader,
 }: props) {
   const [isDragging, setIsDragging] = useState<boolean>(false);
+  const [currentPage, setCurrentPage] = useState<number>(0);
 
-  // Selecionar arquivo
   const handleFileChange = async (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file && file.name.endsWith(".csv")) {
@@ -32,7 +35,7 @@ export default function SelectFileCard({
         header: true,
         dynamicTyping: true,
         skipEmptyLines: true,
-        complete(results, file) {
+        complete(results) {
           let chaves = Object.keys(results.data[0] || []);
 
           let data: any[][] = results.data.map((row: any) => {
@@ -45,6 +48,7 @@ export default function SelectFileCard({
 
           setData(data);
           setHeader(chaves);
+          setCurrentPage(0); // Reset to first page
         },
       });
     } else {
@@ -52,7 +56,6 @@ export default function SelectFileCard({
     }
   };
 
-  // Arrastar e soltar
   const handleDrop = (event: React.DragEvent<HTMLDivElement>) => {
     setIsDragging(false);
     event.preventDefault();
@@ -66,67 +69,147 @@ export default function SelectFileCard({
   };
 
   const handleDragOver = (event: React.DragEvent<HTMLDivElement>) => {
-    setIsDragging(true); // Quando o usuário arrasta algo para cima
+    setIsDragging(true);
     event.preventDefault();
   };
 
   const handleDragLeave = () => {
-    setIsDragging(false); // Quando o usuário cancela o arrasto
+    setIsDragging(false);
   };
 
-  return (
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+  };
+
+  const displayedData = data.slice(
+    currentPage * ITEMS_PER_PAGE,
+    (currentPage + 1) * ITEMS_PER_PAGE
+  );
+
+  const totalPages = Math.ceil(data.length / ITEMS_PER_PAGE);
+
+  const renderPageNumbers = (): JSX.Element[] => {
+    const pageNumbers: JSX.Element[] = [];
+
+    if (totalPages <= 1) return pageNumbers;
+
+    pageNumbers.push(
+      <button
+        key={0}
+        onClick={() => handlePageChange(0)}
+        className={`mx-1 px-2 py-1 border rounded ${currentPage === 0 ? 'bg-blue-500 text-white' : 'bg-gray-200 text-black'}`}
+      >
+        1
+      </button>
+    );
+
+    if (currentPage > 3) {
+      pageNumbers.push(<span key="start-ellipsis" className="mx-1">...</span>);
+    }
+
+    const startPage = Math.max(1, currentPage - 1);
+    const endPage = Math.min(totalPages - 2, currentPage + 1);
+
+    for (let i = startPage; i <= endPage; i++) {
+      pageNumbers.push(
+        <button
+          key={i}
+          onClick={() => handlePageChange(i)}
+          className={`mx-1 px-2 py-1 border rounded ${currentPage === i ? 'bg-blue-500 text-white' : 'bg-gray-200 text-black'}`}
+        >
+          {i + 1}
+        </button>
+      );
+    }
+
+    if (currentPage < totalPages - 4) {
+      pageNumbers.push(<span key="end-ellipsis" className="mx-1">...</span>);
+    }
+
+    if (totalPages > 1) {
+      pageNumbers.push(
+        <button
+          key={totalPages - 1}
+          onClick={() => handlePageChange(totalPages - 1)}
+          className={`mx-1 px-2 py-1 border rounded ${currentPage === totalPages - 1 ? 'bg-blue-500 text-white' : 'bg-gray-200 text-black'}`}
+        >
+          {totalPages}
+        </button>
+      );
+    }
+
+    return pageNumbers;
+  };
+
+  return !selectedFile ? (
     <div
-      className={`${
-        data.length > 0 ? `w-4/5` : `w-2/5`
-      } relative mx-auto mt-24 bg-main-dark border-2 border-main-lighter text-white pt-4 px-4 placeholder-gray-300 rounded-3xl min-h-min flex flex-col items-center justify-between ${
-        isDragging ? "blur-sm" : ""
-      }`}
+      className={`${data.length > 0 ? `w-4/5` : `w-2/5`
+        } min-h-[170px] relative mx-auto mt-24 bg-gray-100 border-dashed border-2 border-gray-700 text-gray-600 px-4 placeholder-gray-300 rounded-md flex flex-col items-center justify-center gap-4 ${isDragging ? "blur-sm" : ""
+        }`}
       onDrop={handleDrop}
       onDragOver={handleDragOver}
       onDragLeave={handleDragLeave}
     >
-      {isDragging ? (
-        <h2 className="mb-0">Arrastar e soltar</h2>
-      ) : (
+      <Icon
+        icon="ic:outline-upload-file"
+        className="text-gray"
+        width="50"
+      />
+      <h2 className="mb-0">
+        Arraste e solte ou{" "}
+        <a
+          className="underline cursor-pointer"
+          onClick={() => {
+            const fileInput = document.getElementById("fileInput");
+            if (fileInput) {
+              fileInput.click();
+            }
+          }}
+        >
+          selecione do Computador
+        </a>
+        <input
+          type="file"
+          id="fileInput"
+          data-testid="fileInput"
+          style={{ display: "none" }}
+          accept=".csv"
+          onChange={handleFileChange}
+        />
+      </h2>
+      <p className="text-sm text-gray-600">Por favor, selecione um arquivo no formato .csv</p>
+    </div>
+  ) : (
+    <div
+      className={`${data.length > 0 ? `w-4/5` : `w-2/5`
+        } min-h-[170px] relative mx-auto flex flex-col items-center justify-center ${isDragging ? "blur-sm" : ""
+        }`}
+      onDrop={handleDrop}
+      onDragOver={handleDragOver}
+      onDragLeave={handleDragLeave}
+    >
+      {data.length > 0 && (
         <>
-          <Icon
-            icon="ic:outline-upload-file"
-            className=" text-white"
-            width="50"
-          />
-
-          {selectedFile ? ( // se tiver arquivo selecionado, seu nome é exibido
-            <p className="blur-none">{selectedFile.name}</p>
-          ) : (
-            <>
-              <h2 className="mb-0">Arrastar e soltar</h2>
-              <h2 className="mt-0">Ou</h2>
-            </>
-          )}
-
-          {data.length > 0 && (
-            <CsvTable data={data.slice(0, 4)} head={header} />
-          )}
-
-          <button
-            className="border-2 border-main-lighter border-b-0 bottom-0 rounded-3xl rounded-b-none mt-5 py-2 w-3/5 bg-main-medium hover:bg-main-darker"
-            onClick={() => {
-              const fileInput = document.getElementById("fileInput");
-              if (fileInput) {
-                fileInput.click();
-              }
-            }}
-          >
-            Selecionar do Computador
-          </button>
-          <input
-            type="file"
-            id="fileInput"
-            data-testid="fileInput"
-            style={{ display: "none" }}
-            accept=".csv"
-            onChange={handleFileChange}
-          />
+          <CsvTable data={displayedData} head={header} />
+          <div className="flex justify-between mt-4">
+            <Button
+              variant="contained"
+              onClick={() => handlePageChange(currentPage - 1)}
+              disabled={currentPage === 0}
+            >
+              Anterior
+            </Button>
+            <div className="flex items-center">
+              {renderPageNumbers()}
+            </div>
+            <Button
+              variant="contained"
+              onClick={() => handlePageChange(currentPage + 1)}
+              disabled={(currentPage + 1) * ITEMS_PER_PAGE >= data.length}
+            >
+              Próximo
+            </Button>
+          </div>
         </>
       )}
     </div>

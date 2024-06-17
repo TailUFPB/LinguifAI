@@ -2,12 +2,18 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer base {
+  body {
+    font-family: Inter, sans-serif;
+  }
+
+  code,
+  pre {
+    font-family: Menlo, Monaco, Consolas, "Courier New", monospace;
+  }
+}
+
 * {
   margin: 0;
   padding: 0;
-}
-
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
-    monospace;
 }
