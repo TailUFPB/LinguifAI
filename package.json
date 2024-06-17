@@ -5,7 +5,7 @@
     "name": "Cameron",
     "email": "cameron.maloney@warriorlife.net"
   },
-  "version": "0.2.5",
+  "version": "0.2.6",
   "main": "./public/electron.js",
   "homepage": "./",
   "private": true,
