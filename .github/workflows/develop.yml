@@ -124,8 +124,6 @@ jobs:
           name: LinguifAI-Windows
           path: dist/
 
-      - run: tree
-
       - name: Create Release
         id: create_release
         uses: actions/create-release@v1
