@@ -47,7 +47,15 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - run: tree
+      - name: Rename AppImage file
+        run: mv dist/*.AppImage "dist/LinguifAI-${{ steps.project-version.outputs.version }}.AppImage"
+
+      - name: Upload Linux artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: LinguifAI-Linux
+          path: dist/*.AppImage
+
 
 
   build-windows:
