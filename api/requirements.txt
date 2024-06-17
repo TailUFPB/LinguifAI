@@ -8,3 +8,8 @@ numpy==1.26.4
 python-dotenv==1.0.1
 openai==1.33.0
 flask_sse==1.0.0
+langchain==0.2.5
+langchain-community==0.2.5
+tiktoken==0.7.0
+langchain-openai==0.1.8
+faiss-cpu==1.8.0

@@ -175,7 +175,7 @@ export default function TrainView() {
                 const newProgress: number =
                     training_in_progress || training_progress === 100
                         ? training_progress
-                        : 0; // Explicitly type newProgress
+                        : 0;
                 updateLoadingProgress(newProgress);
 
                 setTrainLosses(train_losses);
@@ -186,7 +186,6 @@ export default function TrainView() {
         };
 
         const updateLoadingProgress = (newProgress: number) => {
-            // Explicitly type newProgress parameter
             const duration = 1000;
             const startTime = Date.now();
             const startProgress = prevLoadingProgressRef.current;
@@ -237,6 +236,12 @@ export default function TrainView() {
             });
         }
     }, [trainingCompleted]);
+  
+    const [trainingType, setTrainingType] = useState<string>("nb");
+
+    const handleTrainingTypeChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+        setTrainingType(event.target.value);
+    }
 
     return (
         <div className="p-8 text-center">
@@ -347,6 +352,23 @@ export default function TrainView() {
                     </div>
 
 
+
+                    <div className="w-1/2  mx-auto mt-10 mb-4">
+                        <label htmlFor="trainingType" className="block mb-2">
+                            Tipo de Treinamento
+                        </label>
+                        <select
+                            id="trainingType"
+                            className="w-full border-2 border-gray-500 rounded-xl py-2 px-4 hover:bg-gray-100 focus:outline-none h-14"
+                            onChange={handleTrainingTypeChange}
+                            value={trainingType}
+                        >
+                            <option value="nb">NB (Naive Bayes)</option>
+                            <option value="rnn">RNN (Recurrent Neural Network)</option>
+                        </select>
+                    </div>
+
+
                     <div className="w-1/2 relative mx-auto mt-10">
                         <div className="relative w-full">
                             {isLoading && (
@@ -363,19 +385,11 @@ export default function TrainView() {
                             )}
 
                             {!isLoading && <button
-                                className={`w-2/4 bg-blue-400 text-white py-2 px-4 hover:bg-blue-500 focus:outline-none border-2 border-blue-500 rounded-xl h-14`}
-                                onClick={handleNbSubmit}
+                                className={`w-full bg-blue-400 text-white py-2 px-4 hover:bg-blue-500 focus:outline-none border-2 border-blue-500 rounded-xl h-14`}
+                                onClick={trainingType === "nb" ? handleNbSubmit : handleRnnSubmit}
                                 disabled={isLoading}
                             >
-                                {isLoading ? "Carregando..." : "Treinar NB"}
-                            </button>}
-
-                            {!isLoading && <button
-                                className={`w-2/4 bg-blue-400 text-white py-2 px-4 hover:bg-blue-500 focus:outline-none border-2 border-blue-500 rounded-xl h-14`}
-                                onClick={handleRnnSubmit}
-                                disabled={isLoading}
-                            >
-                                {isLoading ? "Carregando..." : "Treinar RNN"}
+                                {isLoading ? "Carregando..." : "Treinar"}
                             </button>}
 
                             {hasTrained && train_losses.length > 0 && (

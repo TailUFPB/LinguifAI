@@ -4,7 +4,7 @@ import Papa from "papaparse";
 import CsvTable from "../csvTable/csvTable";
 import { Button } from "@mui/material";
 
-interface props {
+interface Props {
   selectedFile: File | null;
   setSelectedFile: (file: File | null) => void;
   setData: (data: any[][]) => void;
@@ -22,7 +22,7 @@ export default function SelectFileCard({
   data,
   header,
   setHeader,
-}: props) {
+}: Props) {
   const [isDragging, setIsDragging] = useState<boolean>(false);
   const [currentPage, setCurrentPage] = useState<number>(0);
 
@@ -56,6 +56,7 @@ export default function SelectFileCard({
     }
   };
 
+  // Handle file drop
   const handleDrop = (event: React.DragEvent<HTMLDivElement>) => {
     setIsDragging(false);
     event.preventDefault();
@@ -63,6 +64,7 @@ export default function SelectFileCard({
     const file = event.dataTransfer.files[0];
     if (file && file.name.endsWith(".csv")) {
       setSelectedFile(file);
+      parseCSV(file);
     } else {
       setSelectedFile(null);
     }
@@ -177,6 +179,7 @@ export default function SelectFileCard({
           onChange={handleFileChange}
         />
       </h2>
+      <p className="text-sm text-gray-600">Por favor, selecione um arquivo no formato .csv</p>
     </div>
   ) : (
     <div

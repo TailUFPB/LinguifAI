@@ -2,10 +2,10 @@
   "name": "LinguifAI",
   "description": "",
   "author": {
-    "name": "TailLinguifAI",
-    "email": ""
+    "name": "Cameron",
+    "email": "cameron.maloney@warriorlife.net"
   },
-  "version": "0.3.8",
+  "version": "0.3.0",
   "main": "./public/electron.js",
   "homepage": "./",
   "private": true,
@@ -53,7 +53,8 @@
     "start-electron": "set ELECTRON_START_URL=http://localhost:3000/ && electron .",
     "pack": "electron-builder --dir",
     "dist": "electron-builder",
-    "electron:package:win": "npm run build && electron-builder -w -c.extraMetadata.main=build/electron.js"
+    "electron:package:win": "npm run build && electron-builder -w -c.extraMetadata.main=build/electron.js",
+    "electron:package:linux": "npm run build && electron-builder -l -c.extraMetadata.main=build/electron.js"
   },
   "eslintConfig": {
     "extends": [
@@ -74,6 +75,8 @@
     ]
   },
   "devDependencies": {
+    "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
+    "@babel/plugin-transform-private-property-in-object": "^7.24.7",
     "concurrently": "^8.2.2",
     "electron": "^26.6.10",
     "electron-builder": "^24.13.3",
@@ -85,6 +88,12 @@
     "win": {
       "target": [
         "nsis"
+      ]
+    },
+    "linux": {
+      "target": [
+        "AppImage",
+        "deb"
       ]
     },
     "files": [
