@@ -17,4 +17,5 @@ RUN npm install
 EXPOSE 3000
 
 # Defina o comando para rodar o servidor
-CMD ["serve", "-s", "build"]
+# build then serve
+CMD ["npm", "run", "build", "&", "serve", "-s", "build", "-l", "3000"]
