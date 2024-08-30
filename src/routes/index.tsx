@@ -15,7 +15,7 @@ export default function Router() {
       path: "/about",
       element: <About />,
     },
-    { path: "*", element: <Navigate to="/404" replace /> },
+    { path: "*", element: <Navigate to="/" replace /> },
     { path: "/404", element: <>404</> },
   ]);
 }
