@@ -2502,11 +2502,6 @@
   resolved "https://registry.npmjs.org/@types/node/-/node-16.18.52.tgz"
   integrity sha512-sm2aph6cRSsTMFYFgI+RpPLunXO9ClJkpizUVdT7KmGeyfQ14xnjTMT/f3MHcfKqevXqGT6BgVFzW8wcEoDUtA==
 
-"@types/node@^18.11.18":
-  version "18.17.17"
-  resolved "https://registry.npmjs.org/@types/node/-/node-18.17.17.tgz"
-  integrity sha512-cOxcXsQ2sxiwkykdJqvyFS+MLQPLvIdwh5l6gNg8qF6s+C7XSkEWOZjK+XhUZd+mYvHV/180g2cnCcIl4l06Pw==
-
 "@types/papaparse@^5.3.1":
   version "5.3.9"
   resolved "https://registry.npmjs.org/@types/papaparse/-/papaparse-5.3.9.tgz"
@@ -4919,15 +4914,6 @@ electron-packager@^17.1.2:
     semver "^7.1.3"
     yargs-parser "^21.1.1"
 
-electron-process@^0.2.0:
-  version "0.2.0"
-  resolved "https://registry.npmjs.org/electron-process/-/electron-process-0.2.0.tgz"
-  integrity sha512-5yeSw7KgpR3Oz2SzHCRbqVbk6nuypJ5fQiEEt3G3kgtCHTO7lBroqTatQ8ftIdPjyshLgh3u33WcXjpivwB6hA==
-  dependencies:
-    lodash "^4.0.0"
-    object-hash "^1.1.0"
-    uuid "^2.0.1"
-
 electron-publish@24.13.1:
   version "24.13.1"
   resolved "https://registry.npmjs.org/electron-publish/-/electron-publish-24.13.1.tgz"
@@ -4945,15 +4931,6 @@ electron-to-chromium@^1.4.668:
   version "1.4.749"
   resolved "https://registry.npmjs.org/electron-to-chromium/-/electron-to-chromium-1.4.749.tgz"
   integrity sha512-LRMMrM9ITOvue0PoBrvNIraVmuDbJV5QC9ierz/z5VilMdPOVMjOtpICNld3PuXuTZ3CHH/UPxX9gHhAPwi+0Q==
-
-electron@^26.6.10:
-  version "26.6.10"
-  resolved "https://registry.npmjs.org/electron/-/electron-26.6.10.tgz"
-  integrity sha512-pV2SD0RXzAiNRb/2yZrsVmVkBOMrf+DVsPulIgRjlL0+My9BL5spFuhHVMQO9yHl9tFpWtuRpQv0ofM/i9P8xg==
-  dependencies:
-    "@electron/get" "^2.0.0"
-    "@types/node" "^18.11.18"
-    extract-zip "^2.0.1"
 
 emittery@^0.10.2:
   version "0.10.2"
@@ -5571,7 +5548,7 @@ express@^4.17.3:
     utils-merge "1.0.1"
     vary "~1.1.2"
 
-extract-zip@^2.0.0, extract-zip@^2.0.1:
+extract-zip@^2.0.0:
   version "2.0.1"
   resolved "https://registry.npmjs.org/extract-zip/-/extract-zip-2.0.1.tgz"
   integrity sha512-GDhU9ntwuKyGXdZBUgTIe+vXnWj0fppUEtMDL0+idd5Sta8TGpHssn/eusA9mrPr9qNDym6SxAYZjNvCn/9RBg==
@@ -7684,7 +7661,7 @@ lodash.uniq@^4.5.0:
   resolved "https://registry.npmjs.org/lodash.uniq/-/lodash.uniq-4.5.0.tgz"
   integrity sha512-xfBaXQd9ryd9dlSDvnvI0lvxfLJlYAZzXomUYzLKtUeOQvOP5piqAWuGtrhWeqaXK9hhoM/iyJc5AV+XfsX3HQ==
 
-lodash@^4.0.0, lodash@^4.17.15, lodash@^4.17.20, lodash@^4.17.21, lodash@^4.7.0:
+lodash@^4.17.15, lodash@^4.17.20, lodash@^4.17.21, lodash@^4.7.0:
   version "4.17.21"
   resolved "https://registry.npmjs.org/lodash/-/lodash-4.17.21.tgz"
   integrity sha512-v2kDEe57lecTulaDIuNTPy3Ry4gLGJ6Z1O3vE1krgXZNrsQ+LFTGHVxVjcXPs17LhbZVGedAJv8XZ1tvj5FvSg==
@@ -8087,11 +8064,6 @@ object-assign@^4.0.1, object-assign@^4.1.1:
   version "4.1.1"
   resolved "https://registry.npmjs.org/object-assign/-/object-assign-4.1.1.tgz"
   integrity sha512-rJgTQnkUnH1sFw8yT6VSU3zD3sWmu6sZhIseY8VX+GRu3P6F7Fu+JNDoXfklElbLJSnc3FUQHVe4cU5hj+BcUg==
-
-object-hash@^1.1.0:
-  version "1.3.1"
-  resolved "https://registry.npmjs.org/object-hash/-/object-hash-1.3.1.tgz"
-  integrity sha512-OSuu/pU4ENM9kmREg0BdNrUDIl1heYa4mBZacJc+vVWz4GtAwu7jO8s4AIt2aGRUTqxykpWzI3Oqnsm13tTMDA==
 
 object-hash@^3.0.0:
   version "3.0.0"
@@ -11139,11 +11111,6 @@ utils-merge@1.0.1:
   version "1.0.1"
   resolved "https://registry.npmjs.org/utils-merge/-/utils-merge-1.0.1.tgz"
   integrity sha512-pMZTvIkT1d+TFGvDOqodOclx0QWkkgi6Tdoa8gC8ffGAAqz9pzPTZWAybbsHHoED/ztMtkv/VoYTYyShUn81hA==
-
-uuid@^2.0.1:
-  version "2.0.3"
-  resolved "https://registry.npmjs.org/uuid/-/uuid-2.0.3.tgz"
-  integrity sha512-FULf7fayPdpASncVy4DLh3xydlXEJJpvIELjYjNeQWYUZ9pclcpvCZSr2gkmN2FrrGcI7G/cJsIEwk5/8vfXpg==
 
 uuid@^8.3.2:
   version "8.3.2"
