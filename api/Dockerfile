@@ -1,11 +1,14 @@
 # Use uma imagem base com Python
 FROM python:3.10.12-slim
 
-# Instale pkg-config e bibliotecas de desenvolvimento HDF5
+# Instale pacotes essenciais para compilação
 RUN apt-get update && \
-    apt-get install -y pkg-config libhdf5-dev && \
-    rm -rf /var/lib/apt/lists/*
-    
+    apt-get install -y \
+    build-essential \
+    pkg-config \
+    libhdf5-dev && \
+    rm -rf /var/lib/apt/lists/**
+
 # Define o diretório de trabalho
 WORKDIR /app
 
