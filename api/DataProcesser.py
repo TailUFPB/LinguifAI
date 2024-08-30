@@ -55,18 +55,18 @@ class DataProcesser():
         if os.path.exists('assets/tweet_emotions.csv'):
             prefix = ''
         else:
-            prefix = 'public/'
+            prefix = 'default_models/'
         if model_name=="emotion_pipeline.pkl":
-            df = pd.read_csv(prefix + 'assets/tweet_emotions.csv')
+            df = pd.read_csv(prefix + 'tweet_emotions.csv')
             train_data, test_data, train_target, test_target = train_test_split(df['content'], df['sentiment'], test_size=0.2, shuffle=True)
         elif model_name=="hate_speech.pkl":
-            df = pd.read_csv(prefix + 'assets/nb_hatespeech.csv', sep=';')
+            df = pd.read_csv(prefix + 'nb_hatespeech.csv', sep=';')
             train_data, test_data, train_target, test_target = train_test_split(df['comment'], df['isHate'], test_size=0.2, shuffle=True)
         elif model_name=="text_classification_pipeline.pkl":
-            df = pd.read_csv(prefix + 'assets/nb_news.csv')
+            df = pd.read_csv(prefix + 'nb_news.csv')
             train_data, test_data, train_target, test_target = train_test_split(df['short_description'], df['category'], test_size=0.2, shuffle=True)
         else:
-            with open(f'api/models/{model_name}', 'rb') as file:
+            with open(f'models/{model_name}', 'rb') as file:
                 return pickle.load(file), True
         return make_pipeline(TfidfVectorizer(), MultinomialNB()).fit(train_data, train_target), False
 
@@ -106,7 +106,7 @@ class DataProcesser():
 
     def pretrained_predict(self, df, pipeline, model_name = None):
         if model_name: 
-            label_map_filename = f"api/encoders/LabelMapping-{model_name.split('_')[0]}.joblib"
+            label_map_filename = f"encoders/LabelMapping-{model_name.split('_')[0]}.joblib"
             label_encoder = joblib.load(label_map_filename)
 
         texts_to_predict = df['input_column']
@@ -123,7 +123,7 @@ class DataProcesser():
         return df
 
     def load_weights_and_model(self, name):
-        model_filename = os.path.join("api", "models", name)
+        model_filename = os.path.join("models", name)
         if os.path.exists(model_filename):
             model = torch.load(model_filename)
             return model
@@ -131,10 +131,10 @@ class DataProcesser():
             raise FileNotFoundError(f"Model file '{model_filename}' not found.")
 
     def trained_predict(self, df, model_name):
-        label_map_filename = f"api/encoders/LabelMapping-{model_name}.joblib"
+        label_map_filename = f"encoders/LabelMapping-{model_name}.joblib"
         label_encoder = joblib.load(label_map_filename)
 
-        vocab_file = f"api/encoders/Vocab-{model_name}.joblib"
+        vocab_file = f"encoders/Vocab-{model_name}.joblib"
         token2id = joblib.load(vocab_file)
 
         model = self.load_weights_and_model(model_name)

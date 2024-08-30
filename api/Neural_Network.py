@@ -54,7 +54,7 @@ class CustomDataset:
         label_encoder = LabelEncoder()
         self.encoded_labels = label_encoder.fit_transform(df['labels'])
         encoder_name = f"LabelMapping-{name}.joblib"
-        encoder_filename = os.path.join("api", "encoders", encoder_name)
+        encoder_filename = os.path.join("encoders", encoder_name)
         os.makedirs(os.path.dirname(encoder_filename), exist_ok=True)
         joblib.dump(label_encoder, encoder_filename)
 
@@ -90,7 +90,7 @@ def create_and_train_nb_model(df, name, epochs = 10, batch_size = 16, learning_r
     print(f'Test Report:\n{classification_report(y_test, test_preds)}')
 
     # Saving the pipeline to a file
-    model_path = os.path.join('api', 'models', f"{name}_pipeline.pkl")
+    model_path = os.path.join('models', f"{name}_pipeline.pkl")
     os.makedirs(os.path.dirname(model_path), exist_ok=True)
     with open(model_path, "wb") as model_file:
         pickle.dump(pipeline, model_file)

@@ -75,7 +75,7 @@ class CustomDataset(Dataset):
         self.token2idx['<PAD>'] = max(self.token2idx.values()) + 1
 
         vocab_filename = f"Vocab-{name}"
-        vocab_file = os.path.join("api", "encoders", f"{vocab_filename}.joblib")
+        vocab_file = os.path.join("encoders", f"{vocab_filename}.joblib")
         os.makedirs(os.path.dirname(vocab_file), exist_ok=True)
         joblib.dump(self.token2idx, vocab_file)
 
@@ -88,7 +88,7 @@ class CustomDataset(Dataset):
         label_encoder = LabelEncoder()
         df['encoded_labels'] = label_encoder.fit_transform(df['labels'])
         encoder_name = f"LabelMapping-{name}"
-        encoder_filename = os.path.join("api", "encoders", f"{encoder_name}.joblib")
+        encoder_filename = os.path.join("encoders", f"{encoder_name}.joblib")
         os.makedirs(os.path.dirname(encoder_filename), exist_ok=True)
         joblib.dump(label_encoder, encoder_filename)
 
@@ -400,7 +400,7 @@ def create_and_train_rnn_model(df, name, epochs = 10, batch_size = 32, learning_
 
     # Finalizar e salvar o modelo se não foi cancelado
     if not canceled:
-        model_path = os.path.join('api', 'models', name)
+        model_path = os.path.join('models', name)
         os.makedirs(os.path.dirname(model_path), exist_ok=True)
         #torch.save(model.state_dict(), model_path)
         torch.save(model, model_path)
