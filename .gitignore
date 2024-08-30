@@ -20,9 +20,9 @@ api/__pycache__/
 api/.env
 .env
 .env.local
-.env.development.local
 .env.test.local
-.env.production.local
+.env.development
+.env.production
 
 # log files
 npm-debug.log*
