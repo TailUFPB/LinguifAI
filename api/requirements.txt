@@ -22,5 +22,5 @@ torchtext==0.15.2
 langchain==0.2.15
 langchain-community==0.2.14
 langchain-openai==0.1.23
-torch==2.2.2
+torch==2.0.1
 openai==1.43.0
