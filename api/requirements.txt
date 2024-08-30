@@ -18,8 +18,9 @@ matplotlib==3.7.1
 seaborn==0.13.0
 tensorflow==2.16.1
 keras==3.0.0
-torchtext==0.17.2
+torchtext==0.15.2
 langchain==0.2.15
 langchain-community==0.2.14
 langchain-openai==0.1.23
+torch==2.2.2
 openai==1.43.0
