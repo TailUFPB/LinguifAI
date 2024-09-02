@@ -13,7 +13,8 @@ RUN apt-get update && \
 WORKDIR /app
 
 # Copie o requirements.txt para o container
-COPY api/requirements.txt .
+COPY api/. .
+
 
 RUN pip install --upgrade pip
 
@@ -24,3 +25,4 @@ RUN pip install --no-cache-dir -r requirements.txt
 EXPOSE 5000
 
 # Comando padrão pode ser substituído pelo docker-compose
+CMD ["python", "app.py"]
